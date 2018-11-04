@@ -1,0 +1,571 @@
+/*
+  sta.dlg
+
+*! VERSION 1.1.1  11may2018
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_medium
+DEFINE _dlght 345
+INCLUDE header
+HELP hlp1, view("help sta")
+RESET res1
+
+DEFINE _var_w 	120
+DEFINE _y_vars  120
+DEFINE _gb2   	260
+DEFINE _col1   	150
+DEFINE _col2   	290
+DEFINE _y_nst 	285
+DEFINE _x _lft
+DEFINE _y _top
+DEFINE _cx 100
+
+DIALOG main, label("sta - Association Measures") tabtitle("Main")
+BEGIN
+	GROUPBOX	gb_data	_lft	_top	220		110, label("Data type")
+	RADIO		rb_freq	_ilft	_ss		200		., label("Frequency data (unpaired)") first default(1)	/*
+										*/			onclickon(program type_freq) option(data(freq))
+	RADIO		rb_pt	_ilft	_ss		200		., label("Person-time data (unpaired)") middle 			/*
+										*/			onclickon(program type_pt) option(data(pt))
+	RADIO		rb_pair	_ilft	_ss		200		., label("Paired data") last onclickon(program type_paired) option(data(paired))
+
+	GROUPBOX	gb_st	_gb2	_top	150		110, label("Study type")
+	RADIO		rb_cs	+5		_ss		140		., label("Cross-Sectional") first default(1)	/*
+										*/			onclickon(program st_co) option(st(cs))
+	RADIO		rb_co	@		_ss		140		., label("Cohort") middle onclickon(program st_co) option(st(co))
+	RADIO		rb_ex	@		_ss		140		., label("Experimental") middle onclickon(program st_co) option(st(ex))
+	RADIO		rb_cc	@		_ss		140		., label("Case-Control") last onclickon(program st_cc) option(st(cc))
+
+	TEXT  		tx_resp  	_lft   	_y_vars	_var_w	., label("Response variable:")
+	VARNAME		v_resp	  	@    	_ms		_var_w	., label("Response variable") numeric
+	TEXT  		tx_exp   	_col1   _y_vars	_var_w	., label("Exposure variable:")
+	VARNAME		v_exp	  	@		_ms		_var_w	., label("Exposure variable") numeric
+	TEXT  		tx_pt    	_col2	_y_vars	_var_w	., label("Person-Time variable:")
+	VARNAME		v_pt		@		_ms		_var_w	., label("Person-Time variable") numeric
+
+	CHECKBOX    cb_tables   _lft	_ms		150		., default(1) label("Show 2x2 tables")
+	CHECKBOX    cb_rare  	_gb2   @	    120		., label("Rare disease") option(rare)
+	CHECKBOX    cb_det  	_lft    _ss		280		., default(0) onclickon(program detail_on) onclickoff(program detail_off) /*
+												*/		label("Display additional statistics") option(detail)
+	CHECKBOX    cb_relsym  	@    	@		280		., default(0) label("Relative simmetry") option(relatsymm)
+	
+	GROUPBOX	gb_xtr		_lft	205		400		80,
+	GROUPBOX	gb_xtr2		_lft	205		400		50,
+	EDIT		ed_pe		40		_ss		80		., numonly label("Proportion of exposed") option(pe)
+	TEXT  		tx_pe 		+85  	@ 		250  	., label("Proportion of exposed in the population")
+	TEXT  		tx_OR 		_ilft  	_ms		20  	., label("OR")
+	EDIT		ed_r		40		@		80		., numonly label("Proportion of exposed") option(r)
+	TEXT  		tx_r 		+85  	@ 		250  	., label("Proportion of cases in the population")
+	
+	GROUPBOX	gb_nst		_lft  	_y_nst	400    60, label("Name of the study")
+	EDIT		ed_nst		_ilft   _ms	 	380		., option(nst)
+END
+
+INCLUDE ifin
+
+DIALOG opt, tabtitle("Options")
+BEGIN
+	INCLUDE _sp_level
+
+	CHECKBOX    cb_str  	_lft	40		120		., default(0) onclickon(program stratify_on) 	/*
+												*/		onclickoff(program stratify_off) 			/*
+												*/		label("Stratify on variable:")
+	VARNAME		v_str	 	_lft 	_ss  	120 	., label("Stratum variable") numeric option(by)
+
+	GROUPBOX	gb_method	_lft	85		180		110, label("Within-stratum weights")
+	RADIO		rb_mh		+5		_ss		170		., label("Mantel-Haenszel") first default(1) option(method(mh))
+	RADIO		rb_iv		@		_ss		170		., label("Inverse of variance") middle option(method(iv))
+	RADIO		rb_is		@		_ss		170		., label("Internal Std.") middle option(method(is))
+	RADIO		rb_es		@		_ss		170		., label("External Std.") last option(method(es))
+
+	GROUPBOX	gb_zero		220		85		180		110, label("Zero-cell correction")
+	RADIO		rb_n		+5		_ss		170		., label("None") first default(1) option(zero(n))
+	RADIO		rb_c		@		_ss		170		., label("Constant") middle option(zero(c))
+	RADIO		rb_p		@		_ss		170		., label("Proportional") middle option(zero(p))
+	RADIO		rb_r		@		_ss		170		., label("Reciprocal") last option(zero(r))
+
+	GROUPBOX	gb_ci		_lft	200		180		90, label("Confidence interval type")
+	RADIO		rb_wil		+5		_ss		170		., label("Wilson") first default(1) option(wilson)
+	RADIO		rb_ex		@		_ss		170		., label("Exact") middle option(exact)
+	RADIO		rb_wald		@		_ss		170		., label("Wald") last option(wald)
+	
+	GROUPBOX	gb_orci		_lft	200		180		90, label("Odds Ratio")
+	RADIO		rb_exact	+5		_ss		170		., label("Exact confidence intervals") first default(1)
+	RADIO		rb_corn		@		_ss		170		., label("Cornfield approximation") middle option(cornfield)
+	RADIO		rb_woolf	@		_ss		170		., label("Woolf approximation") last option(woolf)
+
+	GROUPBOX	gb_assoc	220		200		190		70, label("Association chi-square type")
+	RADIO		rb_pearson	+5		_ss		180		., label("Pearson") first default(1) option(pearson)
+	RADIO		rb_chi_mh	@		_ss		180		., label("Mantel-Haenszel") last option(mh)
+	
+	CHECKBOX    cb_nnt		_lft	290    300		., label("Compute Number Needed to Treat (NNT)") 	/*
+												*/		onclickon(program nnt_on) onclickoff(program nnt_off)
+	EDIT		ed_nnt		+20    	+20    	20		., numonly label("Code of good outcome") option(nnt) default(1)
+	TEXT  		tx_nnt   	+25     @ 		200		., label("Code of good outcome")
+END
+
+
+PROGRAM type_freq
+BEGIN
+	call program show_st
+	call program enable_disable_st
+	
+	call program set_var_names
+	call program hide_pt
+
+	call program show_str
+
+	if !opt.cb_str {
+		call program show_ci_p_zero
+	}
+	else {
+		call program hide_ci_p
+		call program show_zero
+		if main.rb_cc {
+			call program show_or_ci
+		}
+		else {
+			call program hide_or_ci
+		}
+	}
+	
+	call main.cb_det.show
+	call main.cb_relsym.hide
+END
+
+PROGRAM type_pt
+BEGIN
+	call program hide_st
+	call program show_pt
+
+	call program hide_ci_p
+	call program hide_zero
+	
+	call program show_str
+
+	call main.cb_det.show
+	call main.cb_relsym.hide
+	
+	call program hide_nnt
+	call program hide_or_ci
+END
+
+PROGRAM type_paired
+BEGIN
+	call program hide_st
+	call program hide_pt
+	call program set_var_names
+
+	call program hide_rpe
+	call program hide_ci_p
+	call program hide_zero
+	call program hide_nnt
+	
+	call program hide_str
+
+	call main.cb_det.hide
+	call main.cb_relsym.show
+	
+	call program hide_or_ci
+END
+
+PROGRAM hide_str
+BEGIN
+	call opt.cb_str.hide
+	call opt.v_str.hide
+	call opt.gb_method.hide
+	call opt.rb_mh.hide
+	call opt.rb_iv.hide
+	call opt.rb_is.hide
+	call opt.rb_es.hide
+END
+
+PROGRAM show_str
+BEGIN
+	call opt.cb_str.show
+	call opt.v_str.show
+	call opt.gb_method.show
+	call opt.rb_mh.show
+	call opt.rb_iv.show
+	call opt.rb_is.show
+	call opt.rb_es.show
+	call opt.cb_str.setoff
+END
+
+PROGRAM st_co
+BEGIN
+	if opt.cb_str {
+		call program hide_rpe
+		call program hide_or_ci
+	}
+	else {
+		if main.cb_det {
+			call program show_pe
+		}
+		else {
+			call program hide_rpe
+		}
+	}
+	
+	if main.rb_ex {
+		call program show_nnt
+	}
+	else {
+		call program hide_nnt
+	}
+	
+	call main.cb_rare.hide
+END
+
+PROGRAM st_cc
+BEGIN
+	if !opt.cb_str {
+		call program show_rpe
+	}
+	
+	if opt.cb_str {
+		call program show_or_ci
+	}
+	
+	if main.cb_det {
+		call main.cb_rare.show
+	}
+	else {
+		call main.cb_rare.hide
+	}
+	
+	call program hide_nnt
+END
+
+PROGRAM detail_on
+BEGIN
+	if main.rb_freq {
+		if !main.rb_cc {
+			call main.cb_rare.hide
+			if !opt.cb_str {
+				call program show_pe
+			}
+		}
+		else {
+			if !opt.cb_str {
+				call main.cb_rare.show
+			}
+		}
+	}
+	if main.rb_pt & !opt.cb_str {
+		call program show_pe
+	}	
+END
+
+PROGRAM detail_off
+BEGIN
+	call main.cb_rare.hide
+	if !(main.rb_freq & main.rb_cc) {
+		call program hide_rpe
+	}
+END
+
+PROGRAM stratify_on
+BEGIN
+	call opt.v_str.enable
+	call opt.gb_method.enable
+	call opt.rb_mh.enable
+	call opt.rb_iv.enable
+	call opt.rb_is.enable
+	call opt.rb_es.enable
+	
+	call program hide_ci_p
+	call program enable_disable_st
+
+	call main.cb_det.setoff
+	call main.cb_det.disable
+	call program hide_rpe
+	
+	if main.rb_cc & main.rb_freq {
+		call program show_or_ci
+	}
+END
+
+PROGRAM stratify_off
+BEGIN
+	call opt.v_str.disable
+	call opt.gb_method.disable
+	call opt.rb_mh.disable
+	call opt.rb_iv.disable
+	call opt.rb_is.disable
+	call opt.rb_es.disable
+
+	if main.rb_freq {
+		call program show_ci_p_zero
+		call program enable_disable_st
+	}
+	call main.cb_det.enable
+	
+	if main.rb_cc {
+		call program show_rpe
+	}
+	call program hide_or_ci
+END
+
+PROGRAM show_or_ci
+BEGIN
+	call opt.gb_orci.show
+	call opt.rb_exact.show
+	call opt.rb_corn.show
+	call opt.rb_woolf.show
+END
+
+PROGRAM hide_or_ci
+BEGIN
+	call opt.gb_orci.hide
+	call opt.rb_exact.hide
+	call opt.rb_corn.hide
+	call opt.rb_woolf.hide
+END
+
+PROGRAM show_pe
+BEGIN
+	call main.gb_xtr.hide
+	call main.gb_xtr2.show
+	call main.ed_pe.show
+	call main.tx_pe.show
+	call main.tx_OR.hide
+	call main.ed_r.hide
+	call main.tx_r.hide
+END
+
+PROGRAM show_rpe
+BEGIN
+	call main.gb_xtr.show
+	call main.gb_xtr2.hide
+	call main.ed_pe.show
+	call main.tx_pe.show
+	call main.tx_OR.show
+	call main.ed_r.show
+	call main.tx_r.show
+END
+
+PROGRAM hide_rpe
+BEGIN
+	call main.gb_xtr.hide
+	call main.gb_xtr2.hide
+	call main.ed_pe.hide
+	call main.tx_pe.hide
+	call main.tx_OR.hide
+	call main.ed_r.hide
+	call main.tx_r.hide
+END
+
+PROGRAM show_ci_p_zero
+BEGIN
+	call opt.gb_ci.show
+	call opt.rb_wil.show
+	call opt.rb_wil.seton
+	call opt.rb_ex.show
+	call opt.rb_wald.show
+	
+	call opt.gb_assoc.show
+	call opt.rb_pearson.show
+	call opt.rb_pearson.seton
+	call opt.rb_chi_mh.show
+	
+	call program show_zero
+END
+
+PROGRAM show_zero
+BEGIN
+	call opt.gb_zero.show
+	call opt.rb_n.show
+	call opt.rb_n.seton
+	call opt.rb_c.show
+	call opt.rb_p.show
+	call opt.rb_r.show
+END
+
+PROGRAM hide_zero
+BEGIN
+	call opt.gb_zero.hide
+	call opt.rb_n.hide
+	call opt.rb_n.hide
+	call opt.rb_c.hide
+	call opt.rb_p.hide
+	call opt.rb_r.hide
+END
+
+PROGRAM hide_ci_p
+BEGIN
+	call opt.gb_ci.hide
+	call opt.rb_wil.hide
+	call opt.rb_ex.hide
+	call opt.rb_wald.hide
+	
+	call opt.gb_assoc.hide
+	call opt.rb_pearson.hide
+	call opt.rb_chi_mh.hide
+END
+
+PROGRAM hide_pt
+BEGIN
+	call main.tx_pt.hide
+	call main.v_pt.hide
+END
+
+PROGRAM show_pt
+BEGIN
+	call main.tx_pt.show
+	call main.v_pt.show
+END
+
+PROGRAM show_st
+BEGIN
+	call main.gb_st.show
+	call main.rb_cs.show
+	call main.rb_co.show
+	call main.rb_ex.show
+	call main.rb_cc.show
+END
+
+PROGRAM hide_st
+BEGIN
+	call main.gb_st.hide
+	call main.rb_cs.hide
+	call main.rb_co.hide
+	call main.rb_ex.hide
+	call main.rb_cc.hide
+END
+
+PROGRAM enable_disable_st
+BEGIN
+	if opt.cb_str {
+		call main.rb_cs.disable
+		call main.rb_ex.disable
+		if !main.rb_cc {
+			call main.rb_co.seton
+		}
+	}
+	else {
+		call main.rb_cs.enable
+		call main.rb_ex.enable
+	}
+END
+
+PROGRAM set_var_names
+BEGIN
+	if main.rb_freq | main.rb_pt {
+		call main.tx_resp.setlabel "Response variable:"
+		call main.tx_exp.setlabel "Exposure variable:"
+	}
+	if main.rb_pair {
+		call main.tx_resp.setlabel "Y variable:"
+		call main.tx_exp.setlabel "X variable:"
+	}
+END
+
+PROGRAM hide_nnt
+BEGIN
+	call opt.cb_nnt.hide
+	call opt.ed_nnt.hide
+	call opt.tx_nnt.hide
+END
+
+PROGRAM show_nnt
+BEGIN
+	call opt.cb_nnt.show
+	call opt.ed_nnt.show
+	call opt.tx_nnt.show
+END
+
+PROGRAM nnt_off
+BEGIN
+	call opt.tx_nnt.disable
+	call opt.ed_nnt.disable
+END
+
+PROGRAM nnt_on
+BEGIN
+	call opt.tx_nnt.enable
+	call opt.ed_nnt.enable
+END
+
+
+PROGRAM command
+BEGIN
+	put "sta "
+	if main.rb_pt {
+		//Person-time data
+		require main.v_exp main.v_resp main.v_pt
+		put main.v_resp " " main.v_exp " " main.v_pt
+	}
+	else{
+		//Frequency or paired data
+		require main.v_exp main.v_resp
+		put main.v_resp " " main.v_exp
+	}
+	
+	put " " /program ifin_output
+	
+	beginoptions
+		option radio(main rb_freq rb_pt rb_pair)			//data
+		if main.rb_freq | main.rb_pt {
+			if main.rb_freq {
+				option radio(main rb_cs rb_co rb_ex rb_cc)	//st
+			}
+
+			option main.cb_det		//detail
+			
+			//Stratified
+			if opt.cb_str {
+				optionarg opt.v_str							//by
+				option radio(opt rb_mh rb_iv rb_es rb_is)	//method
+				if main.rb_freq & main.rb_cc {
+					option radio(opt rb_corn rb_woolf)		//cornfield|woolf OR CI
+				}
+			}
+						
+			if main.rb_freq {
+				if !opt.cb_str {
+					if !opt.rb_wil {
+						option radio(opt rb_wil rb_ex rb_wald)				//wilson|exact|wald CI
+					}
+					if !opt.rb_pearson {
+						option radio(opt rb_pearson rb_chi_mh)				//pearson|mh chi
+					}
+					
+					if opt.cb_nnt {
+						optionarg opt.ed_nnt			//nnt
+					}
+				}
+				if main.rb_cc {
+					if main.cb_det  {
+						option main.cb_rare					//rare (cc only)
+					}
+				}
+				optionarg main.ed_pe		//pe
+				optionarg main.ed_r			//r
+				
+				if !opt.rb_n {
+					option radio(opt rb_c rb_p rb_r)					//zero
+				}
+			}
+			if main.rb_pt {
+				optionarg main.ed_pe		//pe
+			}
+		}
+		
+		if main.rb_pair {
+			option main.cb_relsym	//relatsym (paired data only)
+		}
+
+		if !main.cb_tables {
+			put " notables"			//notables
+		}
+
+		INCLUDE _level_opt_pr		//level
+
+		optionarg main.ed_nst		//nst
+	endoptions
+END
+

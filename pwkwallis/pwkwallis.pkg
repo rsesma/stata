@@ -1,0 +1,15 @@
+v 3
+d pwkwallis.  Kruskal-Wallis equality-of-populations rank test & pairwise comparisons
+d After installation, see help pwkwallis.
+d
+d (c)JM. Domenech
+d Programmer: R. Sesma
+d Laboratori d'Estadistica Aplicada, Universitat Autonoma de Barcelona.
+d
+d Distribution-Date:  13jun2017
+d Version 1.0.7 (13jun2017)
+d
+d E-mail: stata@graunt.cat
+f pwkwallis.ado
+f pwkwallis.sthlp
+f pwkwallis.dlg

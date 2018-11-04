@@ -1,0 +1,75 @@
+/*
+  cohenkap.dlg
+
+*! VERSION 1.1.1  04may2018
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_msmall
+INCLUDE header
+HELP hlp1, view("help cohenkap")
+RESET res1
+
+DEFINE _y_vars   10
+DEFINE _var_inc +25
+DEFINE _ratX    225
+DEFINE _y_nst 	150
+DEFINE _var_w 	120
+DEFINE _x _lft
+DEFINE _y 90
+DEFINE _cx 100
+
+DIALOG main, label("cohenkap - Weighted kappa") tabtitle("Main")
+BEGIN
+	TEXT  		tx_ratY	_lft  _y_vars   _var_w	., label("Rater Y variable:") left
+	VARNAME		v_ratY	  @   _var_inc	_var_w  ., label("Rater Y variable")
+	TEXT  		tx_ratX _ratX _y_vars   _var_w	., label("Rater X variable:") left
+	VARNAME		v_ratX	  @	  _var_inc  _var_w  ., label("Rater X variable")
+
+	CHECKBOX	cb_order _lft	_ls		250	  	., label("Ordered categories")
+	INCLUDE _sp_level
+	COMBOBOX	co_me	_lft	_mls	70	 ., dropdownlist contents(ci_descrip) default("Wilson") values(ci_values)
+	TEXT  		tx_me 	+72	 	@ 		310  ., label("method to calculate confidence intervals for proportions") left
+	
+	GROUPBOX	gb_nst	_lft  	_y_nst	370    60, label("Name of the study")
+	EDIT		ed_nst	_ilft   _ms	 	350		., option(nst)
+END
+
+INCLUDE byifin
+
+LIST ci_descrip
+	BEGIN
+		Wilson
+		Exact
+		Wald
+	END
+
+LIST ci_values
+	BEGIN
+		wilson
+		exact
+		wald
+	END
+
+	
+PROGRAM command
+BEGIN
+	INCLUDE _by_pr
+	put "cohenkap "
+	require main.v_ratY main.v_ratX
+	put main.v_ratY " " main.v_ratX
+	INCLUDE _ifin_pr
+	beginoptions
+		if main.cb_order {
+			put " ordered"
+		}
+		if !main.co_me.iseq("wilson") {
+			put main.co_me
+		}
+		INCLUDE _level_main_pr
+		optionarg main.ed_nst
+	endoptions
+END
+

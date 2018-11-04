@@ -1,0 +1,1954 @@
+/*
+nsize
+*! VERSION 1.2.8  11may2018
+*/
+VERSION 12.0
+
+DEFINE _dlgw   370
+DEFINE _dlgh   410
+
+POSITION . . _dlgw _dlgh
+
+HELP   hlp1, view("help nsize")
+RESET  res1
+COPY  cop1
+OK ok1, label("OK")
+CANCEL can1, label("Cancel")
+SUBMIT sub1, label("Submit")
+
+DEFINE _top     10
+DEFINE _left    10
+DEFINE _radiow 280
+DEFINE _vinc   +20
+DEFINE _vinc2  +25
+DEFINE _hinc   +10
+DEFINE _xlb     15
+DEFINE _lbw    240
+DEFINE _xed    260
+DEFINE _edw     50
+DEFINE _xp     318
+DEFINE _pw      30
+DEFINE _y_c1    30
+DEFINE _y_c2    55
+DEFINE _y_c3    80
+DEFINE _y_c4   105
+DEFINE _y_c5   130
+DEFINE _y_c6   155
+DEFINE _y_c7   180
+DEFINE _ainc   +40
+DEFINE _gbinc  +40
+DEFINE _gbw    345
+DEFINE _gbinc2 +50
+DEFINE _gbh5   245
+DEFINE _gbh1    55
+DEFINE _gbh2    80
+
+DIALOG main, label("nsize - Sample Size & Power") tabtitle("Main")
+BEGIN
+	GROUPBOX gb_type _left _top _gbw 310, label("Type")
+	LISTBOX types_lb _hinc _vinc 320 260, contents(types) values(types_val) onselchangelist(list_actions)
+    GROUPBOX gb_nst _left 340 _gbw 55, label("Name of the study")
+	TEXT  nst_lb _hinc _vinc 30  ., label("Label:")
+	EDIT  nst      +40    @ 280  ., option(nst)
+END
+
+LIST types
+BEGIN
+	Comparison of one proportion to a reference (non equal)
+	Comparison of two proportions (non equal)
+	Comparison of one proportion to a reference (equivalence)
+	Comparison of two proportions (equivalence)
+	Comparison of paired proportions (matched)
+	Comparison of one mean to a reference (non equal)
+	Comparison of two means (non equal)
+	Comparison of two means (equivalence)
+	Comparison of k means (ANOVA)
+	Estimation of population proportion
+	Estimation of the difference between 2 proportions
+	Estimation of population mean
+	Estimation of the difference between 2 means
+	Comparison of one correlation to a reference
+	Comparison of two correlations
+	Comparison of two risks - Cohort risk studies
+	Comparison of two risks - Case-Control studies
+	Comparison of two rates
+	Number of communities (Risk): Intervention trials
+END
+
+DIALOG opt, tabtitle("Options")
+BEGIN
+	GROUPBOX gb_common _left _top _gbw _gbh5
+	TEXT  c1_d	_xlb _y_c1 _lbw  ., right
+	EDIT  c1    _xed   @   _edw  ., numonly
+	TEXT  c1_p	_xp  _y_c1 _pw   .
+	TEXT  c2_d	_xlb _y_c2 _lbw  ., right
+	EDIT  c2    _xed   @   _edw  ., numonly
+	TEXT  c2_p	_xp  _y_c2 _pw   .
+	TEXT  c3_d	_xlb _y_c3 _lbw  ., right
+	EDIT  c3    _xed   @   _edw  ., numonly
+	TEXT  c3_p	_xp  _y_c3 _pw   .
+	TEXT  c4_d	_xlb _y_c4 _lbw  ., right
+	EDIT  c4    _xed   @   _edw  ., numonly
+	TEXT  c4_p	_xp  _y_c4 _pw   .
+	TEXT  c5_d	_xlb _y_c5 _lbw  ., right
+	EDIT  c5    _xed   @   _edw  ., numonly
+	TEXT  c5_p	_xp  _y_c5 _pw   .
+	TEXT  c6_d	_xlb _y_c6 _lbw  ., right
+	EDIT  c6    _xed   @   _edw  ., numonly
+	TEXT  c6_p	_xp  _y_c6 _pw   .
+	TEXT  c7_d	_xlb _y_c7 _lbw  ., right
+	EDIT  c7    _xed   @   _edw  ., numonly
+	TEXT  c7_p	_xp  _y_c7 _pw   .
+	TEXT  a_d   _xlb 220   _lbw  ., right
+	EDIT  a     _xed   @   _edw  ., numonly default(5)
+	TEXT  a_p	_xp    @   _pw   .
+	CHECKBOX size _left 235 _gbw 55, label("Sample Size") groupbox onclickon(program size_click) onclickoff(program size_clickoff)
+	TEXT  b_d   _xlb 255   _lbw  ., right
+	EDIT  b     _xed   @   _edw  ., default("20 15 10")
+	TEXT  b_p	_xp    @   _pw   .
+	CHECKBOX power _left 295 _gbw _gbh2, label("Power") groupbox onclickon(program power_click)
+	TEXT  p1_d  _xlb 315   _lbw  ., right
+	EDIT  p1    _xed   @   _edw  ., numonly
+	TEXT  p1_p	_xp    @   _pw   .
+	TEXT  p2_d  _xlb 340   _lbw  ., right
+	EDIT  p2    _xed   @   _edw  ., numonly
+	TEXT  p2_p	_xp    @   _pw   .
+	CHECKBOX simul _left 75 _gbw _gbh2, label("k Simultaneous comparisons") groupbox onclickon(program simul_click)
+	TEXT  m_d +10  _vinc  130  ., left label("List of hypothetical means:")
+	EDIT  m    @   _vinc2 290  ., label("List of hypothetical means") option(means)
+	TEXT  m_p _xp    @    _pw  ., label("means")
+	CHECKBOX pair _left _gbinc _gbw _gbh2, label("c Pairwise comparisons") groupbox onclickon(program pair_click)
+	TEXT  ef_d	_xlb _vinc2 _lbw  ., right label("Minimum expected effect size:")
+	EDIT  ef    _xed   @    _edw  ., numonly label("Minimum expected effect size") option(effect)
+	TEXT  ef_p  _xp    @    _pw   ., label("effect")
+	TEXT  c_d	_xlb _vinc2 _lbw  ., right label("Number of pairwise comparisons:")
+	EDIT  c     _xed   @    _edw  ., numonly label("Number of pairwise comparisons") option(c)
+	TEXT  c_p   _xp    @    _pw   ., label("c")
+	CHECKBOX powerk _left _gbinc _gbw _gbh2, label("Power") groupbox onclickon(program powerk_on) onclickoff(program powerk_off)
+	TEXT  nk_d +10  _vinc   130  ., left label("Sample size (by group):")
+	EDIT  nk    @   _vinc2  290  ., label("Sample size (by group)") option(nk)
+	TEXT  nk_p _xp    @     _pw  ., label("nk")
+	CHECKBOX apre _left 100 _gbw _gbh2, label("Sample Size") groupbox onclickon(program apre_click)
+	TEXT  ap_d +10  _vinc  200  ., left label("List of CI absolute precision values(%):")
+	EDIT  ap    @   _vinc2 290  ., label("List of CI absolute precision values") option(apre)
+	TEXT  ap_p _xp    @    _pw  ., label("apre")
+	CHECKBOX prec _left 205 _gbw _gbh2, label("Precision of CI") groupbox onclickon(program prec_click)
+	TEXT  n1_d  _xlb 225   _lbw  ., right
+	EDIT  n1    _xed   @   _edw  ., numonly
+	TEXT  n1_p	_xp    @   _pw   .
+	TEXT  n2_d  _xlb 250   _lbw  ., right
+	EDIT  n2    _xed   @   _edw  ., numonly
+	TEXT  n2_p	_xp    @   _pw   .
+	
+	EDIT  p0    _xed _y_c1 _edw  ., option(p0)
+	EDIT  ns    _xed  225  _edw  ., option(ns)
+	
+	GROUPBOX gb_radio _left 110 _gbw 55
+	RADIO m1_r	  35  130  100   ., first label("Sample Size") onclickon(program m1_click)
+	RADIO m2_r	+120   @   100   ., middle label("Power") onclickon(program m2_click)
+	RADIO m3_r	+105   @   100   ., last label("Effect size") onclickon(program m3_click)
+	GROUPBOX gb_test  _left _top _gbw 55, label("Test")
+	RADIO t1_r	  35   30  100   ., first label("Non-Inferiority") onclickon(program t1_click)
+	RADIO t2_r	+120   @   100   ., middle label("Superiority") onclickon(program t2_click)
+	RADIO t3_r	+105   @   100   ., last label("Equivalence") onclickon(program t3_click)
+	GROUPBOX gb_means _left 170 _gbw 80
+	TEXT  mn1_d	_xlb  +20  _lbw   ., right
+	EDIT  mn1   _xed   @   _edw   ., numonly
+	TEXT  mn1_p	_xp    @   _pw    .
+	TEXT  mn2_d	_xlb  +25  _lbw   ., right
+	EDIT  mn2   _xed   @   _edw   ., numonly
+	TEXT  mn2_p	_xp    @   _pw    .
+	TEXT  mn3_d	_xlb  +25  _lbw   ., right
+	EDIT  mn3   _xed   @   _edw   ., numonly
+	TEXT  mn3_p	_xp    @   _pw    .
+END
+
+LIST types_val
+BEGIN
+	co1p
+	co2p
+	c1pe
+	c2pe
+	copp
+	co1m
+	co2m
+	c2me
+	cokm
+	ci1p
+	ci2p
+	ci1m
+	ci2m
+	co1c
+	co2c
+	co2r1
+	co2r2
+	co2i
+	ncr
+END
+
+LIST list_actions
+BEGIN
+	program co1p_type
+	program co2p_type
+	program c1pe_type
+	program c2pe_type
+	program copp_type
+	program co1m_type
+	program co2m_type
+	program c2me_type
+	program cokm_type
+	program ci1p_type
+	program ci2p_type
+	program ci1m_type
+	program ci2m_type
+	program co1c_type
+	program co2c_type
+	program co2r1_type
+	program co2r2_type
+	program co2i_type
+	program ncr_type
+END
+
+PROGRAM reset_options
+BEGIN
+	call opt.c1.setvalue ""
+	call opt.c2.setvalue ""
+	call opt.c2.setdefault ""
+	call opt.c2.setposition . . 50 .
+	call opt.c2_p.setposition 318 . 30 .
+	call opt.c3.setvalue ""
+	call opt.c3.setdefault ""
+	call opt.c3.setposition . . 50 .
+	call opt.c3_p.setposition 318 . 30 .
+	call opt.c4.setvalue ""
+	call opt.c5.setvalue ""
+	call opt.c6.setvalue ""
+	call opt.a.setvalue ""
+	call opt.b.setvalue ""
+	call opt.p1.setvalue ""
+	call opt.p2.setvalue ""
+	call opt.size.seton
+	call program resetpos_def
+	call opt.m.setvalue ""
+	call opt.ef.setvalue ""
+	call opt.c.setvalue ""
+	call opt.nk.setvalue ""
+	call opt.ap.setvalue ""
+	call opt.n1.setvalue ""
+	call opt.n2.setvalue ""
+	call program hide_cokm
+	call program show_not_cokm
+	call program hide_apre
+	call program hide_means
+	call program hide_test
+END
+
+PROGRAM show_not_cokm
+BEGIN
+	call opt.gb_common.setposition . . . 240
+	call opt.c2_d.show
+	call opt.c2.show
+	call opt.c2_p.show
+	call opt.size.show
+	call opt.power.show
+END
+
+PROGRAM show_means
+BEGIN
+	call opt.gb_radio.show
+	call opt.m1_r.show
+	call opt.m2_r.show
+	call opt.m3_r.show
+	call opt.gb_means.show
+	call opt.mn1_d.show
+	call opt.mn1.show
+	call opt.mn1_p.show
+	call opt.mn2_d.show
+	call opt.mn2.show
+	call opt.mn2_p.show
+	call opt.mn3_d.show
+	call opt.mn3.show
+	call opt.mn3_p.show
+END
+
+PROGRAM hide_means
+BEGIN
+	call opt.gb_radio.hide
+	call opt.m1_r.hide
+	call opt.m2_r.hide
+	call opt.m3_r.hide
+	call opt.gb_means.hide
+	call opt.mn1_d.hide
+	call opt.mn1.hide
+	call opt.mn1_p.hide
+	call opt.mn2_d.hide
+	call opt.mn2.hide
+	call opt.mn2_p.hide
+	call opt.mn3_d.hide
+	call opt.mn3.hide
+	call opt.mn3_p.hide
+END
+
+PROGRAM hide_test
+BEGIN
+	call opt.gb_test.hide
+	call opt.t1_r.hide
+	call opt.t2_r.hide
+	call opt.t3_r.hide
+END
+
+PROGRAM show_test
+BEGIN
+	call opt.gb_test.show
+	call opt.t1_r.show
+	call opt.t2_r.show
+	call opt.t3_r.show
+END
+
+PROGRAM hide_cokm
+BEGIN
+	call opt.simul.hide
+	call opt.m_d.hide
+	call opt.m.hide
+	call opt.m_p.hide
+	call opt.pair.hide
+	call opt.ef_d.hide
+	call opt.ef.hide
+	call opt.ef_p.hide
+	call opt.c_d.hide
+	call opt.c.hide
+	call opt.c_p.hide
+	call opt.powerk.hide
+	call opt.nk_d.hide
+	call opt.nk.hide
+	call opt.nk_p.hide
+END
+
+PROGRAM hide_apre
+BEGIN
+	call opt.apre.hide
+	call opt.ap_d.hide
+	call opt.ap.hide
+	call opt.ap_p.hide
+	call opt.prec.hide
+	call opt.n1_d.hide
+	call opt.n1.hide
+	call opt.n1_p.hide
+	call opt.n2_d.hide
+	call opt.n2.hide
+	call opt.n2_p.hide
+	
+	call opt.c1.show
+	call opt.p0.hide
+	call opt.ns.hide
+END
+
+PROGRAM size_click
+BEGIN
+	if (main.types_lb.iseq("ncr")) {
+		//Do nothing
+	}
+	else {
+		call opt.b_d.enable
+		call opt.b.enable
+		call opt.b_p.enable
+		call opt.power.setoff
+		call opt.p1_d.disable
+		call opt.p1.disable
+		call opt.p1_p.disable
+		call opt.p2_d.disable
+		call opt.p2.disable
+		call opt.p2_p.disable
+	}
+END
+
+PROGRAM size_clickoff
+BEGIN
+	if (main.types_lb.iseq("ncr")) {
+		call opt.size.seton
+	}
+END
+
+PROGRAM power_click
+BEGIN
+	call opt.size.setoff
+	call opt.b_d.disable
+	call opt.b.disable
+	call opt.b_p.disable
+	call opt.p1_d.enable
+	call opt.p1.enable
+	call opt.p1_p.enable
+	call opt.p2_d.enable
+	call opt.p2.enable
+	call opt.p2_p.enable
+	
+	if (main.types_lb.iseq("co2m")) {
+		call opt.c3.setvalue ""
+	}
+	if (main.types_lb.iseq("co2r2")) {
+		call opt.c4.setvalue ""
+	}
+	if (main.types_lb.iseq("co2r1") | main.types_lb.iseq("co2i")) {
+		call opt.c6.setvalue ""
+	}
+END
+
+PROGRAM apre_click
+BEGIN
+	call opt.ap_d.enable
+	call opt.ap.enable
+	call opt.ap_p.enable
+	call opt.prec.setoff
+
+	if (main.types_lb.iseq("ci1p")) {
+		call opt.c1_d.setlabel "Supposed Population Proportion(%):"
+		call opt.n1_d.setlabel "Sample Size:"
+		call opt.ns.disable
+		call opt.c2.setvalue "90 95 99"
+	}
+	else {
+		call opt.n1.disable
+	}
+
+	call opt.n1_d.disable
+	call opt.n1_p.disable
+	call opt.n2_d.disable
+	call opt.n2.disable
+	call opt.n2_p.disable
+END
+
+PROGRAM prec_click
+BEGIN
+	call opt.apre.setoff
+	call opt.ap_d.disable
+	call opt.ap.disable
+	call opt.ap_p.disable
+	
+	call opt.n1_d.enable
+	if (main.types_lb.iseq("ci1p")) {
+		call opt.c1_d.setlabel "List of Supposed Population Proportions(%):"
+		call opt.n1_d.setlabel "List of Sample Sizes:"
+
+		call opt.ns.enable		
+		call opt.c2.setvalue "95"
+	}
+	else {
+		call opt.n1.enable
+	}
+	call opt.n1_p.enable
+	call opt.n2_d.enable
+	call opt.n2.enable
+	call opt.n2_p.enable
+	
+	if (main.types_lb.iseq("ci2m")) {
+		call opt.c3.setvalue ""
+	}
+	if (main.types_lb.iseq("ci2p")) {
+		call opt.c4.setvalue ""
+	}
+END
+
+PROGRAM simul_click
+BEGIN
+	call opt.m_d.enable
+	call opt.m.enable
+	call opt.m_p.enable
+	call opt.pair.setoff
+	call opt.ef_d.disable
+	call opt.ef.disable
+	call opt.ef_p.disable
+	call opt.c_d.disable
+	call opt.c.disable
+	call opt.c_p.disable
+END
+
+PROGRAM pair_click
+BEGIN
+	call opt.simul.setoff
+	call opt.m_d.disable
+	call opt.m.disable
+	call opt.m_p.disable
+	call opt.ef_d.enable
+	call opt.ef.enable
+	call opt.ef_p.enable
+	call opt.c_d.enable
+	call opt.c.enable
+	call opt.c_p.enable
+END
+
+PROGRAM powerk_on
+BEGIN
+	call opt.nk_d.enable
+	call opt.nk.enable
+	call opt.nk_p.enable
+END
+
+PROGRAM powerk_off
+BEGIN
+	call opt.nk_d.disable
+	call opt.nk.disable
+	call opt.nk_p.disable
+END
+
+PROGRAM co1p_type
+BEGIN
+	call opt.settabtitle "Options - co1p"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Proportion(%) of events in reference population:"
+	call gaction opt.c1.setlabel "Proportion(%) of events in reference population"
+	call gaction opt.c1.setoption p
+	call gaction opt.c1_p.setlabel "p"
+	call gaction opt.c2_d.setlabel "Proportion(%) of events in sample:"
+	call gaction opt.c2.setoption p1
+	call gaction opt.c2_p.setlabel "p1"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "or   Minimum expected effect size(%):"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption effect
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "effect"
+	call program hidec4_6
+	call program showAlphaBeta
+	call program showp1
+	call gaction opt.p1_d.setlabel "Sample Size:"
+	call gaction opt.p1.setlabel "Sample Size"
+	call gaction opt.p1.setoption n
+	call gaction opt.p1_p.setlabel "n"
+	call program repos3
+END
+
+PROGRAM co2p_type
+BEGIN
+	call opt.settabtitle "Options - co2p"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Proportion(%) of events in reference group:"
+	call gaction opt.c1.setlabel "Proportion(%) of events in reference group"
+	call gaction opt.c1.setoption p0
+	call gaction opt.c1_p.setlabel "p0"
+	call gaction opt.c2_d.setlabel "Proportion(%) of events in new group:"
+	call gaction opt.c2.setoption p1
+	call gaction opt.c2_p.setlabel "p1"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "or   Minimum expected effect size(%):"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption effect
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "effect"
+	call program hidec4_6
+	call program showAlphaBeta
+	call program showp1
+	call gaction opt.p1_d.setlabel "Sample Size:"
+	call gaction opt.p1.setlabel "Sample Size"
+	call gaction opt.p1.setoption n
+	call gaction opt.p1_p.setlabel "n"
+	call program repos3
+END
+
+PROGRAM c1pe_type
+BEGIN
+	call opt.settabtitle "Options - c1pe"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Proportion(%) of events in reference treatment:"
+	call gaction opt.c1.setlabel "Proportion(%) of events in reference treatment"
+	call gaction opt.c1.setoption p0
+	call gaction opt.c1_p.setlabel "p0"
+	call gaction opt.c2_d.setlabel "Proportion(%) of events in experimental treatment:"
+	call gaction opt.c2.setlabel "Proportion(%) of events in experimental treatment"
+	call gaction opt.c2.setoption p1
+	call gaction opt.c2_p.setlabel "p1"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "Non-Inferiority limit(%):"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption delta
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "delta"
+	call program hidec4_6
+	call program showAlphaBeta
+	call program showp1
+	call gaction opt.p1_d.setlabel "Sample Size:"
+	call gaction opt.p1.setlabel "Sample Size"
+	call gaction opt.p1.setoption n
+	call gaction opt.p1_p.setlabel "n"
+	call program show_test
+	call program repos5
+	call gaction opt.t3_r.seton
+END
+
+PROGRAM c2pe_type
+BEGIN
+	call opt.settabtitle "Options - c2pe"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Proportion(%) of events in reference treatment:"
+	call gaction opt.c1.setlabel "Proportion(%) of events in reference treatment"
+	call gaction opt.c1.setoption p0
+	call gaction opt.c1_p.setlabel "p0"
+	call gaction opt.c2_d.setlabel "Proportion(%) of events in experimental treatment:"
+	call gaction opt.c2.setlabel "Proportion(%) of events in experimental treatment"
+	call gaction opt.c2.setoption p1
+	call gaction opt.c2_p.setlabel "p1"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "Non-Inferiority limit(%):"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption delta
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "delta"
+	call program hidec4_6
+	call gaction opt.c4_d.show
+	call gaction opt.c4.show
+	call gaction opt.c4_p.show
+	call gaction opt.c4_d.setlabel "Ratio n0/n1:"
+	call gaction opt.c4.setoption r
+	call gaction opt.c4.setvalue 1
+	call gaction opt.c4_p.setlabel "r"
+	call program showAlphaBeta
+	call program showp1p2
+	call gaction opt.p1_d.setlabel "Sample Size (Reference treatment):"
+	call gaction opt.p1.setlabel "Sample Size (Reference treatment)"
+	call gaction opt.p1.setoption n0
+	call gaction opt.p1_p.setlabel "n0"
+	call gaction opt.p2_d.setlabel "Sample Size (Experimental treatment):"
+	call gaction opt.p2.setlabel "Sample Size (Experimental treatment)"
+	call gaction opt.p2.setoption n1
+	call gaction opt.p2_p.setlabel "n1"
+	call program show_test
+	call program repos4
+	call gaction opt.t3_r.seton
+END
+
+PROGRAM copp_type
+BEGIN
+	call opt.settabtitle "Options - copp"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Expected Response/Exposure Odds Ratio:"
+	call gaction opt.c1.setlabel "Expected Response/Exposure Odds Ratio"
+	call gaction opt.c1.setoption or
+	call gaction opt.c1_p.setlabel "or"
+	call gaction opt.c2_d.setlabel "Proportion of Discordant pairs(%):"
+	call gaction opt.c2.setoption pd
+	call gaction opt.c2_p.setlabel "pd"
+	call gaction opt.c3_d.show
+	call gaction opt.c3.show
+	call gaction opt.c3_p.show
+	call gaction opt.c3_d.setlabel "or   Proportion in the Reference group(%):"
+	call gaction opt.c3.setoption p0
+	call gaction opt.c3_p.setlabel "p0"
+	call gaction opt.c4_d.show
+	call gaction opt.c4.show
+	call gaction opt.c4_p.show
+	call gaction opt.c4_d.setlabel "and   Marginal Odds Ratio:"
+	call gaction opt.c4.setoption ora
+	call gaction opt.c4_p.setlabel "ora"
+	call gaction opt.c5_d.show
+	call gaction opt.c5.show
+	call gaction opt.c5_p.show
+	call gaction opt.c5_d.setlabel "Ratio of Matching (1:r):"
+	call gaction opt.c5.setoption r
+	call gaction opt.c5.setvalue 1
+	call gaction opt.c5_p.setlabel "r"
+	call gaction opt.c6_d.hide
+	call gaction opt.c6.hide
+	call gaction opt.c6_p.hide
+	call gaction opt.c7_d.hide
+	call gaction opt.c7.hide
+	call gaction opt.c7_p.hide
+	call program showAlphaBeta
+	call program showp1
+	call gaction opt.p1_d.setlabel "Sample Size (Total number of cases):"
+	call gaction opt.p1.setlabel "Sample Size"
+	call gaction opt.p1.setoption n
+	call gaction opt.p1_p.setlabel "n"
+	call program repos1
+END
+
+PROGRAM co1m_type
+BEGIN
+	call opt.settabtitle "Options - co1m"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Common standard deviation:"
+	call gaction opt.c1.setlabel "Common standard deviation"
+	call gaction opt.c1.setoption sd
+	call gaction opt.c1_p.setlabel "sd"
+	call gaction opt.c2_d.hide
+	call gaction opt.c2.hide
+	call gaction opt.c2_p.hide
+	call gaction opt.c3_d.hide
+	call gaction opt.c3.hide
+	call gaction opt.c3_p.hide
+	call program hidec4_6
+	call program hideAlphaBeta
+	call program hidep1p2
+
+	call opt.gb_common.setposition . . . 95
+	call gaction opt.a_d.show
+	call gaction opt.a.show
+	call gaction opt.a_p.show
+	call opt.a_d.setposition . 70 . .
+	call opt.a.setposition . 70 . .
+	call opt.a_p.setposition . 70 . .
+	call opt.a_d.setlabel "Alpha risk(%):"
+	call opt.a.setoption alpha
+	call opt.a.setvalue 5
+	call opt.a_p.setlabel "alpha"
+
+	call program show_means
+
+	call opt.gb_radio.setposition . 110 . 55
+	call opt.m1_r.setposition 35 130 100 .
+	call opt.m2_r.setposition 160 130 100 .
+	call opt.m3_r.setposition 260 130 100 .
+	call opt.gb_means.setposition . 170 . 80
+	call opt.mn1_d.setposition . 190 . .
+	call opt.mn1.setposition . 190 . .
+	call opt.mn1_p.setposition . 190 . .
+	call opt.mn2_d.setposition . 215 . .
+	call opt.mn2.setposition . 215 . .
+	call opt.mn2_p.setposition . 215 . .
+	
+	if opt.m1_r {
+		call program m1_click
+	}
+	if opt.m2_r {
+		call program m2_click
+	}
+	if opt.m3_r {
+		call program m3_click
+	}
+	
+END
+
+PROGRAM co2m_type
+BEGIN
+	call opt.settabtitle "Options - co2m"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Common standard deviation of Groups 0 and 1:"
+	call gaction opt.c1.setoption sd
+	call gaction opt.c1_p.setlabel "sd"
+	call gaction opt.c2_d.setlabel "Ratio n0/n1:"
+	call gaction opt.c2.setoption r
+	call gaction opt.c2.setvalue 1
+	call gaction opt.c2_p.setlabel "r"
+	call gaction opt.c3_d.hide
+	call gaction opt.c3.hide
+	call gaction opt.c3_p.hide
+	call program hidec4_6
+	call program hideAlphaBeta
+	call program hidep1p2
+	
+	call opt.gb_common.setposition . . . 120
+	call gaction opt.a_d.show
+	call gaction opt.a.show
+	call gaction opt.a_p.show
+	call opt.a_d.setposition . 98 . .
+	call opt.a.setposition . 98 . .
+	call opt.a_p.setposition . 98 . .
+	call opt.a_d.setlabel "Alpha risk(%):"
+	call opt.a.setoption alpha
+	call opt.a.setvalue 5
+	call opt.a_p.setlabel "alpha"
+
+	call program show_means
+
+	call opt.gb_radio.setposition . 135 . 55
+	call opt.m1_r.setposition 35 155 100 .
+	call opt.m2_r.setposition 160 155 100 .
+	call opt.m3_r.setposition 260 155 100 .
+	call opt.gb_means.setposition . 195 . 100
+	call opt.mn1_d.setposition . 215 . .
+	call opt.mn1.setposition . 215 . .
+	call opt.mn1_p.setposition . 215 . .
+	call opt.mn2_d.setposition . 240 . .
+	call opt.mn2.setposition . 240 . .
+	call opt.mn2_p.setposition . 240 . .
+	call opt.mn3_d.setposition . 265 . .
+	call opt.mn3.setposition . 265 . .
+	call opt.mn3_p.setposition . 265 . .
+	
+	if opt.m1_r {
+		call program m1_click
+	}
+	if opt.m2_r {
+		call program m2_click
+	}
+	if opt.m3_r {
+		call program m3_click
+	}
+
+END
+
+PROGRAM c2me_type
+BEGIN
+	call opt.settabtitle "Options - c2me"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Common standard deviation:"
+	call gaction opt.c1.setoption sd
+	call gaction opt.c1_p.setlabel "sd"
+	call gaction opt.c2_d.hide
+	call gaction opt.c2.hide
+	call gaction opt.c2_p.hide
+	call gaction opt.c3_d.hide
+	call gaction opt.c3.hide
+	call gaction opt.c3_p.hide
+	call program hidec4_6
+	call program hideAlphaBeta
+	call program hidep1p2
+
+	call opt.gb_common.setposition . . . 95
+	call gaction opt.a_d.show
+	call gaction opt.a.show
+	call gaction opt.a_p.show
+	call opt.a_d.setposition . 70 . .
+	call opt.a.setposition . 70 . .
+	call opt.a_p.setposition . 70 . .
+	call opt.a_d.setlabel "Alpha risk(%):"
+	call opt.a.setoption alpha
+	call opt.a.setvalue 5
+	call opt.a_p.setlabel "alpha"
+
+	call program show_means
+
+	call opt.gb_radio.setposition . 110 . 55
+	call opt.m1_r.setposition 35 130 100 .
+	call opt.m2_r.setposition 160 130 100 .
+	call opt.m3_r.setposition 260 130 100 .
+	call opt.gb_means.setposition . 170 . 80
+	call opt.mn1_d.setposition . 190 . .
+	call opt.mn1.setposition . 190 . .
+	call opt.mn1_p.setposition . 190 . .
+	call opt.mn2_d.setposition . 215 . .
+	call opt.mn2.setposition . 215 . .
+	call opt.mn2_p.setposition . 215 . .
+
+	if opt.m1_r {
+		call program m1_click
+	}
+	if opt.m2_r {
+		call program m2_click
+	}
+	if opt.m3_r {
+		call program m3_click
+	}
+END
+
+PROGRAM cokm_type
+BEGIN
+	call opt.settabtitle "Options - cokm"
+	call program reset_options
+	call opt.gb_common.setposition . . . 55
+	call gaction opt.c1_d.setlabel "Common standard deviation estimated:"
+	call gaction opt.c1.setlabel "Common standard deviation estimated"
+	call gaction opt.c1.setoption sd
+	call gaction opt.c1_p.setlabel "sd"
+	call opt.simul.show
+	call opt.m_d.show
+	call opt.m.show
+	call opt.m_p.show
+	call opt.simul.seton
+	call gaction opt.c2_d.hide
+	call gaction opt.c2.hide
+	call gaction opt.c2_p.hide
+	call gaction opt.c3_d.hide
+	call gaction opt.c3.hide
+	call gaction opt.c3_p.hide
+	call program hidec4_6
+	call program hideAlphaBeta
+	call program hidep1p2
+	call opt.pair.show
+	call opt.ef_d.show
+	call opt.ef.show
+	call opt.ef_p.show
+	call opt.c_d.show
+	call opt.c.show
+	call opt.c_p.show
+	call opt.powerk.show
+	call opt.nk_d.show
+	call opt.nk.show
+	call opt.nk_p.show
+	call opt.powerk.setoff
+END
+
+PROGRAM ci1p_type
+BEGIN
+	call opt.settabtitle "Options - ci1p"
+	call program reset_options
+	call opt.gb_common.setposition . . . 105
+	call gaction opt.c1_d.setlabel "Supposed Population Proportion(%):"
+	call opt.c1.hide
+	call opt.p0.show
+	call gaction opt.p0.setlabel "Supposed Population Proportion(%)"
+	call gaction opt.c1_p.setlabel "p0"
+	call gaction opt.c2_d.setlabel "Confidence level(%):"
+	call gaction opt.c2.setoption cl
+	call gaction opt.c2.setvalue "90 95 99"
+	call gaction opt.c2.setdefault "90 95 99"
+	call gaction opt.c2_p.setlabel "cl"
+	call gaction opt.c3_d.show
+	call gaction opt.c3.show
+	call gaction opt.c3_p.show
+	call gaction opt.c3_d.setlabel "Population Size:"
+	call gaction opt.c3.setoption n
+	call gaction opt.c3_p.setlabel "n"
+	call program hidec4_6
+	call program hideAlphaBeta
+	call program showapre1
+	call gaction opt.ap_d.setlabel "List of CI absolute precision values(%):"
+	call program hidep1p2
+	call program showapre_n1
+	call gaction opt.n1_d.setlabel "Sample Size:"
+	call opt.n1.hide
+	call opt.ns.show
+	call gaction opt.n1_p.setlabel "ns"
+	call gaction opt.apre.seton
+END
+
+PROGRAM ci2p_type
+BEGIN
+	call opt.settabtitle "Options - ci2p"
+	call program reset_options
+	call opt.gb_common.setposition . . . 130
+	call gaction opt.c1_d.setlabel "Supposed proportion in Pop.0(%):"
+	call gaction opt.c1.setlabel "Supposed proportion in Pop.0(%)"
+	call gaction opt.c1.setoption p0
+	call gaction opt.c1_p.setlabel "p0"
+	call gaction opt.c2_d.setlabel "Supposed proportion in Pop.1(%):"
+	call gaction opt.c2.setlabel "Supposed proportion in Pop.1(%)"
+	call gaction opt.c2.setoption p1
+	call gaction opt.c2_p.setlabel "p1
+	call gaction opt.c3_d.show
+	call gaction opt.c3.show
+	call gaction opt.c3_p.show
+	call gaction opt.c3_d.setlabel "Confidence level(%):"
+	call gaction opt.c3.setoption cl
+	call gaction opt.c3.setvalue "90 95 97.5 99"
+	call gaction opt.c3.setdefault "90 95 97.5 99"
+	call opt.c3.setposition . . 75 .
+	call gaction opt.c3_p.setlabel "cl"
+	call opt.c3_p.setposition 338 . 10 .
+	call program hidec4_6
+	call gaction opt.c4_d.show
+	call gaction opt.c4.show
+	call gaction opt.c4_p.show
+	call gaction opt.c4_d.setlabel "Ratio n0/n1:"
+	call gaction opt.c4.setoption r
+	call gaction opt.c4.setvalue 1
+	call gaction opt.c4_p.setlabel "r"
+	call program hideAlphaBeta
+	call program hidep1p2
+	call program showapre2
+	call gaction opt.ap_d.setlabel "List of CI absolute precision values(%):"
+	call program showapre_n2
+	call gaction opt.n1_d.setlabel "Sample Size (Group 1):"
+	call gaction opt.n1.setoption n1
+	call gaction opt.n1_p.setlabel "n1"
+	call gaction opt.n2_d.setlabel "Sample Size (Group 0):"
+	call gaction opt.n2.setoption n0
+	call gaction opt.n2_p.setlabel "n0"
+	call gaction opt.apre.seton
+END
+
+PROGRAM ci1m_type
+BEGIN
+	call opt.settabtitle "Options - ci1m"
+	call program reset_options
+	call opt.gb_common.setposition . . . 105
+	call gaction opt.c1_d.setlabel "Supposed Standard Deviation:"
+	call gaction opt.c1.setlabel "Supposed Standard Deviation"
+	call gaction opt.c1.setoption sd
+	call gaction opt.c1_p.setlabel "sd"
+	call gaction opt.c2_d.setlabel "Confidence level(%):"
+	call gaction opt.c2.setoption cl
+	call gaction opt.c2.setvalue "90 95 99"
+	call gaction opt.c2.setdefault "90 95 99"
+	call gaction opt.c2_p.setlabel "cl"
+	call gaction opt.c3_d.show
+	call gaction opt.c3.show
+	call gaction opt.c3_p.show
+	call gaction opt.c3_d.setlabel "Population Size:"
+	call gaction opt.c3.setoption n
+	call gaction opt.c3_p.setlabel "n"
+	call program hidec4_6
+	call program hideAlphaBeta
+	call program showapre1
+	call gaction opt.ap_d.setlabel "List of CI absolute precision values:"
+	call program hidep1p2
+	call program showapre_n1
+	call gaction opt.n1_d.setlabel "Sample Size:"
+	call gaction opt.n1.setoption ns
+	call gaction opt.n1_p.setlabel "ns"
+	call gaction opt.apre.seton
+END
+
+PROGRAM ci2m_type
+BEGIN
+	call opt.settabtitle "Options - ci2m"
+	call program reset_options
+	call opt.gb_common.setposition . . . 105
+	call gaction opt.c1_d.setlabel "Supposed Standard Deviation:"
+	call gaction opt.c1.setlabel "Supposed Standard Deviation"
+	call gaction opt.c1.setoption sd
+	call gaction opt.c1_p.setlabel "sd"
+	call gaction opt.c2_d.setlabel "Confidence level(%):"
+	call gaction opt.c2.setoption cl
+	call gaction opt.c2.setvalue "90 95 97.5 99"
+	call gaction opt.c2.setdefault "90 95 97.5 99"
+	call opt.c2.setposition . . 75 .
+	call gaction opt.c2_p.setlabel "cl"
+	call opt.c2_p.setposition 338 . 10 .
+	call gaction opt.c3_d.show
+	call gaction opt.c3.show
+	call gaction opt.c3_p.show
+	call gaction opt.c3_d.setlabel "Ratio n0/n1:"
+	call gaction opt.c3.setoption r
+	call gaction opt.c3.setvalue 1
+	call gaction opt.c3_p.setlabel "r"
+	call program hidec4_6
+	call program hideAlphaBeta
+	call program showapre1
+	call gaction opt.ap_d.setlabel "List of CI absolute precision values:"
+	call program hidep1p2
+	call program showapre_n3
+	call gaction opt.n1_d.setlabel "Sample Size (Group 1):"
+	call gaction opt.n1.setoption n1
+	call gaction opt.n1_p.setlabel "n1"
+	call gaction opt.n2_d.setlabel "Sample Size (Group 0):"
+	call gaction opt.n2.setoption n0
+	call gaction opt.n2_p.setlabel "n0"
+	call gaction opt.apre.seton
+END
+
+PROGRAM co1c_type
+BEGIN
+	call opt.settabtitle "Options - co1c"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Correlation in a reference population:"
+	call gaction opt.c1.setlabel "Correlation in a reference population"
+	call gaction opt.c1.setoption cr
+	call gaction opt.c1_p.setlabel "cr"
+	call gaction opt.c2_d.setlabel "Correlation in a sample:"
+	call gaction opt.c2.setoption cr1
+	call gaction opt.c2_p.setlabel "cr1"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "or   Minimum expected effect size:"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption effect
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "effect"
+	call program hidec4_6
+	call program showAlphaBeta
+	call program showp1
+	call gaction opt.p1_d.setlabel "Size of sample 1:"
+	call gaction opt.p1.setlabel "Size of sample 1"
+	call gaction opt.p1.setoption n1
+	call gaction opt.p1_p.setlabel "n1"
+	call program repos3
+END
+
+PROGRAM co2c_type
+BEGIN
+	call opt.settabtitle "Options - co2c"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Correlation in a sample 0:"
+	call gaction opt.c1.setlabel "Correlation in a sample 0"
+	call gaction opt.c1.setoption cr0
+	call gaction opt.c1_p.setlabel "cr0"
+	call gaction opt.c2_d.setlabel "Correlation in a sample 1:"
+	call gaction opt.c2.setoption cr1
+	call gaction opt.c2_p.setlabel "cr1"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "or   Minimum expected effect size:"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption effect
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "effect"
+	call program hidec4_6
+	call program showAlphaBeta
+	call program showp1p2
+	call gaction opt.p1_d.setlabel "Size of sample 1:"
+	call gaction opt.p1.setlabel "Size of sample 1"
+	call gaction opt.p1.setoption n1
+	call gaction opt.p1_p.setlabel "n1"
+	call gaction opt.p2_d.setlabel "Size of sample 0:"
+	call gaction opt.p2.setoption n0
+	call gaction opt.p2_p.setlabel "n0"
+	call program repos3
+END
+
+PROGRAM co2r1_type
+BEGIN
+	call opt.settabtitle "Options - co2r (cohort)"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Event risk in UnExposed(%):"
+	call gaction opt.c1.setlabel "Event risk in UnExposed(%)"
+	call gaction opt.c1.setoption r0
+	call gaction opt.c1_p.setlabel "r0"
+	call gaction opt.c2_d.setlabel "Event risk in Exposed(%):"
+	call gaction opt.c2.setoption r1
+	call gaction opt.c2_p.setlabel "r1"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "or   Expected Risk Ratio:"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption rr
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "rr"
+	call gaction opt.c4_d.show
+	call gaction opt.c4_d.setlabel "or   Expected Risk Difference(%):"
+	call gaction opt.c4.show
+	call gaction opt.c4.setoption rd
+	call gaction opt.c4_p.show
+	call gaction opt.c4_p.setlabel "rd"
+	call gaction opt.c5_d.show
+	call gaction opt.c5_d.setlabel "or   Expected Odds Ratio:"
+	call gaction opt.c5.show
+	call gaction opt.c5.setoption or
+	call gaction opt.c5_p.show
+	call gaction opt.c5_p.setlabel "or"
+	call gaction opt.c6_d.show
+	call gaction opt.c6_d.setlabel "Ratio n0/n1 (default 1):"
+	call gaction opt.c6.show
+	call gaction opt.c6.setoption r
+	call gaction opt.c6_p.show
+	call gaction opt.c6_p.setlabel "r"
+	call gaction opt.c7_d.show
+	call gaction opt.c7_d.setlabel "or   Cohort exposure prevalence(%):"
+	call gaction opt.c7.show
+	call gaction opt.c7.setoption pe
+	call gaction opt.c7_p.show
+	call gaction opt.c7_p.setlabel "pe"
+	call program showAlphaBeta
+	call program showp1p2
+	call gaction opt.p1_d.setlabel "Size of sample 1:"
+	call gaction opt.p1.setlabel "Size of sample 1"
+	call gaction opt.p1.setoption n1
+	call gaction opt.p1_p.setlabel "n1"
+	call gaction opt.p2_d.setlabel "Size of sample 0:"
+	call gaction opt.p2.setoption n0
+	call gaction opt.p2_p.setlabel "n0"
+END
+
+PROGRAM co2r2_type
+BEGIN
+	call opt.settabtitle "Options - co2r (case-control)"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Proportion of exposed in NonCases(%):"
+	call gaction opt.c1.setlabel "Proportion of exposed in NonCases(%)"
+	call gaction opt.c1.setoption pe0
+	call gaction opt.c1_p.setlabel "pe0"
+	call gaction opt.c2_d.setlabel "Proportion of exposed in Cases(%):"
+	call gaction opt.c2.setoption pe1
+	call gaction opt.c2_p.setlabel "pe1"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "or   Expected Odds Ratio:"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption or
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "or"
+	call program hidec4_6
+	call gaction opt.c4_d.show
+	call gaction opt.c4_d.setlabel "Ratio m0/m1:"
+	call gaction opt.c4.show
+	call gaction opt.c4.setoption r
+	call gaction opt.c4.setvalue 1
+	call gaction opt.c4_p.show
+	call gaction opt.c4_p.setlabel "r"
+	call program showAlphaBeta
+	call program showp1p2
+	call gaction opt.p1_d.setlabel "Size of sample 1:"
+	call gaction opt.p1.setlabel "Size of sample 1"
+	call gaction opt.p1.setoption m1
+	call gaction opt.p1_p.setlabel "m1"
+	call gaction opt.p2_d.setlabel "Size of sample 0:"
+	call gaction opt.p2.setoption m0
+	call gaction opt.p2_p.setlabel "m0"
+	call program repos2
+END
+
+PROGRAM co2i_type
+BEGIN
+	call opt.settabtitle "Options - co2i"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Event rate in UnExposed:"
+	call gaction opt.c1.setlabel "Event rate in UnExposed"
+	call gaction opt.c1.setoption i0
+	call gaction opt.c1_p.setlabel "i0"
+	call gaction opt.c2_d.setlabel "Event rate in Exposed:"
+	call gaction opt.c2.setoption i1
+	call gaction opt.c2_p.setlabel "i1"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "or   Expected Rate Ratio:"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption ir
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "ir"
+	call gaction opt.c4_d.show
+	call gaction opt.c4_d.setlabel "or   Expected Rate Difference:"
+	call gaction opt.c4.show
+	call gaction opt.c4.setoption id
+	call gaction opt.c4_p.show
+	call gaction opt.c4_p.setlabel "id"
+	call gaction opt.c5_d.show
+	call gaction opt.c5_d.setlabel "Mean duration of Follow up:"
+	call gaction opt.c5.show
+	call gaction opt.c5.setoption d
+	call gaction opt.c5_p.show
+	call gaction opt.c5_p.setlabel "d"
+	call gaction opt.c6_d.show
+	call gaction opt.c6_d.setlabel "Ratio n0/n1:"
+	call gaction opt.c6.show
+	call gaction opt.c6.setoption r
+	call gaction opt.c6.setvalue 1
+	call gaction opt.c6_p.show
+	call gaction opt.c6_p.setlabel "r"
+	call gaction opt.c7_d.hide
+	call gaction opt.c7.hide
+	call gaction opt.c7_p.hide
+	call program showAlphaBeta
+	call program showp1p2
+	call gaction opt.p1_d.setlabel "Size of sample 1:"
+	call gaction opt.p1.setlabel "Size of sample 1"
+	call gaction opt.p1.setoption n1
+	call gaction opt.p1_p.setlabel "n1"
+	call gaction opt.p2_d.setlabel "Size of sample 0:"
+	call gaction opt.p2.setoption n0
+	call gaction opt.p2_p.setlabel "n0"
+END
+
+PROGRAM ncr_type
+BEGIN
+	call opt.settabtitle "Options - ncr"
+	call program reset_options
+	call gaction opt.c1_d.setlabel "Supposed Between Group Variance:"
+	call gaction opt.c1.setlabel "Supposed Between Group Variance"
+	call gaction opt.c1.setoption vb
+	call gaction opt.c1_p.setlabel "vb"
+	call gaction opt.c2_d.setlabel "Supposed Within Group Variance:"
+	call gaction opt.c2.setlabel "Supposed Between Group Variance"
+	call gaction opt.c2.setoption vw
+	call gaction opt.c2_p.setlabel "vw"
+	call gaction opt.c3_d.show
+	call gaction opt.c3_d.setlabel "Minimum expected effect size in proportion:"
+	call gaction opt.c3.show
+	call gaction opt.c3.setoption effect
+	call gaction opt.c3_p.show
+	call gaction opt.c3_p.setlabel "effect"
+	call program hidec4_6
+	call program showAlphaBeta
+	call program hidep1p2
+	call program repos3
+END
+
+PROGRAM showapre1
+BEGIN
+	call opt.apre.show
+	call opt.ap_d.show
+	call opt.ap.show
+	call opt.ap_p.show
+	call opt.apre.setposition . 120 . .
+	call opt.ap_d.setposition . 140 . .
+	call opt.ap.setposition . 165 . .
+	call opt.ap_p.setposition . 165 . .
+END
+
+PROGRAM showapre2
+BEGIN
+	call opt.apre.show
+	call opt.ap_d.show
+	call opt.ap.show
+	call opt.ap_p.show
+	call opt.apre.setposition . 145 . .
+	call opt.ap_d.setposition . 165 . .
+	call opt.ap.setposition . 190 . .
+	call opt.ap_p.setposition . 190 . .
+END
+
+PROGRAM showapre_n1
+BEGIN
+	call opt.prec.show
+	call opt.n1_d.show
+	call opt.n1.show
+	call opt.n1_p.show
+	call opt.prec.setposition . 205 . 55
+	call opt.n1_d.setposition . 225 . .
+	call opt.n1.setposition . 225 . .
+	call opt.n1_p.setposition . 225 . .
+END
+
+PROGRAM showapre_n2
+BEGIN
+	call opt.prec.show
+	call opt.n1_d.show
+	call opt.n1.show
+	call opt.n1_p.show
+	call opt.prec.setposition . 230 . 80
+	call opt.n1_d.setposition . 250 . .
+	call opt.n1.setposition . 250 . .
+	call opt.n1_p.setposition . 250 . .
+	call opt.n2_d.show
+	call opt.n2.show
+	call opt.n2_p.show
+	call opt.n2_d.setposition . 275 . .
+	call opt.n2.setposition . 275 . .
+	call opt.n2_p.setposition . 275 . .
+END
+
+PROGRAM showapre_n3
+BEGIN
+	call opt.prec.show
+	call opt.n1_d.show
+	call opt.n1.show
+	call opt.n1_p.show
+	call opt.prec.setposition . 205 . 80
+	call opt.n1_d.setposition . 225 . .
+	call opt.n1.setposition . 225 . .
+	call opt.n1_p.setposition . 225 . .
+	call opt.n2_d.show
+	call opt.n2.show
+	call opt.n2_p.show
+	call opt.n2_d.setposition . 250 . .
+	call opt.n2.setposition . 250 . .
+	call opt.n2_p.setposition . 250 . .
+END
+
+PROGRAM repos1
+BEGIN
+	call opt.gb_common.setposition . . . 195
+	call opt.a_d.setposition . 170 . .
+	call opt.a.setposition . 170 . .
+	call opt.a_p.setposition . 170 . .
+	call opt.size.setposition . 210 . .
+	call opt.b_d.setposition . 230 . .
+	call opt.b.setposition . 230 . .
+	call opt.b_p.setposition . 230 . .
+	call opt.power.setposition . 270 . .
+	call opt.p1_d.setposition . 290 . .
+	call opt.p1.setposition . 290 . .
+	call opt.p1_p.setposition . 290 . .
+	call opt.p2_d.setposition . 315 . .
+	call opt.p2.setposition . 315 . .
+	call opt.p2_p.setposition . 315 . .
+END
+
+PROGRAM repos2
+BEGIN
+	call opt.gb_common.setposition . . . 170
+	call opt.a_d.setposition . 150 . .
+	call opt.a.setposition . 150 . .
+	call opt.a_p.setposition . 150 . .
+	call opt.size.setposition . 185 . .
+	call opt.b_d.setposition . 205 . .
+	call opt.b.setposition . 205 . .
+	call opt.b_p.setposition . 205 . .
+	call opt.power.setposition . 255 . .
+	call opt.p1_d.setposition . 275 . .
+	call opt.p1.setposition . 275 . .
+	call opt.p1_p.setposition . 275 . .
+	call opt.p2_d.setposition . 300 . .
+	call opt.p2.setposition . 300 . .
+	call opt.p2_p.setposition . 300 . .
+END
+
+PROGRAM repos3
+BEGIN
+	call opt.gb_common.setposition . . . 145
+	call opt.a_d.setposition . 120 . .
+	call opt.a.setposition . 120 . .
+	call opt.a_p.setposition . 120 . .
+	call opt.size.setposition . 160 . .
+	call opt.b_d.setposition . 180 . .
+	call opt.b.setposition . 180 . .
+	call opt.b_p.setposition . 180 . .
+	call opt.power.setposition . 220 . .
+	call opt.p1_d.setposition . 240 . .
+	call opt.p1.setposition . 240 . .
+	call opt.p1_p.setposition . 240 . .
+	call opt.p2_d.setposition . 265 . .
+	call opt.p2.setposition . 265 . .
+	call opt.p2_p.setposition . 265 . .
+END
+
+PROGRAM repos4
+BEGIN
+	call opt.gb_common.setposition . . . 165
+	call opt.a_d.setposition . 140 . .
+	call opt.a.setposition . 140 . .
+	call opt.a_p.setposition . 140 . .
+	call opt.gb_test.setposition . 180 . .
+	call opt.t1_r.setposition . 200 . .
+	call opt.t2_r.setposition . 200 . .
+	call opt.t3_r.setposition . 200 . .
+	call opt.size.setposition . 240 . .
+	call opt.b_d.setposition . 260 . .
+	call opt.b.setposition . 260 . .
+	call opt.b_p.setposition . 260 . .
+	call opt.power.setposition . 300 . .
+	call opt.p1_d.setposition . 320 . .
+	call opt.p1.setposition . 320 . .
+	call opt.p1_p.setposition . 320 . .
+	call opt.p2_d.setposition . 345 . .
+	call opt.p2.setposition . 345 . .
+	call opt.p2_p.setposition . 345 . .
+END
+
+PROGRAM repos5
+BEGIN
+	call opt.gb_common.setposition . . . 145
+	call opt.a_d.setposition . 120 . .
+	call opt.a.setposition . 120 . .
+	call opt.a_p.setposition . 120 . .
+	call opt.gb_test.setposition . 160 . .
+	call opt.t1_r.setposition . 180 . .
+	call opt.t2_r.setposition . 180 . .
+	call opt.t3_r.setposition . 180 . .
+	call opt.size.setposition . 220 . .
+	call opt.b_d.setposition . 240 . .
+	call opt.b.setposition . 240 . .
+	call opt.b_p.setposition . 240 . .
+	call opt.power.setposition . 280 . .
+	call opt.p1_d.setposition . 300 . .
+	call opt.p1.setposition . 300 . .
+	call opt.p1_p.setposition . 300 . .
+END
+
+PROGRAM resetpos_def
+BEGIN
+	call opt.gb_common.setposition . . . 240
+	call opt.a_d.setposition . 220 . .
+	call opt.a.setposition . 220 . .
+	call opt.a_p.setposition . 220 . .
+	call opt.size.setposition . 255 . .
+	call opt.b_d.setposition . 275 . .
+	call opt.b.setposition . 275 . .
+	call opt.b_p.setposition . 275 . .
+	call opt.power.setposition . 315 . .
+	call opt.p1_d.setposition . 335 . .
+	call opt.p1.setposition . 335 . .
+	call opt.p1_p.setposition . 335 . .
+	call opt.p2_d.setposition . 360 . .
+	call opt.p2.setposition . 360 . .
+	call opt.p2_p.setposition . 360 . .
+END
+
+PROGRAM hidec4_6
+BEGIN
+	call gaction opt.c4_d.hide
+	call gaction opt.c4.hide
+	call gaction opt.c4_p.hide
+	call gaction opt.c5_d.hide
+	call gaction opt.c5.hide
+	call gaction opt.c5_p.hide
+	call gaction opt.c6_d.hide
+	call gaction opt.c6.hide
+	call gaction opt.c6_p.hide
+	call gaction opt.c7_d.hide
+	call gaction opt.c7.hide
+	call gaction opt.c7_p.hide
+END
+
+PROGRAM showp1
+BEGIN
+	call gaction opt.p1_d.show
+	call gaction opt.p1.show
+	call gaction opt.p1_p.show
+	call gaction opt.p2_d.hide
+	call gaction opt.p2.hide
+	call gaction opt.p2_p.hide
+	call gaction opt.power.setposition . . . 55
+END
+
+PROGRAM showp1p2
+BEGIN
+	call gaction opt.p1_d.show
+	call gaction opt.p1.show
+	call gaction opt.p1_p.show
+	call gaction opt.p2_d.show
+	call gaction opt.p2.show
+	call gaction opt.p2_p.show
+	call gaction opt.power.setposition . . . 80
+END
+
+PROGRAM showAlphaBeta
+BEGIN
+	call gaction opt.a_d.show
+	call gaction opt.a.show
+	call gaction opt.a_d.setlabel "Alpha risk(%):"
+	call gaction opt.a.setoption alpha
+	call gaction opt.a.setvalue 5
+	call gaction opt.a_p.show
+	call gaction opt.a_p.setlabel "alpha"
+	call gaction opt.b_d.show
+	call gaction opt.b.show
+	call gaction opt.b_d.setlabel "Beta risk(%):"
+	call gaction opt.b.setoption beta
+	call gaction opt.b.setvalue "20 15 10"
+	call gaction opt.b_p.show
+	call gaction opt.b_p.setlabel "beta"
+END
+
+PROGRAM hideAlphaBeta
+BEGIN
+	call gaction opt.a_d.hide
+	call gaction opt.a.hide
+	call gaction opt.a_p.hide
+	call gaction opt.size.hide
+	call gaction opt.b_d.hide
+	call gaction opt.b.hide
+	call gaction opt.b_p.hide
+END
+
+PROGRAM hidep1p2
+BEGIN
+	call opt.power.hide
+	call opt.p1_d.hide
+	call opt.p1.hide
+	call opt.p1_p.hide
+	call opt.p2_d.hide
+	call opt.p2.hide
+	call opt.p2_p.hide
+END
+
+PROGRAM t1_click
+BEGIN
+	call gaction opt.c3_d.setlabel "Non-Inferiority limit:"
+END
+
+PROGRAM t2_click
+BEGIN
+	call gaction opt.c3_d.setlabel "Superiority limit:"
+END
+
+PROGRAM t3_click
+BEGIN
+	call gaction opt.c3_d.setlabel "Equivalence limit:"
+END
+
+PROGRAM m1_click
+BEGIN
+	if (main.types_lb.iseq("co1m") | main.types_lb.iseq("co2m")) {
+		call gaction opt.mn1_d.setlabel "Minimum expected effect size:"
+		call gaction opt.mn1.setoption effect
+		call gaction opt.mn1_p.setlabel "effect"
+	}
+	else {
+		call gaction opt.mn1_d.setlabel "Equivalence limits:"
+		call gaction opt.mn1.setoption eqlim
+		call gaction opt.mn1_p.setlabel "eqlim"
+	}
+	call gaction opt.mn1.setdefault ""
+	call gaction opt.mn1.setvalue ""
+	call gaction opt.mn2_d.setlabel "Beta risk(%):"
+	call gaction opt.mn2.setdefault "20 15 10"
+	call gaction opt.mn2.setvalue "20 15 10"
+	call gaction opt.mn2.setoption beta
+	call gaction opt.mn2_p.setlabel "beta"
+	if (main.types_lb.iseq("co1m") | main.types_lb.iseq("c2me")) {
+		call opt.gb_means.setposition . 170 . 80
+	}
+	else {
+		call opt.gb_means.setposition . 195 . 80
+	}
+	call gaction opt.mn3_d.hide
+	call gaction opt.mn3.hide
+	call gaction opt.mn3_p.hide
+END
+
+PROGRAM m2_click
+BEGIN
+	if (main.types_lb.iseq("co1m") | main.types_lb.iseq("co2m")) {
+		call gaction opt.mn1_d.setlabel "Minimum expected effect size:"
+		call gaction opt.mn1_p.setlabel "effect"
+		call gaction opt.mn1.setoption effect
+	}
+	else {
+		call gaction opt.mn1_d.setlabel "Equivalence limits:"
+		call gaction opt.mn1.setoption eqlim
+		call gaction opt.mn1_p.setlabel "eqlim"
+	}
+	call gaction opt.mn1.setdefault ""
+	call gaction opt.mn1.setvalue ""
+	if (main.types_lb.iseq("co1m") | main.types_lb.iseq("c2me")) {
+		call opt.gb_means.setposition . 170 . 80
+		call gaction opt.mn3_d.hide
+		call gaction opt.mn3.hide
+		call gaction opt.mn3_p.hide
+		call gaction opt.mn2_d.setlabel "Sample Size (by group):"
+		call gaction opt.mn2.setoption n
+		call gaction opt.mn2.setlabel "Sample Size (by group)"
+		call gaction opt.mn2_p.setlabel "n"
+		call gaction opt.mn2.setdefault ""
+		call gaction opt.mn2.setvalue ""
+	}
+	else {
+		call opt.gb_means.setposition . 195 . 100
+		call gaction opt.mn3_d.show
+		call gaction opt.mn3.show
+		call gaction opt.mn3_p.show
+		call gaction opt.mn2_d.setlabel "Sample Size (Group 1):"
+		call gaction opt.mn2.setoption n1
+		call gaction opt.mn2.setlabel "Sample Size (Group 1)"
+		call gaction opt.mn2_p.setlabel "n1"
+		call gaction opt.mn2.setdefault ""
+		call gaction opt.mn2.setvalue ""
+		call gaction opt.mn3_d.setlabel "Sample Size (Group 0):"
+		call gaction opt.mn3.setoption n0
+		call gaction opt.mn3_p.setlabel "n0"
+		call gaction opt.mn3.setdefault ""
+		call gaction opt.mn3.setvalue ""
+	}
+END
+
+PROGRAM m3_click
+BEGIN
+	call gaction opt.mn1_d.setlabel "Beta risk(%):"
+	call gaction opt.mn1.setdefault "20 15 10"
+	call gaction opt.mn1.setvalue "20 15 10"
+	call gaction opt.mn1.setoption beta
+	call gaction opt.mn1_p.setlabel "beta"
+	if (main.types_lb.iseq("co1m") | main.types_lb.iseq("c2me")) {
+		call opt.gb_means.setposition . 170 . 80
+		call gaction opt.mn3_d.hide
+		call gaction opt.mn3.hide
+		call gaction opt.mn3_p.hide
+		call gaction opt.mn2_d.setlabel "Sample Size (by group):"
+		call gaction opt.mn2.setlabel "Sample Size (by group)"
+		call gaction opt.mn2.setoption n
+		call gaction opt.mn2_p.setlabel "n"
+		call gaction opt.mn2.setdefault ""
+		call gaction opt.mn2.setvalue ""
+	}
+	else {
+		call opt.gb_means.setposition . 195 . 100
+		call gaction opt.mn3_d.show
+		call gaction opt.mn3.show
+		call gaction opt.mn3_p.show
+		call gaction opt.mn2_d.setlabel "Sample Size (Group 1):"
+		call gaction opt.mn2.setoption n1
+		call gaction opt.mn2.setlabel "Sample Size (Group 1)"
+		call gaction opt.mn2_p.setlabel "n1"
+		call gaction opt.mn2.setdefault ""
+		call gaction opt.mn2.setvalue ""
+		call gaction opt.mn3_d.setlabel "Sample Size (Group 0):"
+		call gaction opt.mn3.setoption n0
+		call gaction opt.mn3_p.setlabel "n0"
+		call gaction opt.mn3.setdefault ""
+		call gaction opt.mn3.setvalue ""
+	}
+END
+
+
+PROGRAM command
+BEGIN
+	put "nsize "
+	if main.types_lb.iseq("co2r1") | main.types_lb.iseq("co2r2") {
+		put "co2r"
+	}
+	else {
+		put main.types_lb
+	}
+
+	beginoptions
+		if main.types_lb.iseq("ci1p") {
+			require opt.p0
+			optionarg opt.p0
+		}
+		else {
+			require opt.c1
+			optionarg opt.c1
+		}
+		if main.types_lb.iseq("co1p") | main.types_lb.iseq("co2p") {
+			if !opt.c2 & !opt.c3 {
+				stopbox stop "Missing option p1 or effect"
+			}
+			if opt.c2 & opt.c3 {
+				stopbox stop "Options p1 and effect are incompatible"
+			}
+			optionarg opt.c2 opt.c3
+		}
+		if main.types_lb.iseq("c1pe") | main.types_lb.iseq("c2pe") {
+			require opt.c2 opt.c3
+			optionarg opt.c2 opt.c3
+			if opt.t1_r {
+				put " noninf"
+			}
+			if opt.t2_r {
+				put " super"
+			}
+			if main.types_lb.iseq("c2pe") & !opt.c4.iseq("1") {
+				optionarg opt.c4
+			}
+		}
+		if main.types_lb.iseq("copp") {
+			if opt.power {
+				if !opt.c2 & !opt.c3 {
+					stopbox stop "Missing options pd or p0"
+				}
+			}
+			if opt.c2 | opt.c3 | opt.c4 {
+				if opt.c2 & (opt.c3 | opt.c4) {
+					stopbox stop "Options pd and p0, ora are incompatible"
+				}
+				if !opt.c3 & opt.c4 {
+					stopbox stop "Missing option p0"
+				}
+				if opt.c3 & !opt.c4 {
+					stopbox stop "Missing option ora"
+				}
+				optionarg opt.c2 opt.c3 opt.c4
+			}
+			optionarg opt.c5
+		}
+		if main.types_lb.iseq("co1m") | main.types_lb.iseq("co2m") | main.types_lb.iseq("c2me") {
+			if opt.m1_r {
+				if !opt.mn1 {
+					stopbox stop "Missing option effect or eqlim"
+				}
+				optionarg opt.mn1 
+				if opt.mn2.isdefault() {
+					if opt.a & !opt.a.isdefault() {
+						stopbox stop "For default beta only default alpha (5) is allowed"
+					}
+				}
+				else {
+					optionarg opt.a opt.mn2
+				}
+			}
+
+			if opt.m2_r {
+				if !opt.mn1 {
+					stopbox stop "Missing option effect or eqlim"
+				}
+				require opt.mn2
+				optionarg opt.mn1 opt.a opt.mn2
+				if main.types_lb.iseq("co2m") {
+					if opt.mn3 & opt.c2 {
+						stopbox stop "Options n0 and r are incompatible"
+					}
+					optionarg opt.mn3 opt.c2
+				}
+			}
+			
+			if opt.m3_r {
+				if opt.mn1.isdefault() {
+					if opt.a & !opt.a.isdefault() {
+						stopbox stop "For default beta only default alpha (5) is allowed"
+					}
+				}
+				else {
+					if opt.a & !opt.mn1 {
+						stopbox stop "Missing option beta"
+					}
+					if !opt.a & opt.mn1 {
+						stopbox stop "Missing option alpha"
+					}
+					optionarg opt.a opt.mn1
+				}
+				require opt.mn2
+				optionarg opt.mn2
+				if main.types_lb.iseq("co2m") {
+					if opt.mn3 & opt.c2 {
+						stopbox stop "Options n0 and r are incompatible"
+					}
+					optionarg opt.mn3 opt.c2
+				}
+			}
+		}
+		if main.types_lb.iseq("co1c") | main.types_lb.iseq("co2c") {
+			if !opt.c2 & !opt.c3 {
+				stopbox stop "Missing option cr1 or effect"
+			}
+			if opt.c2 & opt.c3 {
+				stopbox stop "Options cr1 and effect are incompatible"
+			}
+			optionarg opt.c2 opt.c3
+		}
+		if main.types_lb.iseq("co2r1") {
+			if !opt.c2 & !opt.c3 & !opt.c4 & !opt.c5 {
+				stopbox stop "Missing option r1, rr, rd, or"
+			}
+			if opt.c2 & (opt.c3 | opt.c4 | opt.c5) {
+				stopbox stop "Options r1 and rr,rd,or are incompatible"
+			}
+			if opt.c3 & (opt.c4 | opt.c5) {
+				stopbox stop "Options rr and rd,or are incompatible"
+			}
+			if opt.c4 & opt.c5 {
+				stopbox stop "Options rd and or are incompatible"
+			}
+			optionarg opt.c2 opt.c3 opt.c4 opt.c5
+		}
+		if main.types_lb.iseq("co2r2") {
+			if !opt.c2 & !opt.c3 {
+				stopbox stop "Missing option pe1() or or()"
+			}
+			if opt.c2 & opt.c3 {
+				stopbox stop "Options pe1 and or are incompatible"
+			}
+			optionarg opt.c2 opt.c3
+		}
+		if main.types_lb.iseq("co2i") {
+			if !opt.c2 & !opt.c3 & !opt.c4 {
+				stopbox stop "Missing option i1, ir, id"
+			}
+			if opt.c2 & (opt.c3 | opt.c4) {
+				stopbox stop "Options i1 and ir,id are incompatible"
+			}
+			if opt.c3 & opt.c4 {
+				stopbox stop "Options ir and id are incompatible"
+			}
+			if !opt.c5 {
+				stopbox stop "Missing option d"
+			}
+			optionarg opt.c2 opt.c3 opt.c4 opt.c5
+		}
+		if main.types_lb.iseq("co2r1"){
+			if opt.c6 & opt.c7 {
+				stopbox stop "Options r and pe are incompatible"
+			}
+			optionarg opt.c6 opt.c7
+		}
+		if main.types_lb.iseq("co2r2") {
+			optionarg opt.c4
+		}
+		if main.types_lb.iseq("co2i"){
+			optionarg opt.c6
+		}		
+		
+		if !main.types_lb.iseq("co1m") & !main.types_lb.iseq("co2m") & !main.types_lb.iseq("c2me") {
+			if opt.size {
+				if opt.b.isdefault() {
+					if opt.a & !opt.a.isdefault() {
+						stopbox stop "For default beta only default alpha (5) is allowed"
+					}
+				}
+				else {
+					if opt.a & !opt.b {
+						stopbox stop "Missing option beta"
+					}
+					if !opt.a & opt.b {
+						stopbox stop "Missing option alpha"
+					}
+					optionarg opt.a opt.b
+				}
+			}
+			if opt.power {
+				if main.types_lb.iseq("co2r1") | main.types_lb.iseq("co2r2") | main.types_lb.iseq("co2i") {
+					if !opt.p1 & !opt.p2 {
+						stopbox stop "Missing option n1 or n0"
+					}
+					if main.types_lb.iseq("co2r1") | main.types_lb.iseq("co2i") {
+						if opt.c6 & opt.p1 & opt.p2 {
+							stopbox stop "Option r is incompatible with options n1, n0"
+						}
+					}
+					if main.types_lb.iseq("co2r2") {
+						if opt.c4 & opt.p1 & opt.p2 {
+							stopbox stop "Option r is incompatible with options n1, n0"
+						}
+					}
+					optionarg opt.p1 opt.p2
+				}
+				else {
+					require opt.p1
+					optionarg opt.a opt.p1
+					if main.types_lb.iseq("co2m") {
+						if opt.p2 & opt.c3 {
+							stopbox stop "Options n0 and r are incompatible"
+						}
+						optionarg opt.p2
+					}
+					if main.types_lb.iseq("co2c") {
+						if !opt.p2 {
+							stopbox stop "Missing option n0"
+						}
+						optionarg opt.p2
+					}
+					if main.types_lb.iseq("c2pe") {
+						optionarg opt.p2
+					}
+				}
+			}
+		}
+
+		if main.types_lb.iseq("cokm") {
+			if opt.simul {
+				require opt.m
+				optionarg opt.m
+			}
+			if opt.pair {
+				require opt.ef opt.c
+				optionarg opt.ef opt.c
+			}
+			if opt.powerk {
+				require opt.nk
+				optionarg opt.nk
+			}
+		}
+
+		if main.types_lb.iseq("ci1p") | main.types_lb.iseq("ci2p") | main.types_lb.iseq("ci1m") | main.types_lb.iseq("ci2m") {
+			if main.types_lb.iseq("ci2p") {
+				if !opt.c2 {
+					stopbox stop "Missing option p1"
+				}
+			}
+			if main.types_lb.iseq("ci1p") | main.types_lb.iseq("ci1m") {
+				if !opt.c2.isdefault() {
+					optionarg opt.c2
+				}
+				optionarg opt.c3 opt.c4
+			}
+			if main.types_lb.iseq("ci2p") {
+				optionarg opt.c2
+				if !opt.c3.isdefault() {
+					optionarg opt.c3
+				}
+				optionarg opt.c4
+			}
+			if main.types_lb.iseq("ci2m") {
+				if !opt.c2.isdefault() {
+					optionarg opt.c2
+				}
+				optionarg opt.c3
+			}
+			
+			if opt.apre {
+				if !opt.ap {
+					stopbox stop "Missing option apre"
+				}
+				optionarg opt.ap
+			}
+			if opt.prec {
+				if main.types_lb.iseq("ci1p") {
+					require opt.ns
+					optionarg opt.ns
+				}
+				else {
+					if !opt.n1 {
+						if main.types_lb.iseq("ci1m") {
+							stopbox stop "Missing option ns"
+						}
+						else {
+							stopbox stop "Missing option n1"
+						}
+					}
+					if main.types_lb.iseq("ci2p") | main.types_lb.iseq("ci2m") {
+						if main.types_lb.iseq("ci2p") {
+							if opt.n2 & opt.c4 {
+								stopbox stop "Options n0 and r are incompatible"
+							}
+						}
+						else {
+							if opt.n2 & opt.c3 {
+								stopbox stop "Options n0 and r are incompatible"
+							}
+						}
+					}
+					optionarg opt.n1 opt.n2
+				}
+			}
+		}
+		
+		if main.types_lb.iseq("ncr") {
+			require opt.c2 opt.c3
+			optionarg opt.c2 opt.c3
+		}
+		
+		optionarg main.nst		//Add nst
+	endoptions
+END

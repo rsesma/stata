@@ -1,0 +1,52 @@
+/*
+  statmis.dlg
+
+*! VERSION 1.1.3  22oct2018
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_small
+INCLUDE header
+HELP hlp1, view("help statmis")
+RESET res1
+
+DIALOG main, label("statmis - Statistics of missing values") tabtitle("Main")
+BEGIN
+	TEXT  		tx_vars 	_lft   _top 	300  	., label("Variables (leave emtpy for all variables):")
+	VARLIST		vl_vars 	_lft   _ss 		340  	., label("Variables")
+
+	TEXT  		tx_exvars 	_lft   _ls 	    300  	., label("OR All variables except:")
+	VARLIST		vl_exvars 	_lft   _ss 		340  	., label("All Variables Except")
+	
+	TEXT     	tx_na		_lft   _ls	    350  	., label("Not Applicable values coded as .z are excluded from the missing group")
+	
+	GROUPBOX	gb_nst	_lft  140	 340  	50, label("Name of the study")
+	EDIT		ed_nst	_ilft _ss	 320	., option(nst)
+END
+
+INCLUDE ifin
+
+PROGRAM command
+BEGIN
+	put "statmis "
+	
+	if (!main.vl_vars.iseq("") & !main.vl_exvars.iseq("")) {
+		stopbox stop "Only one variable list is allowed"
+	}
+	if (!main.vl_vars.iseq("")) {
+		put main.vl_vars	
+	}
+	if (!main.vl_exvars.iseq("")) {
+		put main.vl_exvars	
+	}
+	put " " /program ifin_output
+	
+	beginoptions
+		if (!main.vl_exvars.iseq("")) {
+			put " excluded"
+		}
+		optionarg main.ed_nst
+	endoptions
+END

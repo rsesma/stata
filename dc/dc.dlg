@@ -1,0 +1,247 @@
+/*
+  dc.dlg
+
+*! VERSION 1.0.9  19oct2017
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_medium
+DEFINE _dlght 420
+INCLUDE header
+HELP hlp1, view("help dc")
+RESET res1
+
+DIALOG main, label("dc - Data Check") tabtitle("Main")
+BEGIN
+	TEXT  		tx_vars 	_lft   _top 	300  	., label("Variables:")
+	VARLIST		vl_vars 	_lft   _ss 		405  	., label("Variables")
+	CHECKBOX	cb_id		_lft   _ms		250     ., label("Check variables as identifier") onclickon(program isid_on) onclickoff(program isid_off)
+	TEXT 		tx_id 		_lft   _ls	    110	    ., label("Identifier Variables:")
+	VARLIST		vl_ids 		+115    @ 		290  	., label("Identifier Variables") option(id)
+	CHECKBOX	cb_range	_lft   _ls		405    55, label("Check range") groupbox onclickon(program range_on) onclickoff(program range_off)
+	TEXT  		tx_range 	_ilft  _ss 		50  	., label("Range:")
+	EDIT  		ed_range 	+55    @ 		100  	., label("Range") option(vl)
+	TEXT  		tx_ex1 		+110   @ 		220  	., label("Examples: 0/80 ; 0 1 2 ; 15/80 99 ; F M")
+	CHECKBOX	cb_dict		_lft   +40		405    75, label("Check with dictionary file") groupbox onclickon(program dict_on) onclickoff(program dict_off)
+	FILE  		fi_dict 	_ilft  _ss 		380  	., label("Browse...") filter("Stata Data|*.dta") dialogtitle("Select dictionary file") option(table)
+	TEXT 		tx_key 		_ilft  _ms	    90	    ., label("Key Variable:")
+	EDIT    	ed_key 	    +95	   @		100		., label("Key Variable") option(vk)
+	CHECKBOX	cb_date1	_lft   +35		405    75, label("Check date as range") groupbox onclickon(program date1_on) onclickoff(program date1_off)
+	TEXT 		tx_di 		_ilft  _ss	    75	    ., label("Initial Date:")
+	EDIT    	ed_di 	    +80	   @		100		., label("Initial Date") option(di)
+	TEXT 		tx_df 		+120   @	    75	    ., label("Final Date:")
+	EDIT    	ed_df 	    +80	   @		100		., label("Final Date") option(df)
+	TEXT 		tx_ex2 		_ilft  _ms	    300	    ., label("Examples: 01jun2003 ; 01/04/2006 ; 2-4-1998")
+	CHECKBOX	cb_date2	_lft   +35		405    75, label("Check date as date difference") groupbox onclickon(program date2_on) onclickoff(program date2_off)
+	TEXT 		tx_dd 		_ilft  _ss	    100	    ., label("Date Difference:")
+	EDIT    	ed_dd 	    +105   @		100		., label("Date Difference") option(dd)
+	TEXT 		tx_ddun		+130   @	    45	    ., label("Units:")
+	COMBOBOX	co_ddun	  	+50    @	    100  	., dropdownlist contents(dd_units) default("days") label("Units") option(ddunit)
+	TEXT 		tx_ddl 		_ilft  _ms	    60	    ., label("Minimum:")
+	EDIT    	ed_ddl 	    +65	   @		100		., label("Minimum Data Difference") option(ddl)
+	TEXT 		tx_ddu 		+150   @	    60	    ., label("Maximum:")
+	EDIT    	ed_ddu 	    +65	   @		100		., label("Maximum Data Difference") option(ddu)	
+END
+
+DIALOG opt, tabtitle("Options and Logical Checks")
+BEGIN
+	GROUPBOX	gb_opt		_lft   _top		405    95, label("Options")
+	TEXT 		tx_nd 		_ilft  _ss	    120	    ., label("Number of Decimals:")
+	EDIT    	ed_nd 	    +125   @		40		., label("Number of Decimals") option(nd) numonly default(0)
+	TEXT 		tx_varl		_ilft  _ms	    160	    ., label("Additional variables to list:")
+	VARLIST		vl_varl 	+165   @ 		220  	., label("Additional variables to list") option(varl)
+	CHECKBOX	cb_miss		_ilft  _ms		180     ., label("Treat missing values as errors")
+	CHECKBOX	cb_dup		+190   @		190     ., label("Treat duplicate values as errors")
+	
+	GROUPBOX	gb_1		_lft   +30		405    55, label("Logical check 1")
+	TEXT 		tx_code1	_ilft  _ss	    75	    ., label("Error Code 1:")
+	EDIT    	ed_code1    +80     @		30		., label("Error Code 1") option(code1) numonly
+	EXP     	expr1       +40     @		260		., label("Expression") option(expr1) error("Logical Check Expression 1")
+	GROUPBOX	gb_2		_lft   +40		405    55, label("Logical check 2")
+	TEXT 		tx_code2	_ilft  _ss	    75	    ., label("Error Code 2:")
+	EDIT    	ed_code2    +80     @		30		., label("Error Code 2") option(code2) numonly
+	EXP     	expr2       +40     @		260		., label("Expression") option(expr2) error("Logical Check Expression 2")
+	GROUPBOX	gb_3		_lft   +40		405    55, label("Logical check 3")
+	TEXT 		tx_code3	_ilft  _ss	    75	    ., label("Error Code 3:")
+	EDIT    	ed_code3    +80     @		30		., label("Error Code 3") option(code3) numonly
+	EXP     	expr3       +40     @		260		., label("Expression") option(expr3) error("Logical Check Expression 3")
+	GROUPBOX	gb_4		_lft   +40		405    55, label("Logical check 4")
+	TEXT 		tx_code4	_ilft  _ss	    75	    ., label("Error Code 4:")
+	EDIT    	ed_code4    +80     @		30		., label("Error Code 4") option(code4) numonly
+	EXP     	expr4       +40     @		260		., label("Expression") option(expr4) error("Logical Check Expression 4")
+	GROUPBOX	gb_5		_lft   +40		405    55, label("Logical check 5")
+	TEXT 		tx_code5	_ilft  _ss	    75	    ., label("Error Code 5:")
+	EDIT    	ed_code5    +80     @		30		., label("Error Code 5") option(code5) numonly
+	EXP     	expr5       +40     @		260		., label("Expression") option(expr5) error("Logical Check Expression 5")
+END
+
+LIST dd_units
+	BEGIN
+		days
+		years
+	END
+
+
+PROGRAM isid_on
+BEGIN
+	call main.tx_id.disable
+	call main.vl_ids.disable
+	call main.vl_ids.setvalue ""
+	call main.cb_range.setoff
+	call main.cb_dict.setoff
+	call main.cb_date1.setoff
+	call main.cb_date2.setoff
+END
+
+PROGRAM isid_off
+BEGIN
+	call main.tx_id.enable
+	call main.vl_ids.enable
+END
+
+PROGRAM range_on
+BEGIN
+	call main.tx_range.enable
+	call main.ed_range.enable
+	call main.tx_ex1.enable
+	call main.cb_id.setoff
+	call main.cb_dict.setoff
+	call main.cb_date1.setoff
+	call main.cb_date2.setoff
+END
+
+PROGRAM range_off
+BEGIN
+	call main.tx_range.disable
+	call main.ed_range.disable
+	call main.tx_ex1.disable
+	call main.ed_range.setvalue ""
+END
+
+PROGRAM dict_on
+BEGIN
+	call main.fi_dict.enable
+	call main.tx_key.enable
+	call main.ed_key.enable
+	call main.cb_id.setoff
+	call main.cb_range.setoff
+	call main.cb_date1.setoff
+	call main.cb_date2.setoff
+END
+
+PROGRAM dict_off
+BEGIN
+	call main.fi_dict.disable
+	call main.tx_key.disable
+	call main.ed_key.disable
+	call main.fi_dict.setvalue ""
+	call main.ed_key.setvalue ""
+END
+
+PROGRAM date1_on
+BEGIN
+	call main.tx_di.enable
+	call main.ed_di.enable
+	call main.tx_df.enable
+	call main.ed_df.enable
+	call main.tx_ex2.enable
+	call main.cb_id.setoff
+	call main.cb_range.setoff
+	call main.cb_dict.setoff
+	call main.cb_date2.setoff
+END
+
+PROGRAM date1_off
+BEGIN
+	call main.tx_di.disable
+	call main.ed_di.disable
+	call main.tx_df.disable
+	call main.ed_df.disable
+	call main.tx_ex2.disable
+	call main.ed_di.setvalue ""
+	call main.ed_df.setvalue ""
+END
+
+PROGRAM date2_on
+BEGIN
+	call main.tx_dd.enable
+	call main.ed_dd.enable
+	call main.tx_ddun.enable
+	call main.co_ddun.enable
+	call main.tx_ddl.enable
+	call main.ed_ddl.enable
+	call main.tx_ddu.enable
+	call main.ed_ddu.enable
+	call main.cb_id.setoff
+	call main.cb_range.setoff
+	call main.cb_dict.setoff
+	call main.cb_date1.setoff
+END
+
+PROGRAM date2_off
+BEGIN
+	call main.tx_dd.disable
+	call main.ed_dd.disable
+	call main.tx_ddun.disable
+	call main.co_ddun.disable
+	call main.tx_ddl.disable
+	call main.ed_ddl.disable
+	call main.tx_ddu.disable
+	call main.ed_ddu.disable
+	call main.ed_dd.setvalue ""
+	call main.co_ddun.setvalue "days"
+	call main.ed_ddl.setvalue ""
+	call main.ed_ddu.setvalue ""
+END
+
+
+PROGRAM command
+BEGIN
+	put "dc "
+	require main.vl_vars
+	put main.vl_vars
+	beginoptions
+		if main.cb_id {
+			put "isid"
+		}
+		else {
+			if main.cb_range {
+				optionarg main.ed_range
+			}
+		
+			if main.cb_dict {
+				optionarg main.fi_dict main.ed_key
+			}
+		
+			if main.cb_date1 {
+				optionarg main.ed_di main.ed_df
+			}
+		
+			if main.cb_date2 {
+				optionarg main.ed_dd main.ed_ddl main.ed_ddu
+				if !main.co_ddun.isdefault() {
+					optionarg main.co_ddun
+				}
+			}
+		
+			if !opt.ed_nd.isdefault() {
+				optionarg opt.ed_nd
+			}
+			optionarg opt.vl_varl
+			
+			if opt.cb_miss {
+				put "nomissing"
+			}
+
+			if opt.cb_dup {
+				put "nodups"
+			}
+
+			optionarg main.vl_ids
+			
+			optionarg opt.ed_code1 opt.expr1 opt.ed_code2 opt.expr2 opt.ed_code3 opt.expr3 opt.ed_code4 opt.expr4 opt.ed_code5 opt.expr5
+		}
+	endoptions
+END

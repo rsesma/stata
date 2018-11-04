@@ -1,0 +1,15 @@
+v 3
+d agree.  Agreement: Bland-Altman & Passing-Bablok methods.
+d After installation, see help agree.
+d
+d (c)JM. Domenech
+d Programmer: R. Sesma
+d Laboratori d'Estadistica Aplicada, Universitat Autonoma de Barcelona.
+d
+d Distribution-Date:  11may2018
+d Version 1.1.34 (11may2018)
+d
+d E-mail: stata@graunt.cat
+f agree.ado
+f agree.sthlp
+f agree.dlg

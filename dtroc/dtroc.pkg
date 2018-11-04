@@ -1,0 +1,15 @@
+v 3
+d dtroc  ROC analysis & optimal cutoff point.
+d After installation, see help dtroc.
+d
+d (c)JM. Domenech
+d Programmer: R. Sesma
+d Laboratori d'Estadistica Aplicada, Universitat Autonoma de Barcelona.
+d
+d Distribution-Date:  11may2018
+d Version 1.1.2 (11may2018)
+d
+d E-mail: stata@graunt.cat
+f dtroc.ado
+f dtroc.sthlp
+f dtroc.dlg

@@ -1,0 +1,59 @@
+/*
+  cir.dlg
+
+*! VERSION 1.1.1  23jun2017
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_msmall
+INCLUDE _ht280
+INCLUDE header
+HELP hlp1, view("help cir")
+RESET res1
+
+DEFINE _xY    225
+DEFINE _y_nst 	150
+DEFINE _var_w 	150
+DEFINE _x _lft
+DEFINE _y 165
+DEFINE _cx 100
+
+DIALOG main, label("cir - Confidence Interval for corrrelations") tabtitle("Main")
+BEGIN
+	TEXT  		tx_y _lft _top  _var_w	., label("Y variable:") left
+	VARNAME		v_y	  @   _ss	_var_w  ., label("Y variable")
+	TEXT  		tx_x _xY  _top  _var_w	., label("X variable:") left
+	VARNAME		v_x	  @	  _ss   _var_w  ., label("X variable")
+	TEXT  		tx_by _lft _ms   _var_w	., label("Grouping variable:") left
+	VARNAME		v_by	  @	  _ss   _var_w  ., label("Grouping variable") option(by)
+
+	RADIO		rb_pear _lft	_ls		250	  ., label("Pearson correlation") first option("pearson")
+	RADIO		rb_spe  _xY	    @		250	  ., label("Spearman correlation") last option("spearman")
+	TEXT		tx_rho	_lft	_ls		200	  ., label("Hypothetical correlation to compare with:")
+	EDIT 		ed_rho 	+215	@ 		100   ., numonly option(rho)
+	INCLUDE _sp_level
+	
+	GROUPBOX	gb_nst	_lft  	_xls	370    60, label("Name of the study")
+	EDIT		ed_nst	_ilft   _ms	 	350		., option(nst)
+END
+
+INCLUDE byifin
+
+PROGRAM command
+BEGIN
+	INCLUDE _by_pr
+	put "cir "
+	require main.v_x main.v_y
+	put main.v_y " " main.v_x
+	put " " /program ifin_output
+	beginoptions
+		option radio(main rb_pear rb_spe)
+		optionarg main.v_by
+		optionarg main.ed_rho
+		INCLUDE _level_main_pr
+		optionarg main.ed_nst
+	endoptions
+END
+

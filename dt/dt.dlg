@@ -1,0 +1,154 @@
+/*
+  dt.dlg
+
+*! VERSION 1.1.3  03jul2018
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_msmall
+DEFINE _dlght 360
+INCLUDE header
+HELP hlp1, view("help dt")
+RESET res1
+
+DEFINE _y_vars   60
+DEFINE _var_inc +20
+DEFINE _var_w 	120
+DEFINE _ed_w 	20
+DEFINE _ytest 	65
+DEFINE _yref 	120
+DEFINE _yp	 	175
+DEFINE _yprev	230
+DEFINE _y_nst 	290
+DEFINE _x _lft
+DEFINE _y _top
+DEFINE _cx 100
+
+DIALOG main, label("dt - Diagnostic Tests") tabtitle("Main")
+BEGIN
+	GROUPBOX	gb_st	_lft   _top		370    50, label("Study type")
+	RADIO    	rb_cs   +10    +20      110		., first default(1) label("Cross-Sectional") onclickon(program change_st)
+	RADIO    	rb_cc   +160   @        100		., last default(0) label("Case-Control") onclickon(program change_st)
+
+	GROUPBOX	gb_test	_lft   _ytest	370    50, label("Diagnostic test variable")
+	VARNAME		v_test	+10    _var_inc	_var_w  ., label("Diagnostic test variable")
+	TEXT  		tx_tvp 	+125    @ 	    100  	., label("Positive value:") right
+	EDIT		ed_tvp	+105   @    	_ed_w	., numonly label("Diagnostic test variable positive value") default(1)
+	TEXT  		tx_tvn 	+25    @ 	    70  	., label("Negative:") right
+	EDIT		ed_tvn	+75    @    	_ed_w	., numonly label("Diagnostic test variable negative value") default(0)
+
+	GROUPBOX	gb_ref	_lft   _yref	370    50, label("Reference criterion variable")
+	VARNAME		v_ref	+10    _var_inc	_var_w  ., label("Reference criterion variable")
+	TEXT  		tx_rvp 	+125   @ 	    100  	., label("Positive value:") right
+	EDIT		ed_rvp	+105   @    	_ed_w	., numonly label("Reference criterion variable positive value") default(1)
+	TEXT  		tx_rvn 	+25    @ 	    70  	., label("Negative:") right
+	EDIT		ed_rvn	+75    @    	_ed_w	., numonly label("Reference criterion variable negative value") default(0)
+
+	GROUPBOX	gb_p	_lft   _yp		370    50, label("List of hypothetical population prevalence (%)")
+	EDIT		ed_p	_ilft  _var_inc	350		., label("List of hypothetical population prevalence") option(p)
+	
+	GROUPBOX	gb_prev	 _lft   _yprev	370    50, label("Population Sample")
+	TEXT  		tx_m1 	 _ilft  +20		100  	., label("Total cases (m1):")
+	EDIT		ed_m1	 +105   @	    40		., label("Total cases (m1)") numonly option(m1)
+	TEXT  		tx_n 	 +100   @ 		100  	., label("Size of sample (n):")
+	EDIT		ed_n	 +105    @	    40		., label("Size of sample (n)") numonly option(n)
+
+	GROUPBOX	gb_nst	_lft  	_y_nst	370    60, label("Name of the study")
+	EDIT		ed_nst	_ilft   _ms	 	350		., option(nst)
+END
+
+INCLUDE byifin
+
+DIALOG opt, tabtitle("Options")
+BEGIN
+	INCLUDE _sp_level
+	COMBOBOX	co_me	_lft	_mls	70	., dropdownlist contents(ci_descrip) default("wilson") values(ci_values)
+	TEXT  		tx_me 	+72	 @ 		310  	., label("method to calculate confidence intervals for proportions") left
+END
+
+LIST ci_descrip
+	BEGIN
+		Wilson
+		Exact
+		Wald
+	END
+
+LIST ci_values
+	BEGIN
+		wilson
+		exact
+		wald
+	END
+
+
+PROGRAM change_st
+BEGIN
+	//Void m1,n controls
+	call main.ed_m1.setvalue ""
+	call main.ed_n.setvalue ""
+	
+	//Show/hide m1,n,prev controls
+	if main.rb_cs {
+		call main.gb_prev.hide
+		call main.tx_m1.hide
+		call main.ed_m1.hide
+		call main.tx_n.hide
+		call main.ed_n.hide
+	}
+	if main.rb_cc {
+		call main.gb_prev.show
+		call main.tx_m1.show
+		call main.ed_m1.show
+		call main.tx_n.show
+		call main.ed_n.show
+	}
+END
+
+
+PROGRAM command
+BEGIN
+	INCLUDE _by_pr
+	put "dt "
+	require main.v_test main.v_ref
+	put main.v_test " " main.v_ref
+	put " " /program ifin_output
+	beginoptions
+		if main.rb_cs {
+			put " st(cs)"
+		}
+		if main.rb_cc {
+			put " st(cc)"
+		}
+
+		if (!main.ed_tvn.iseq("0") | !main.ed_tvp.iseq("1")) {
+			put " valtest(" 
+			put main.ed_tvn
+			put " " 
+			put main.ed_tvp
+			put ")"
+		}
+	
+		if (!main.ed_rvn.iseq("0") | !main.ed_rvp.iseq("1")) {
+			put " valref(" 
+			put main.ed_rvn
+			put " " 
+			put main.ed_rvp
+			put ")"
+		}
+		optionarg main.ed_p
+		
+		if main.rb_cc {
+			optionarg main.ed_m1 main.ed_n
+		}
+		
+		if !opt.co_me.isdefault() {
+			put " " opt.co_me
+		}
+		
+		INCLUDE _level_opt_pr
+		
+		optionarg main.ed_nst
+	endoptions
+END

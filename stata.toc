@@ -1,0 +1,24 @@
+v 3
+d User-written commands by the Laboratori d'Estadistica Aplicada (UAB)
+
+d This site provides user-written commands and other materials for use with Stata.
+
+p agree Agreement: Bland-Altman & Passing-Bablok methods
+p allsets All Possible Subsets: linear, logistic & Cox regression
+p chisqi Goodness of fit Chi-squared test
+p ci2p This command is obsolete. Install new command sta
+p cir Confidence Intervals for Pearson and Spearman Correlation
+p cohenkap Kappa & Weighted kappa
+p confound Modelling confounding in Linear, Logistic and Cox Regression
+p dc Data Check
+p dcreport Data Check - Incidence Report
+p dt Diagnostic Tests
+p dtroc ROC Analysis & optimal cutoff point
+p mar Meta-Analysis: OR,RR,RD,IR,ID,B,MD,R combined
+p nsize Sample Size & Power calculations
+p pwkwallis Kruskal-Wallis equality-of-populations rank test & pairwise comparisons
+p rndseq Generation of Random Sequences
+p rtrend Trend test (2xk table) for frequency and person-time data
+p scct Stochastic Curtailment: Clinical trials
+p sta Association measures (frequency, person-time & paired data)
+p statmis Statistics of missing values

@@ -1,0 +1,170 @@
+<NotepadPlus>
+    <Project name="stata">
+        <Folder name="agree">
+            <File name="agree\agree.ado" />
+            <File name="agree\agree.dlg" />
+            <File name="agree\agree.pkg" />
+            <File name="agree\agree.sthlp" />
+        </Folder>
+        <Folder name="allsets">
+            <File name="allsets\allsets.ado" />
+            <File name="allsets\allsets.dlg" />
+            <File name="allsets\allsets.pkg" />
+            <File name="allsets\allsets.sthlp" />
+        </Folder>
+        <Folder name="chisqi">
+            <File name="chisqi\chisqi.ado" />
+            <File name="chisqi\chisqi.dlg" />
+            <File name="chisqi\chisqi.pkg" />
+            <File name="chisqi\chisqi.sthlp" />
+        </Folder>
+        <Folder name="ci2p">
+            <File name="ci2p\ci2p.ado" />
+            <File name="ci2p\ci2p.pkg" />
+            <File name="ci2p\ci2p.sthlp" />
+            <File name="ci2p\ci2pi.ado" />
+            <File name="ci2p\ci2pi.sthlp" />
+        </Folder>
+        <Folder name="cir">
+            <File name="cir\cir.ado" />
+            <File name="cir\cir.dlg" />
+            <File name="cir\cir.pkg" />
+            <File name="cir\cir.sthlp" />
+            <File name="cir\ciri.ado" />
+            <File name="cir\ciri.dlg" />
+            <File name="cir\ciri.sthlp" />
+        </Folder>
+        <Folder name="cohenkap">
+            <File name="cohenkap\cohenkap.ado" />
+            <File name="cohenkap\cohenkap.dlg" />
+            <File name="cohenkap\cohenkap.pkg" />
+            <File name="cohenkap\cohenkap.sthlp" />
+            <File name="cohenkap\cohenkapi.ado" />
+            <File name="cohenkap\cohenkapi.dlg" />
+            <File name="cohenkap\cohenkapi.sthlp" />
+            <File name="cohenkap\cohenkapi__dlg.ado" />
+        </Folder>
+        <Folder name="confound">
+            <File name="confound\confound.ado" />
+            <File name="confound\confound.dlg" />
+            <File name="confound\confound.pkg" />
+            <File name="confound\confound.sthlp" />
+        </Folder>
+        <Folder name="dc">
+            <File name="dc\dc.ado" />
+            <File name="dc\dc.dlg" />
+            <File name="dc\dc.pkg" />
+            <File name="dc\dc.sthlp" />
+        </Folder>
+        <Folder name="dcreport">
+            <File name="dcreport\dcreport.ado" />
+            <File name="dcreport\dcreport.dlg" />
+            <File name="dcreport\dcreport.pkg" />
+            <File name="dcreport\dcreport.sthlp" />
+        </Folder>
+        <Folder name="dtable">
+            <File name="dtable\dtable.ado" />
+            <File name="dtable\dtable_desc.ado" />
+            <File name="dtable\dtable_tab.ado" />
+        </Folder>
+        <Folder name="dt">
+            <File name="dt\dt.ado" />
+            <File name="dt\dt.dlg" />
+            <File name="dt\dt.pkg" />
+            <File name="dt\dt.sthlp" />
+            <File name="dt\dti.ado" />
+            <File name="dt\dti.dlg" />
+            <File name="dt\dti.sthlp" />
+        </Folder>
+        <Folder name="dtroc">
+            <File name="dtroc\dtroc.ado" />
+            <File name="dtroc\dtroc.dlg" />
+            <File name="dtroc\dtroc.pkg" />
+            <File name="dtroc\dtroc.sthlp" />
+        </Folder>
+        <Folder name="getaccess">
+            <File name="getaccess\getaccess.ado" />
+        </Folder>
+        <Folder name="mar">
+            <File name="mar\mar.ado" />
+            <File name="mar\mar.dlg" />
+            <File name="mar\mar.pkg" />
+            <File name="mar\mar.sthlp" />
+        </Folder>
+        <Folder name="nsize">
+            <File name="nsize\nsize.ado" />
+            <File name="nsize\nsize.dlg" />
+            <File name="nsize\nsize.pkg" />
+            <File name="nsize\nsize.sthlp" />
+            <File name="nsize\nsize__utils.ado" />
+        </Folder>
+        <Folder name="pwkwallis">
+            <File name="pwkwallis\pwkwallis.ado" />
+            <File name="pwkwallis\pwkwallis.dlg" />
+            <File name="pwkwallis\pwkwallis.pkg" />
+            <File name="pwkwallis\pwkwallis.sthlp" />
+        </Folder>
+        <Folder name="rndseq">
+            <File name="rndseq\rndseq.ado" />
+            <File name="rndseq\rndseq.dlg" />
+            <File name="rndseq\rndseq.pkg" />
+            <File name="rndseq\rndseq.sthlp" />
+        </Folder>
+        <Folder name="rtrend">
+            <File name="rtrend\rtrend.ado" />
+            <File name="rtrend\rtrend.dlg" />
+            <File name="rtrend\rtrend.pkg" />
+            <File name="rtrend\rtrend.sthlp" />
+            <File name="rtrend\rtrendi.ado" />
+            <File name="rtrend\rtrendi.dlg" />
+            <File name="rtrend\rtrendi.sthlp" />
+            <File name="rtrend\rtrend__utils.ado" />
+        </Folder>
+        <Folder name="scct">
+            <File name="scct\scct.ado" />
+            <File name="scct\scct.dlg" />
+            <File name="scct\scct.pkg" />
+            <File name="scct\scct.sthlp" />
+        </Folder>
+        <Folder name="sta">
+            <File name="sta\sta.ado" />
+            <File name="sta\sta.dlg" />
+            <File name="sta\sta.pkg" />
+            <File name="sta\sta.sthlp" />
+            <File name="sta\stai.ado" />
+            <File name="sta\stai.dlg" />
+            <File name="sta\stai.sthlp" />
+            <File name="sta\sta_freq.sthlp" />
+            <File name="sta\sta_freq_str.sthlp" />
+            <File name="sta\sta_paired.sthlp" />
+            <File name="sta\sta_pt.sthlp" />
+            <File name="sta\sta_pt_str.sthlp" />
+            <File name="sta\sta__utils.ado" />
+        </Folder>
+        <Folder name="statmis">
+            <File name="statmis\statmis.ado" />
+            <File name="statmis\statmis.dlg" />
+            <File name="statmis\statmis.pkg" />
+            <File name="statmis\statmis.sthlp" />
+        </Folder>
+        <Folder name="ttestx">
+            <File name="ttestx\ttestx.ado" />
+            <File name="ttestx\_ttestx.ado" />
+            <File name="ttestx\ttestx.dlg" />
+        </Folder>
+        <Folder name="_metodo_mnu">
+            <File name="_metodo_mnu\_metodo_mnu.ado" />
+            <File name="_metodo_mnu\_metodo_mnu.pkg" />
+        </Folder>
+        <Folder name="_tab">
+            <File name="_tab\_tab.ado" />
+            <File name="_tab\_tab1.dlg" />
+            <File name="_tab\_tab2.dlg" />
+        </Folder>
+        <File name="addPC.ado" />
+        <File name="stata.toc" />
+        <File name="testvars.ado" />
+        <File name="xado.ado" />
+        <File name="xver.ado" />
+    </Project>
+</NotepadPlus>

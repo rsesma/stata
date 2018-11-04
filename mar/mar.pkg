@@ -1,0 +1,15 @@
+v 3
+d mar.  Meta-Analysis: OR,RR,RD,IR,ID,B,MD,R combined.
+d After installation, see help mar.
+d
+d (c)JM. Domenech
+d Programmer: R. Sesma
+d Laboratori d'Estadistica Aplicada, Universitat Autonoma de Barcelona.
+d
+d Distribution-Date:  11may2018
+d Version 1.4.1 (11may2018)
+d
+d E-mail: stata@graunt.cat
+f mar.ado
+f mar.sthlp
+f mar.dlg

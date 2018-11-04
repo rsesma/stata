@@ -1,0 +1,232 @@
+/*
+  _tab2
+
+*! VERSION 0.0.1 20apr2018
+
+tab2.dlg (v1.3.0 16dec2014) & _tab2.idlg (1.1.0 22dec2014) 
+original code modified by R Sesma
+
+*/
+
+VERSION 14.0
+
+INCLUDE _std_glm
+DEFINE _dlght 370
+INCLUDE header
+
+HELP hlp1, view("help tabulate-twoway")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+        setscale_hadj resource TAB2_DLG_HSCALE
+END
+
+PROGRAM POSTINIT_PROGRAM
+BEGIN
+	if __MESSAGE.iseq("-exact-") {
+		call script main_exact_seton
+	}
+	call main.ck_first.hide
+END
+
+DIALOG main, label("tabulate - Two-way table with measures of association") tabtitle(resource LBL_TAB_MAIN)
+BEGIN
+  /*--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+*/
+  TEXT     tx_rowvar   _lft      _top      _vnwd      .,			/*
+		*/ label("Row variable:")		/*
+		*/
+  VARNAME  vl_rowvar   @         _ss       _vnwd      .,			/*
+		*/ label(resource LBL_CATEGORICAL_VARIABLES)		/*
+		*/
+  TEXT     tx_colvar   _lft2      _top      _vnwd      .,			/*
+		*/ label("Column variable:")		/*
+		*/
+  VARNAME  vl_colvar   @         _ss       _vnwd      .,			/*
+		*/ label("Column variable:")		/*
+		*/
+
+  DEFINE _y _ls
+
+  GROUPBOX gb_tests  _lft      _y        _cwd1     _ht17,		/*
+		*/ label(resource LBL_TEST_STATISTICS)			/*
+		*/
+  DEFINE y @y
+  CHECKBOX ck_chi2   _indent   _ss       _inwd     .,			/*
+		*/ label(resource LBL_PEARSONS_CHI_SQUARED)		/*
+		*/ option("chi2")					/*
+		*/
+  DEFINE ydown @y
+  CHECKBOX ck_exact  @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_EXACT)			/*
+		*/ option("exact")					/*
+		*/ onclickon(main.ck_nolog.enable)			/*
+		*/ onclickoff(main.ck_nolog.disable)			/*
+		*/
+  CHECKBOX ck_gamma  @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_GAMMA)			/*
+		*/ option("gamma")					/*
+		*/
+  CHECKBOX ck_lrchi2 @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_LRCHI2)			/*
+		*/ option("lrchi2")					/*
+		*/
+  CHECKBOX ck_taub   @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_TAUB)			/*
+		*/ option("taub")					/*
+		*/
+  CHECKBOX ck_V      @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_V)				/*
+		*/ option("V")						/*
+		*/
+
+/* column 2 */
+  GROUPBOX gb_cell   _lft2     y         _cwd1     _ht17,		/*
+		*/ label(resource _TAB2_GB_CELL)			/*
+		*/
+
+  CHECKBOX ck_cchi2  _indent   _ss       _inwd     .,			/*
+		*/ label(resource LBL_PEARSONS_CHI_SQUARED)		/*
+		*/ option("cchi2")					/*
+		*/ onclickon(program _tab2_test_check)			/*
+		*/ onclickoff(program _tab2_test_check)			/*
+		*/
+  CHECKBOX ck_col    @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_COL)				/*
+		*/ option("column")					/*
+		*/ onclickon(program _tab2_test_check)			/*
+		*/ onclickoff(program _tab2_test_check)			/*
+		*/
+  CHECKBOX ck_row    @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_ROW)				/*
+		*/ option("row")					/*
+		*/ onclickon(program _tab2_test_check)			/*
+		*/ onclickoff(program _tab2_test_check)			/*
+		*/
+  CHECKBOX ck_clrchi2 @        _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_CLRCHI2)			/*
+		*/ option("clrchi2")					/*
+		*/ onclickon(program _tab2_test_check)			/*
+		*/ onclickoff(program _tab2_test_check)			/*
+		*/
+  CHECKBOX ck_cell   @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_CELL)			/*
+		*/ option("cell")					/*
+		*/ onclickon(program _tab2_test_check)			/*
+		*/ onclickoff(program _tab2_test_check)			/*
+		*/
+  CHECKBOX ck_expect @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_EXPECT)			/*
+		*/ option("expected")					/*
+		*/ onclickon(program _tab2_test_check)			/*
+		*/ onclickoff(program _tab2_test_check)			/*
+		*/
+  CHECKBOX ck_nofreq @         _ms       @         .,			/*
+		*/ label(resource LBL_SUPPRESS_FREQUENCIES)		/*
+		*/ option("nofreq")					/*
+		*/ onclickon(program _tab2_test_check)			/*
+		*/ onclickoff(program _tab2_test_check)			/*
+		*/
+  CHECKBOX ck_rowsort  _lft      _xls      _cwd1     .,			/*
+		*/ label(resource _TAB2_CK_ROWSORT)			/*
+		*/ option("rowsort")  onclickon(main.ck_reverse.setoff)		/*
+		*/
+
+  DEFINE y2 @y
+
+  CHECKBOX ck_reverse  _lft     _ms     _cwd1         .,		/*
+		*/ label("List rows in descending order of values")			/*
+		*/ onclickon(main.ck_rowsort.setoff)		/*
+		*/
+  
+  CHECKBOX ck_colsort  _lft     _ms     _cwd1         .,		/*
+		*/ label(resource _TAB2_CK_COLSORT)			/*
+		*/ option("colsort")					/*
+		*/
+		
+  CHECKBOX ck_miss   @		_ms	@	.,			/*
+		*/ label(resource LBL_TREAT_MISSING_VALUES_LIKE_OTHER_VALUES) /*
+		*/ option("miss")					/*
+		*/
+
+
+  CHECKBOX ck_wrap   _lft2   y2       @         .,			/*
+		*/ label(resource _TAB2_CK_WRAP)			/*
+		*/ option("wrap")					/*
+		*/
+  CHECKBOX ck_nokey  _lft2	_ms	      @	.,			/*
+		*/ label(resource _TAB2_CK_NOKEY)			/*
+		*/ option("nokey")					/*
+		*/
+
+  CHECKBOX ck_nolab  @         _ms       @         .,			/*
+		*/ label(resource LBL_SUPPRESS_VALUE_LABELS)		/*
+		*/ option("nolabel")					/*
+		*/
+  CHECKBOX ck_nolog  @         _ms       @         .,			/*
+		*/ label(resource _TAB2_CK_NOLOG)			/*
+		*/ option("nolog")					/*
+		*/
+		
+  CHECKBOX ck_first  @		_ms	@	.,			/*
+		*/ label(resource _TAB2_CK_FIRST)/* 
+		*/ option("firstonly")					/*
+		*/
+END
+
+INCLUDE byifin
+INCLUDE weights_f
+
+DIALOG adv, label("") tabtitle(resource LBL_ADVANCED)
+BEGIN
+  /*--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+*/
+  TEXT     tx_matcel _lft      _top      _iwd      .,			/*
+		*/ label(resource TAB2_ADV_TX_MATCEL)/*
+		*/
+  EDIT     ed_matcel _lft      _ss       _vnwd     .,			/*
+		*/ label(resource TAB2_ADV_ED_MATCEL)			/*
+		*/ max(32)						/*
+		*/ option("matcell")					/*
+		*/
+
+  TEXT     tx_matrow _lft      _ls       _iwd      .,			/*
+		*/ label(resource TAB2_ADV_TX_MATROW)			/*
+		*/
+  EDIT     ed_matrow _lft      _ss       _vnwd     .,			/*
+		*/ label(resource TAB2_ADV_ED_MATROW)			/*
+		*/ max(32)						/*
+		*/ option("matrow")					/*
+		*/
+
+  TEXT     tx_matcol _lft      _ls       _iwd      .,			/*
+		*/ label(resource TAB2_ADV_TX_MATCOL)			/*
+		*/
+  EDIT     ed_matcol _lft      _ss       _vnwd     .,			/*
+		*/ label(resource TAB2_ADV_ED_MATCOL)			/*
+		*/ max(32)						/*
+		*/ option("matcol")					/*
+		*/
+END
+
+INCLUDE _tab2_pr
+
+PROGRAM command
+BEGIN
+	put /program by_output " "
+	if (main.ck_reverse) {
+		put "_tab "
+	}
+	else {
+		put "tabulate "
+	}
+	varlist main.vl_rowvar main.vl_colvar
+	put " " /program weights_output
+	put " " /program ifin_output
+	beginoptions
+		put /program _tab2_opts_output
+		optionarg adv.ed_matcel
+		optionarg adv.ed_matrow
+		optionarg adv.ed_matcol
+	endoptions
+END
+

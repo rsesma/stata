@@ -1,0 +1,60 @@
+/*
+  ciri.dlg
+
+*! VERSION 1.1.1  23jun2017
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_msmall
+INCLUDE _ht280
+INCLUDE header
+HELP hlp1, view("help cir")
+RESET res1
+
+DEFINE _xY    225
+DEFINE _y_nst 	150
+DEFINE _var_w 	150
+DEFINE _x _lft
+DEFINE _y 180
+DEFINE _cx 100
+
+DIALOG main, label("ciri - Confidence Interval for corrrelations") tabtitle("Main")
+BEGIN
+	GROUPBOX	gb_1  _lft   _top	370    55, label("Group 1")
+	TEXT  		tx_r1 _ilft  _ss    120	    ., label("Correlation coefficient:") left
+	EDIT		ed_r1   +125   @  	65      ., label("Correlation coefficient") numonly
+	TEXT  		txn_1  225    @     70	    ., label("Sample Size:") left
+	EDIT		ed_n1   +75    @  	65      ., label("Sample Size") numonly
+	GROUPBOX	gb_0  _lft    70	370    55, label("Group 0")
+	TEXT  		tx_r0 _ilft  _ss    120	    ., label("Correlation coefficient:") left
+	EDIT		ed_r0   +125   @  	65      ., label("Correlation coefficient") numonly
+	TEXT  		txn_0  225     @    70	    ., label("Sample Size:") left
+	EDIT		ed_n0   +75    @  	65      ., label("Sample Size") numonly
+
+	RADIO		rb_pear _lft	_xls	250	  ., label("Pearson correlation") first option("pearson")
+	RADIO		rb_spe  _xY	    @		250	  ., label("Spearman correlation") last option("spearman")
+	TEXT		tx_rho	_lft	_ms		200	  ., label("Hypothetical correlation to compare with:")
+	EDIT 		ed_rho 	+215	@ 		100   ., numonly option(rho)
+	INCLUDE _sp_level
+	
+	GROUPBOX	gb_nst	_lft  	_ls	370    60, label("Name of the study")
+	EDIT		ed_nst	_ilft   _ms	 	350		., option(nst)
+END
+
+	
+PROGRAM command
+BEGIN
+	put "ciri "
+	require main.ed_r1 main.ed_n1
+	put main.ed_r1 " " main.ed_n1
+	put " " main.ed_r0 " " main.ed_n0
+	beginoptions
+		option radio(main rb_pear rb_spe)
+		optionarg main.ed_rho
+		INCLUDE _level_main_pr
+		optionarg main.ed_nst
+	endoptions
+END
+

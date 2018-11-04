@@ -1,0 +1,216 @@
+/*
+  cohenkapi.dlg
+
+*! VERSION 1.1.1  04may2018
+
+*/
+
+VERSION 12.0
+SYNCHRONOUS_ONLY
+
+INCLUDE _std_large
+DEFINE _dlgwd 470
+DEFINE _dlght 430
+INCLUDE header
+HELP hlp1, view("help cohenkap")
+RESET res1
+
+DEFINE lft     80
+DEFINE rlft    55
+DEFINE rw      11
+DEFINE top     85
+DEFINE wid     39
+DEFINE sep    +40
+DEFINE ms     +25
+DEFINE _x _lft
+DEFINE _y 330
+DEFINE _cx 100
+
+SCRIPT PREINIT
+BEGIN
+	create STRING cmd
+	create STRING dlgName
+	dlgName.setvalue class _dlg_rsrcname
+END
+
+PROGRAM POSTINIT_PROGRAM
+BEGIN
+	put "cohenkapi__dlg enableDisable , "
+	put "clsname(" dlgName ") "
+	stata hidden immediate
+END
+
+
+DIALOG main, label("cohenkapi - Weighted kappa") tabtitle("Main")
+BEGIN
+  SPINNER  sp_cat    20    10    60    ., min(2) default(2) max(9) onchange(program cat_changed)
+  TEXT     tx_cat   +65    @     130   ., label("Number of categories")
+  CHECKBOX cb_order +140   @	 130   ., label("Ordered categories")
+
+  TEXT     tx_vX     235   40    70    ., label("Rating X")
+  TEXT     tx_c1     lft   60    wid   ., label("1") center
+  TEXT     tx_c2     sep   @     wid   ., label("2") center
+  TEXT     tx_c3     sep   @     wid   ., label("3") center
+  TEXT     tx_c4     sep   @     wid   ., label("4") center
+  TEXT     tx_c5     sep   @     wid   ., label("5") center
+  TEXT     tx_c6     sep   @     wid   ., label("6") center
+  TEXT     tx_c7     sep   @     wid   ., label("7") center
+  TEXT     tx_c8     sep   @     wid   ., label("8") center
+  TEXT     tx_c9     sep   @     wid   ., label("9") center
+
+  TEXT     tx_vY     10    60    57    ., label("Rating Y") right
+  TEXT     tx_r1     rlft  85    rw    ., label("1") right
+  TEXT     tx_r2     rlft  ms    rw    ., label("2") right
+  TEXT     tx_r3     rlft  ms    rw    ., label("3") right
+  TEXT     tx_r4     rlft  ms    rw    ., label("4") right
+  TEXT     tx_r5     rlft  ms    rw    ., label("5") right
+  TEXT     tx_r6     rlft  ms    rw    ., label("6") right
+  TEXT     tx_r7     rlft  ms    rw    ., label("7") right
+  TEXT     tx_r8     rlft  ms    rw    ., label("8") right
+  TEXT     tx_r9     rlft  ms    rw    ., label("9") right
+  
+  FRAME    fr        70    80    380 235
+  EDIT     ed_r1c1   lft   top   wid   ., numonly
+  EDIT     ed_r1c2   sep   @     @     ., numonly
+  EDIT     ed_r1c3   sep   @     @     ., numonly
+  EDIT     ed_r1c4   sep   @     @     ., numonly
+  EDIT     ed_r1c5   sep   @     @     ., numonly
+  EDIT     ed_r1c6   sep   @     @     ., numonly
+  EDIT     ed_r1c7   sep   @     @     ., numonly
+  EDIT     ed_r1c8   sep   @     @     ., numonly
+  EDIT     ed_r1c9   sep   @     @     ., numonly
+
+  EDIT     ed_r2c1   lft   ms    @     ., numonly
+  EDIT     ed_r2c2   sep   @     @     ., numonly
+  EDIT     ed_r2c3   sep   @     @     ., numonly
+  EDIT     ed_r2c4   sep   @     @     ., numonly
+  EDIT     ed_r2c5   sep   @     @     ., numonly
+  EDIT     ed_r2c6   sep   @     @     ., numonly
+  EDIT     ed_r2c7   sep   @     @     ., numonly
+  EDIT     ed_r2c8   sep   @     @     ., numonly
+  EDIT     ed_r2c9   sep   @     @     ., numonly
+
+  EDIT     ed_r3c1   lft   ms    @     ., numonly
+  EDIT     ed_r3c2   sep   @     @     ., numonly
+  EDIT     ed_r3c3   sep   @     @     ., numonly
+  EDIT     ed_r3c4   sep   @     @     ., numonly
+  EDIT     ed_r3c5   sep   @     @     ., numonly
+  EDIT     ed_r3c6   sep   @     @     ., numonly
+  EDIT     ed_r3c7   sep   @     @     ., numonly
+  EDIT     ed_r3c8   sep   @     @     ., numonly
+  EDIT     ed_r3c9   sep   @     @     ., numonly
+
+  EDIT     ed_r4c1   lft   ms    @     ., numonly
+  EDIT     ed_r4c2   sep   @     @     ., numonly
+  EDIT     ed_r4c3   sep   @     @     ., numonly
+  EDIT     ed_r4c4   sep   @     @     ., numonly
+  EDIT     ed_r4c5   sep   @     @     ., numonly
+  EDIT     ed_r4c6   sep   @     @     ., numonly
+  EDIT     ed_r4c7   sep   @     @     ., numonly
+  EDIT     ed_r4c8   sep   @     @     ., numonly
+  EDIT     ed_r4c9   sep   @     @     ., numonly
+
+  EDIT     ed_r5c1   lft   ms    @     ., numonly
+  EDIT     ed_r5c2   sep   @     @     ., numonly
+  EDIT     ed_r5c3   sep   @     @     ., numonly
+  EDIT     ed_r5c4   sep   @     @     ., numonly
+  EDIT     ed_r5c5   sep   @     @     ., numonly
+  EDIT     ed_r5c6   sep   @     @     ., numonly
+  EDIT     ed_r5c7   sep   @     @     ., numonly
+  EDIT     ed_r5c8   sep   @     @     ., numonly
+  EDIT     ed_r5c9   sep   @     @     ., numonly
+
+  EDIT     ed_r6c1   lft   ms    @     ., numonly
+  EDIT     ed_r6c2   sep   @     @     ., numonly
+  EDIT     ed_r6c3   sep   @     @     ., numonly
+  EDIT     ed_r6c4   sep   @     @     ., numonly
+  EDIT     ed_r6c5   sep   @     @     ., numonly
+  EDIT     ed_r6c6   sep   @     @     ., numonly
+  EDIT     ed_r6c7   sep   @     @     ., numonly
+  EDIT     ed_r6c8   sep   @     @     ., numonly
+  EDIT     ed_r6c9   sep   @     @     ., numonly
+
+  EDIT     ed_r7c1   lft   ms    @     ., numonly
+  EDIT     ed_r7c2   sep   @     @     ., numonly
+  EDIT     ed_r7c3   sep   @     @     ., numonly
+  EDIT     ed_r7c4   sep   @     @     ., numonly
+  EDIT     ed_r7c5   sep   @     @     ., numonly
+  EDIT     ed_r7c6   sep   @     @     ., numonly
+  EDIT     ed_r7c7   sep   @     @     ., numonly
+  EDIT     ed_r7c8   sep   @     @     ., numonly
+  EDIT     ed_r7c9   sep   @     @     ., numonly
+
+  EDIT     ed_r8c1   lft   ms    @     ., numonly
+  EDIT     ed_r8c2   sep   @     @     ., numonly
+  EDIT     ed_r8c3   sep   @     @     ., numonly
+  EDIT     ed_r8c4   sep   @     @     ., numonly
+  EDIT     ed_r8c5   sep   @     @     ., numonly
+  EDIT     ed_r8c6   sep   @     @     ., numonly
+  EDIT     ed_r8c7   sep   @     @     ., numonly
+  EDIT     ed_r8c8   sep   @     @     ., numonly
+  EDIT     ed_r8c9   sep   @     @     ., numonly
+
+  EDIT     ed_r9c1   lft   ms    @     ., numonly
+  EDIT     ed_r9c2   sep   @     @     ., numonly
+  EDIT     ed_r9c3   sep   @     @     ., numonly
+  EDIT     ed_r9c4   sep   @     @     ., numonly
+  EDIT     ed_r9c5   sep   @     @     ., numonly
+  EDIT     ed_r9c6   sep   @     @     ., numonly
+  EDIT     ed_r9c7   sep   @     @     ., numonly
+  EDIT     ed_r9c8   sep   @     @     ., numonly
+  EDIT     ed_r9c9   sep   @     @     ., numonly
+
+  INCLUDE _sp_level
+  COMBOBOX co_me	+120    @	70	   ., dropdownlist contents(ci_descrip) default("wilson") values(ci_values)
+  TEXTBOX  tx_me 	 +72 	-5	200    40, label("method to calculate confidence intervals for proportions") left
+
+  
+  GROUPBOX	gb_nst	 10    360   440   60, label("Name of the study")
+  EDIT		ed_nst	 20    ms	 420   ., option(nst)
+END
+
+LIST ci_descrip
+	BEGIN
+		Wilson
+		Exact
+		Wald
+	END
+
+LIST ci_values
+	BEGIN
+		wilson
+		exact
+		wald
+	END
+
+
+PROGRAM cat_changed
+BEGIN
+	put "cohenkapi__dlg enableDisable , "
+	put "clsname(" dlgName ") "
+	stata hidden immediate
+END
+
+
+PROGRAM command
+BEGIN
+	put "cohenkapi__dlg genCommand, "
+	put "clsname(" dlgName ") "
+	stata hidden immediate
+
+	put "cohenkapi "
+	put cmd
+	beginoptions
+		if main.cb_order {
+			put " ordered"
+		}
+		
+		INCLUDE _level_main_pr
+
+		if !main.co_me.isdefault() {
+			put " " main.co_me
+		}
+
+		optionarg main.ed_nst
+	endoptions
+END

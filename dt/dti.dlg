@@ -1,0 +1,192 @@
+/*
+  dti.dlg
+
+*! VERSION 1.1.3  03jul2018
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_msmall
+DEFINE _dlght 360
+DEFINE _dlgwd 370
+INCLUDE header
+HELP hlp1, view("help dti")
+RESET res1
+
+DEFINE _col1     25
+DEFINE _col2    115
+DEFINE _col2ed  125
+DEFINE _col3    230
+DEFINE _col3ed  240
+DEFINE _wi      340
+DEFINE _h_col_w 100
+DEFINE _h_row_w 70
+DEFINE _ed_w 	90
+DEFINE _yp	 	230
+DEFINE _yprev	165
+DEFINE _y_nst 	290
+DEFINE _x _lft
+DEFINE _y _top
+DEFINE _cx 100
+
+DIALOG main, label("dti - Diagnostic Tests") tabtitle("Main")
+BEGIN
+	GROUPBOX	gb_st	_lft   _top		340    50, label("Study type")
+	RADIO    	rb_cs   +10    +20      110		., first default(1) label("Cross-Sectional") onclickon(program change_st)
+	RADIO    	rb_cc   +115   @        100		., middle default(0) label("Case-Control") onclickon(program change_st)
+	RADIO    	rb_bt   +105   @        100		., last default(0) label("Bayes theorem") onclickon(program change_st)
+
+	TEXT  		tx_ncas _col2  	65 	  _h_col_w	., label("NonCases") center
+	TEXT  		tx_cas 	_col3  	@  	  _h_col_w	., label("Cases") center
+	FRAME 		fr_1	_lft	90		_wi		35
+	TEXT  		tx_pos 	_col1  	+7 	  _h_row_w	., label("Positive") right
+	EDIT		ed_b1	_col2ed @		_ed_w	., numonly max(10000000) label("b1")
+	EDIT		ed_a1	_col3ed @		_ed_w	., numonly max(10000000) label("a1")
+	FRAME 		fr_2	_lft	124		_wi		35
+	TEXT  		tx_neg  _col1  	+7    _h_row_w	., label("Negative") right
+	EDIT		ed_b0	_col2ed @		_ed_w	., numonly max(10000000) label("b0")
+	EDIT		ed_a0	_col3ed @		_ed_w	., numonly max(10000000) label("a0")
+	FRAME 		fr_3	_col2	90		115		69
+	
+	GROUPBOX	gb_prev	 _lft   _yprev	340    50, label("Population Sample")
+	TEXT  		tx_m1 	 _ilft  +20		90  	., label("Total cases (m1):") right
+	EDIT		ed_m1	 +95    @	    50		., label("Total cases (m1)") numonly option(m1)
+	TEXT  		tx_n 	 +60    @ 		100  	., label("Size of sample (n):") right
+	EDIT		ed_n	 +105    @	    50		., label("Size of sample (n)") numonly option(n)
+
+	GROUPBOX	gb_bt	 _lft   _yprev	340    50, label("OR")
+	TEXT  		tx_se 	 _ilft  +20		85  	., label("Sensitivity (%):") right
+	EDIT		ed_se	 +90    @	    50		., label("Sensitivity") numonly max(100)
+	TEXT  		tx_sp 	 +80    @ 		90  	., label("Specificity (%):") right
+	EDIT		ed_sp	 +95    @	    50		., label("Specificity") numonly max(100)
+	
+	GROUPBOX	gb_p	_lft   _yp		340    50, label("List of hypothetical population prevalence (%)")
+	EDIT		ed_p	_ilft  +20		320		., label("List of hypothetical population prevalence") option(p)
+
+	GROUPBOX	gb_nst	_lft  	_y_nst	340    60, label("Name of the study")
+	EDIT		ed_nst	_ilft   _ms	 	320		., option(nst)
+END
+
+DIALOG opt, tabtitle("Options")
+BEGIN
+	INCLUDE _sp_level
+	COMBOBOX	co_me	_lft	_mls	60		., dropdownlist contents(ci_descrip) default("wilson") values(ci_values)
+	TEXT  		tx_me 	+65	 	@ 		310  	., label("Method to calculate confidence intervals for proportions") left
+END
+
+LIST ci_descrip
+	BEGIN
+		Wilson
+		Exact
+		Wald
+	END
+
+LIST ci_values
+	BEGIN
+		wilson
+		exact
+		wald
+	END
+
+
+PROGRAM change_st
+BEGIN
+	//Void m1,n,se,sp controls
+	call main.ed_m1.setvalue ""
+	call main.ed_n.setvalue ""
+	call main.ed_se.setvalue ""
+	call main.ed_sp.setvalue ""
+	
+	if (main.rb_cs | main.rb_cc) {
+		call main.gb_bt.hide
+		call main.tx_se.hide
+		call main.ed_se.hide
+		call main.tx_sp.hide
+		call main.ed_sp.hide
+		
+		call opt.sp_level.enable
+		call opt.tx_level.enable
+		call opt.co_me.enable
+		call opt.tx_me.enable
+	}
+	else {
+		call main.gb_bt.show
+		call main.tx_se.show
+		call main.ed_se.show
+		call main.tx_sp.show
+		call main.ed_sp.show
+
+		call opt.sp_level.disable
+		call opt.tx_level.disable
+		call opt.co_me.disable
+		call opt.tx_me.disable
+	}
+	
+	//Show/hide m1,n controls
+	if (main.rb_cs | main.rb_bt) {
+		call main.gb_prev.hide
+		call main.tx_m1.hide
+		call main.ed_m1.hide
+		call main.tx_n.hide
+		call main.ed_n.hide
+	}
+	if main.rb_cc {
+		call main.gb_prev.show
+		call main.tx_m1.show
+		call main.ed_m1.show
+		call main.tx_n.show
+		call main.ed_n.show
+	}
+END
+
+
+PROGRAM command
+BEGIN
+	put "dti "
+	if (main.rb_cs | main.rb_cc) {
+		require main.ed_a1 main.ed_a0 main.ed_b1 main.ed_b0
+		put main.ed_a1 " " main.ed_a0 " " main.ed_b1 " " main.ed_b0
+	}
+	if main.rb_bt {
+		if ((main.ed_a1 | main.ed_a0 | main.ed_b1 | main.ed_b0) & (main.ed_se | main.ed_sp)) {
+			stopbox stop "a1, a0, b1, b0 are incompatible with se, sp"
+		}
+		else {
+			if (main.ed_a1 | main.ed_a0 | main.ed_b1 | main.ed_b0) {
+				require main.ed_a1 main.ed_a0 main.ed_b1 main.ed_b0
+				put main.ed_a1 " " main.ed_a0 " " main.ed_b1 " " main.ed_b0				
+			}
+			if (main.ed_se | main.ed_sp) {
+				require main.ed_se main.ed_sp
+				put main.ed_se " " main.ed_sp
+			}
+			require main.ed_p
+		}
+	}
+	beginoptions
+		if main.rb_cs {
+			put " st(cs)"
+		}
+		if main.rb_cc {
+			put " st(cc)"
+		}
+		if main.rb_bt {
+			put " st(bt)"
+		}
+
+		optionarg main.ed_p
+		
+		if main.rb_cc {
+			optionarg main.ed_m1 main.ed_n
+		}
+		
+		if !opt.co_me.isdefault() {
+			put " " opt.co_me
+		}
+		
+		INCLUDE _level_opt_pr
+		
+		optionarg main.ed_nst
+	endoptions
+END

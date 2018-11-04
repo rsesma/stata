@@ -1,0 +1,15 @@
+v 3
+d dc.  Data Check.
+d After installation, see help dc.
+d
+d (c)JM. Domenech
+d Programmer: R. Sesma
+d Laboratori d'Estadistica Aplicada, Universitat Autonoma de Barcelona.
+d
+d Distribution-Date:  16oct2017
+d Version 1.0.9 (16oct2017)
+d
+d E-mail: stata@graunt.cat
+f dc.ado
+f dc.sthlp
+f dc.dlg

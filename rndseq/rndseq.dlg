@@ -1,0 +1,161 @@
+/*
+  rndseq.dlg
+
+*! VERSION 1.0.4  05oct2016
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_medium
+INCLUDE _ht340
+INCLUDE header
+HELP hlp1, view("help rndseq")
+RESET res1
+
+DIALOG main, label("rndseq - Generation of Random Sequences") tabtitle("Main")
+BEGIN
+	TEXT  		tx_type	_lft  _top 	 	110 	., label("Randomization type:")
+	COMBOBOX	co_type	 +115    @		280		., dropdownlist contents(type_descrip) values(type_values) default("Simple") /*
+											*/		onselchange(program change_type) label("Randomization type")
+	GROUPBOX	gb_opt	_lft  +25	 400  240, label("Options")
+	TEXT  		tx_drug	_ilft _ms	 30 	., label("Drug:")
+	EDIT		ed_drug	 +40	@	 125	., option(drug) label("Drug")
+	TEXT  		tx_prot	 +154   @	 50 	., label("Protocol:")
+	EDIT		ed_prot	 +60	@	 125	., option(prot) label("Protocol")
+	TEXT  		tx_tre	 _ilft  _ms	 100 	., label("List of Treatments:")
+	EDIT		ed_tre	 _ilft	_ss	 380	., option(treat) label("List of Treatments")
+	TEXT  		tx_note1 _ilft  _ss	 380 	., label("Comma-separated, for example: Treat A, Treat B, Treat C")
+	TEXT  		tx_n	 _ilft  _ms	 105 	., label("Number of subjects:")
+	EDIT		ed_n	 +115	@	 80		., option(n) numonly label("Number of subjects")
+	TEXT  		tx_bs	 +114   @	 60 	., label("Block size:")
+	EDIT		ed_bs	 +70	@	 80		., option(bs) numonly label("Block size")
+	TEXT  		tx_rat	 _ilft  175	 140 	., label("List of randomization ratios:")
+	EDIT		ed_rat	 +150	@	 120	., option(ratio)
+	TEXT  		tx_note2 +130   @	 100 	., label("For example:1 2 2")
+	TEXT  		tx_lp	 _ilft  @	 105 	., label("Low probability:")
+	EDIT		ed_lp	 +115	@	 80		., option(lp) numonly label("Low probability")
+	TEXT  		tx_hp	 +90    @	 90 	., label("High probability:")
+	EDIT		ed_hp	 +95	@	 80		., option(hp) numonly label("High probability")
+	TEXT 		tx_usin	_ilft	_ms	 380	., label("Stata Data file to store results (working directory is used by default):")
+	FILE		fl_usin	_ilft	_ss	 380	., label("Browse...") default("rndseq_results.dta")/*
+					*/							dialogtitle("Save Allsets Results Stata Data File") /*
+					*/							filter("Stata Data (*.dta)|*.dta") save option(using)
+	CHECKBOX	cb_repl	_ilft	_ms	 250  	., label("Replace dataset if it already exists") default(1)
+	
+	GROUPBOX	gb_nst	_lft   275	 400  	55, label("Name of the study")
+	EDIT		ed_nst	_ilft _ss	 380	., option(nst)
+END
+
+DIALOG opt, tabtitle("Center, Strata and others")
+BEGIN
+	GROUPBOX	gb_cent	 _lft  _top	 400  100, label("Labels of Centers")
+	EDIT		ed_cent	 _ilft	_ms	 380	., option(center)
+	TEXT  		tx_cent  _ilft  _ss	 380 	., label("Comma-separated, for example: Center 1, Center 2")
+	TEXT  		tx_pc    _ilft  _ms	 115 	., label("Expected proportions:")
+	EDIT		ed_pc 	 +120	@	 130	., option(pcenter)
+	TEXT  		tx_pc2   +140   @	 120 	., label("By default: Equal prop.")
+
+	GROUPBOX	gb_str	 _lft   +30  400  100, label("Labels of Strata for Centers")
+	EDIT		ed_str	 _ilft	_ms	 380	., option(strata)
+	TEXT  		tx_str   _ilft  _ss	 380 	., label("Comma-separated, for example: Stratum A, Stratum B, Stratum C")
+	TEXT  		tx_sc    _ilft  _ms	 115 	., label("Expected proportions:")
+	EDIT		ed_sc 	 +120	@	 130	., option(pstrata)
+	TEXT  		tx_sc2   +140   @	 120 	., label("By default: Equal prop.")
+
+	TEXT  		tx_pre	 _lft   _xls 80 	., label("List of prefixes:")
+	EDIT		ed_pre	 +90	@	 120	., option(prefix)
+	TEXT  		tx_pre2  +130   @	 180 	., label("For example: 1A 1B 1C 2A 2B 2C")	
+	TEXT  		tx_seed	 _lft   _ms  80 	., label("Seed:")
+	EDIT		ed_seed	 +90	@	 120	., option(seed) numonly
+	CHECKBOX	cb_nop	_lft	_ms	 250  	., label("Do not print the results") default(0)
+END
+
+LIST type_descrip
+	BEGIN
+		Simple
+		Blocking (balanced restricted)
+		Efron (adaptative biased-coin)
+	END
+
+LIST type_values
+	BEGIN
+		simple
+		block
+		efron
+	END
+
+PROGRAM change_type
+BEGIN
+	//Show/hide controls and position
+	if main.co_type.iseq("simple") {
+		call main.tx_bs.hide
+		call main.ed_bs.hide
+		call main.tx_rat.show
+		call main.ed_rat.show
+		call main.tx_note2.show
+		call main.tx_lp.hide
+		call main.ed_lp.hide
+		call main.tx_hp.hide
+		call main.ed_hp.hide
+	}
+	if main.co_type.iseq("block") {
+		call main.tx_bs.show
+		call main.ed_bs.show
+		call main.tx_rat.show
+		call main.ed_rat.show
+		call main.tx_note2.show
+		call main.tx_lp.hide
+		call main.ed_lp.hide
+		call main.tx_hp.hide
+		call main.ed_hp.hide
+	}
+	if main.co_type.iseq("efron") {
+		call main.tx_bs.hide
+		call main.ed_bs.hide
+		call main.tx_rat.hide
+		call main.ed_rat.hide
+		call main.tx_note2.hide
+		call main.tx_lp.show
+		call main.ed_lp.show
+		call main.tx_hp.show
+		call main.ed_hp.show
+	}
+
+END
+
+
+PROGRAM command
+BEGIN
+	put "rndseq " main.co_type
+	beginoptions
+		require main.ed_drug main.ed_prot main.ed_tre main.ed_n
+		optionarg main.ed_drug main.ed_prot main.ed_tre main.ed_n
+
+		if main.co_type.iseq("simple") {
+			optionarg main.ed_rat
+		}
+		if main.co_type.iseq("block") {
+			require main.ed_bs
+			optionarg main.ed_bs main.ed_rat
+		}
+		if main.co_type.iseq("efron") {
+			require main.ed_lp main.ed_hp
+			optionarg main.ed_lp main.ed_hp
+		}
+
+		if !main.fl_usin.isdefault() {
+			optionarg main.fl_usin
+		}
+		if !main.cb_repl {
+			put " noreplace"
+		}
+
+		optionarg opt.ed_cent opt.ed_pc opt.ed_str opt.ed_sc opt.ed_pre opt.ed_seed
+		if opt.cb_nop {
+			put " noprint"
+		}
+
+		optionarg main.ed_nst
+	endoptions
+END

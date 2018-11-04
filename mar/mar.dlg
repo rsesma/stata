@@ -1,0 +1,480 @@
+/*
+  mar.dlg
+
+*! VERSION 1.4.1  11may2018
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_msmall
+DEFINE _dlght 360
+DEFINE _dlgwd 410
+INCLUDE header
+HELP hlp1, view("help mar")
+RESET res1
+
+DEFINE _y_vars   35
+DEFINE _var_inc +25
+DEFINE _resp    225
+DEFINE _colcc   285
+DEFINE _wi      370
+DEFINE _var_w 	120
+DEFINE _h_row_w 70
+DEFINE _ed_w 	80
+DEFINE _y_gbcc 	85
+DEFINE _y_cc 	90
+DEFINE _y_nst 	290
+DEFINE _x _ilft
+DEFINE _y 190
+DEFINE _cx 100
+
+DIALOG main, label("mar - Meta-Analysis") tabtitle("Main")
+BEGIN
+	TEXT  		tx_type 	_lft   _top 	70  	., label("Data type:")
+	COMBOBOX	co_type		+90		@		160		., dropdownlist contents(type_descrip) values(type_values) /*
+													*/	onselchange(program typechange) default("Raw data") label("Data type")	
+	TEXT  		tx_md_std 	+170    @ 	    130  	., label("Standardization:")
+	TEXT  		tx_stat 	_lft   _ms 		80  	., label("Risk measure:")
+	COMBOBOX	co_stat		+90		@		160		., dropdownlist contents(st_descrip) values(st_values) /*
+													*/	onselchange(program statchange) default("Odds Ratio") label("Risk measure")
+	CHECKBOX	cb_peto		+170    @		130     ., label("Peto's odds ratio") onclickon(program peto_on) onclickoff(program peto_off)
+	COMBOBOX	co_md_std	 270	@		130		., dropdownlist contents(md_std_descrip) values(md_std_values) /*
+													*/	default("None") label("Standardization")
+	GROUPBOX	gb_opt		_lft   +40		390    170, label("Options")
+	CHECKBOX	cb_tables	_ilft  _ss		130     ., label("Print crosstab tables")
+	TEXT  		tx_zero  	_ilft  _ss    	120		., label("Zero-cell correction:") left
+	COMBOBOX	co_zero	  	+130   @	    120  	., dropdownlist contents(zero_descrip) values(zero_values) /*
+													*/	default("n") label("Zero-cell correction") option(zero)
+	CHECKBOX	cb_exp		_ilft  _ms		340     ., label("Print exponential values values for slope measures, Exp(b)")
+	TEXT  		tx_date  	_ilft  _ms    	170		., label("Print format for date variable:") left
+	COMBOBOX	co_date  	+170    @	    130  	., dropdownlist contents(date_descrip) values(date_values) /*
+													*/	default("YMD") option(date) label("Print format for date variable")
+	INCLUDE _sp_level
+	CHECKBOX	cb_keep		_ilft  _ms		250     ., label("Add result variables to current dataset")
+													
+	GROUPBOX	gb_nst	_lft  	_y_nst	390    60, label("Name of the study")
+	EDIT		ed_nst	_ilft   _ms	 	370		., option(nst)
+END
+
+INCLUDE ifin
+
+DIALOG opt1, tabtitle("Additional analyses and Graphics")
+BEGIN
+	GROUPBOX	gb_print 	_lft  _top		390    85, label("Print")
+	CHECKBOX	cb_influ	_ilft _ss		150     ., label("Influence Analysis") onclickon(program enablemethod) onclickoff(program disablemethod)
+	CHECKBOX	cb_cumul	_ilft _ss		150     ., label("Cumulative Meta-Analysis") onclickon(program enablemethod) onclickoff(program disablemethod)
+	TEXT  		tx_cumul    +165   @        100		., label("Cumulative variable:") left
+	EDIT		ed_cumul    +110   @	    90      ., option("cum") label("Cumulative Variable order")
+	CHECKBOX	cb_rev      @     _ss	    100     ., label("Reverse order")
+	TEXT  		tx_method  	_lft  +40    	120		., label("Method of weighting:") left
+	COMBOBOX	co_method  	+130   @	    260  	., dropdownlist contents(method_descrip) values(method_values) option(method) /*
+													*/	default("IoV Fixed Effects Model") label("Method of weighting") onselchange(program methodchange)
+	GROUPBOX	gb_graph _lft  	 +25	390    215, label("Graphics")
+	CHECKBOX	cb_forest _ilft  _ss	125     ., label("Forest plot") onclickon(program enablemethod) onclickoff(program disablemethod)
+	TEXT  		tx_forest +180   @      115		., label("Ordered by variable:") left
+	EDIT		ed_forest +120   @	    65      ., default("se") option("forest") label("Order variable forest plot")
+	CHECKBOX	cb_inter  _ilft  _ms	125     ., label("Interval plot") onclickon(program enablemethod) onclickoff(program disablemethod)
+	TEXT  		tx_inter  +180   @      115		., label("Ordered by variable:") left
+	EDIT		ed_int    +120   @	    65      ., default("se") option("interval") label("Order variable interval plot")
+	CHECKBOX	cb_fun    _ilft  _ss	310     ., label("Funnel or Christmas tree plot for assessing bias") onclickon(program enablemethod) onclickoff(program disablemethod)
+	CHECKBOX	cb_funh   _ilft  _ss	375     ., label("Funnel or Christmas tree plot for assessing bias (horizontal)") onclickon(program enablemethod) onclickoff(program disablemethod)
+	CHECKBOX	cb_cum    _ilft  _ss	300     ., label("Cumulative meta-analysis plot") onclickon(program enablemethod) onclickoff(program disablemethod)
+	CHECKBOX	cb_abbe   _ilft  _ss	300     ., label("L'Abbe plot") onclickon(program enablemethod) onclickoff(program disablemethod)
+	CHECKBOX	cb_rad    _ilft  _ss	300     ., label("Radial plot") onclickon(program enablemethod) onclickoff(program disablemethod)
+	CHECKBOX	cb_galb   _ilft  _ss	320     ., label("Radial plot for assessing heterogeneity (Galbraith)") onclickon(program enablemethod) onclickoff(program disablemethod)
+	CHECKBOX	cb_hist   _ilft  _ss	300     ., label("Histogram") onclickon(program enablemethod) onclickoff(program disablemethod)
+END
+
+DIALOG opt2, tabtitle("Publication Bias")
+BEGIN
+	GROUPBOX	gb_bias	_lft   _top	390    180, label("Publication Bias")
+	CHECKBOX	cb_beg	_ilft  _ss	120     ., label("Begg publication bias") onclickon(program enablemethod) onclickoff(program disablemethod)
+	TEXT  		tx_method2  +130 @  240		., label("") left
+	CHECKBOX	cb_egg	_ilft  _ss	200     ., label("Egger publication bias")
+	CHECKBOX	cb_nus	_ilft  _ss	200     ., label("Number of Unpublished Studies")
+	TEXT  		tx_nus  +210    @   80		., label("p-value >")
+	EDIT		ed_nus  +60     @	70      ., numonly option(nus) default(0.05) label("Maximum of the smallest p-values")
+	TEXT  		tx_mac  _ilft  _ms  120		., label("Macaskill publication bias")
+	CHECKBOX	cb_maco	50    _ss	230     ., label("Cohort studies, weight variable:") onclickon(program clickco) onclickoff(program clickoffco)
+	EDIT		ed_maco +240    @	70      ., option("macask") label("Weight variable for cohort studies")
+	CHECKBOX	cb_macc	50    _ms	230     ., label("Case-control studies, weight variable:") onclickon(program clickcc) onclickoff(program clickoffcc)
+	EDIT		ed_macc +240    @	70      ., option("macask") label("Weight variable for case-control studies")
+END
+
+
+LIST type_descrip
+	BEGIN
+		Raw data
+		Summary Statistics data
+		Mixed data
+	END
+
+LIST type_values
+	BEGIN
+		raw
+		sst
+		mix
+	END
+
+LIST st_descrip
+	BEGIN
+		Odds Ratio
+		Relative Risk
+		Rate Ratio
+		Risk Difference
+		Rate Difference
+		Slope
+		Mean Difference
+		Correlation Coefficient
+	END
+
+LIST st_values
+	BEGIN
+		or
+		rr
+		ir
+		rd
+		id
+		b
+		md
+		r
+	END
+
+LIST zero_descrip
+	BEGIN
+		None
+		Constant
+		Proportional
+		Empirical
+	END
+
+LIST zero_values
+	BEGIN
+		n
+		c
+		p
+		e
+	END
+
+LIST method_descrip
+	BEGIN
+		IoV Fixed Effects Model
+		IoV Random Effects Model
+		Mantel-Haenzsel method
+		Peto's odds ratio method
+	END
+
+LIST method_values
+	BEGIN
+		fem
+		rem
+		mh
+		peto
+	END
+
+LIST date_descrip
+	BEGIN
+		YMD: 2010-04-23
+		YM: 2010-04
+		Y: 2010
+	END
+
+LIST date_values
+	BEGIN
+		YMD
+		YM
+		Y
+	END
+
+LIST md_std_descrip
+	BEGIN
+		None
+		Cohen's d
+		Hedges' g
+		Glass's Delta
+	END
+
+LIST md_std_values
+	BEGIN
+		none
+		cohen
+		hedges
+		glass
+	END
+	
+PROGRAM typechange
+BEGIN
+	if (main.co_type.iseq("raw")) {
+		call main.cb_tables.enable
+		call main.tx_zero.enable
+		call main.co_zero.enable
+		call main.cb_peto.show
+	}
+	else {
+		call main.cb_tables.disable
+		call main.cb_tables.setoff
+		call main.tx_zero.disable
+		call main.co_zero.disable
+		call main.co_zero.setvalue "none"
+		call main.cb_peto.hide
+		call main.cb_peto.setoff
+	}
+END
+
+PROGRAM statchange
+BEGIN
+	if (main.co_stat.iseq("b")) {
+		call main.cb_exp.enable
+	}
+	else {
+		call main.cb_exp.disable
+		call main.cb_exp.setoff
+	}
+	if (main.co_stat.iseq("or") & main.co_type.iseq("raw")) {
+		call main.cb_peto.show
+	}
+	else {
+		call main.cb_peto.setoff
+		call main.cb_peto.hide
+	}
+	if (main.co_stat.iseq("md")) {
+		call main.tx_md_std.show
+		call main.co_md_std.show
+	}
+	else {
+		call main.tx_md_std.hide
+		call main.co_md_std.hide
+	}
+	if (main.co_type.iseq("raw")) {
+		call main.cb_tables.enable
+		call main.tx_zero.enable
+		call main.co_zero.enable
+		if (main.co_stat.iseq("b") | main.co_stat.iseq("md") | main.co_stat.iseq("r")) {
+			call main.cb_tables.disable
+			call main.cb_tables.setoff
+			call main.tx_zero.disable
+			call main.co_zero.disable
+			call main.co_zero.setvalue "none"
+		}
+	}
+	else {
+		call main.cb_tables.disable
+		call main.cb_tables.setoff
+		call main.tx_zero.disable
+		call main.co_zero.disable
+		call main.co_zero.setvalue "none"
+	}
+END
+
+PROGRAM methodchange
+BEGIN
+	if (opt1.co_method.iseq("fem")) {
+		call opt2.tx_method2.setlabel "Method of weighting: IoV Fixed Effects Model"
+	}
+	if (opt1.co_method.iseq("rem")) {
+		call opt2.tx_method2.setlabel "Method of weighting: IoV Random Effects Model"
+	}
+	if (opt1.co_method.iseq("mh")) {
+		call opt2.tx_method2.setlabel "Method of weighting: Mantel-Haenzsel method"
+	}
+	if (opt1.co_method.iseq("peto")) {
+		call opt2.tx_method2.setlabel "Method of weighting: Peto's odds ratio method"
+	}
+END
+
+PROGRAM enablemethod
+BEGIN
+	if (!main.cb_peto) {
+		call opt1.co_method.enable
+		if (opt2.cb_beg) {
+			call opt2.tx_method2.show
+		}
+	}
+END
+
+PROGRAM disablemethod
+BEGIN
+	if (!opt1.cb_influ & !opt1.cb_cumul & !opt1.cb_forest & !opt1.cb_inter & !opt1.cb_fun & /*
+	*/	!opt1.cb_funh & !opt1.cb_cum & !opt1.cb_abbe & !opt1.cb_rad & !opt1.cb_galb & /*
+	*/	!opt1.cb_hist & !opt2.cb_beg) {
+		call opt1.co_method.disable
+	}
+	if (!opt2.cb_beg) {
+		call opt2.tx_method2.hide
+	}
+END
+
+PROGRAM enablemethod2
+BEGIN
+	if (!main.cb_peto) {
+		call opt2.co_method2.enable
+	}
+END
+
+PROGRAM disablemethod2
+BEGIN
+	call opt2.co_method2.disable
+END
+
+PROGRAM peto_on
+BEGIN
+	call opt1.co_method.setvalue "peto"
+	call opt1.co_method.disable
+END
+
+PROGRAM peto_off
+BEGIN
+	call opt1.co_method.setvalue "fem"
+	if (!opt1.cb_influ & !opt1.cb_cumul & !opt1.cb_forest & !opt1.cb_inter & !opt1.cb_fun & /*
+	*/	!opt1.cb_funh & !opt1.cb_cum & !opt1.cb_abbe & !opt1.cb_rad & !opt1.cb_galb & !opt1.cb_hist) {
+		call opt1.co_method.disable
+	}
+	else {
+		call opt1.co_method.enable
+	}
+
+END
+
+PROGRAM clickco
+BEGIN
+	if (opt2.ed_maco.iseq("")) {
+		call opt2.ed_maco.setvalue "pres"
+	}
+	call opt2.cb_macc.setoff
+	call opt2.ed_macc.setvalue ""
+END
+
+PROGRAM clickcc
+BEGIN
+	if (opt2.ed_macc.iseq("")) {
+		call opt2.ed_macc.setvalue "pexp"
+	}
+	call opt2.cb_maco.setoff
+	call opt2.ed_maco.setvalue ""
+END
+
+PROGRAM clickoffco
+BEGIN
+	call opt2.ed_maco.setvalue ""
+END
+
+PROGRAM clickoffcc
+BEGIN
+	call opt2.ed_macc.setvalue ""
+END
+
+	
+PROGRAM command
+BEGIN
+	put "mar "
+	put main.co_type " " main.co_stat
+	put " " /program ifin_output
+	beginoptions
+		//Main (minus keep, level & nst)
+		if (main.cb_tables) {
+			put " tables"
+		}
+		if (!main.co_zero.isdefault()) {
+			optionarg main.co_zero
+		}
+		if (main.cb_exp) {
+			put " exp"
+		}
+		if (!main.co_date.isdefault()) {
+			optionarg main.co_date
+		}
+		if (main.co_stat.iseq("md")) {
+			if (main.co_md_std.iseq("cohen")) {
+				put " cohen"
+			}
+			if (main.co_md_std.iseq("hedges")) {
+				put " hedges"
+			}
+			if (main.co_md_std.iseq("glass")) {
+				put " glass"
+			}
+		}
+	
+		//Additional Analyses & Graphics
+		if (opt1.cb_influ) {
+			put " influ"
+		}
+		if (opt1.cb_cumul) {
+			require opt1.ed_cumul			
+			if (opt1.cb_rev) {
+				put " cum(-" opt1.ed_cumul ")"
+			}
+			else {
+				optionarg opt1.ed_cumul
+			}
+		}
+		if (main.cb_peto) {
+			call opt1.co_method.enable
+			optionarg opt1.co_method
+		}
+		else {
+			if (opt1.cb_influ | opt1.cb_cumul | opt1.cb_forest | opt1.cb_inter | opt1.cb_fun | /*
+			*/	opt1.cb_funh | opt1.cb_cum | opt1.cb_abbe | opt1.cb_rad | opt1.cb_galb | /*
+			*/	opt1.cb_hist | opt2.cb_beg) {
+				optionarg opt1.co_method
+			}
+		}
+		if (opt1.cb_forest) {
+			require opt1.ed_forest
+			optionarg opt1.ed_forest
+		}
+		if (opt1.cb_inter) {
+			require opt1.ed_int
+			optionarg opt1.ed_int
+		}
+		if (opt1.cb_fun) {
+			put " funnel"
+		}
+		if (opt1.cb_funh) {
+			put " funnelh"
+		}
+		if (opt1.cb_cum) {
+			put " cumulative"
+		}
+		if (opt1.cb_abbe) {
+			put " abbe"
+		}
+		if (opt1.cb_rad) {
+			put " radial"
+		}
+		if (opt1.cb_galb) {
+			put " galbraith"
+		}
+		if (opt1.cb_hist) {
+			put " histogram"
+		}
+		
+		//Publication Bias
+		if (opt2.cb_beg) {
+			put " begg"
+		}
+		if (opt2.cb_egg) {
+			put " egger"
+		}
+		if (opt2.cb_nus) {
+			require opt2.ed_nus
+			optionarg opt2.ed_nus
+		}
+		if (opt2.cb_maco) {
+			require opt2.ed_maco
+			optionarg opt2.ed_maco
+		}
+		if (opt2.cb_macc) {
+			require opt2.ed_macc
+			optionarg opt2.ed_macc
+		}
+
+		//keep, level & nst
+		if (main.cb_keep) {
+			put " keep"
+		}		
+		INCLUDE _level_main_pr
+		optionarg main.ed_nst
+	endoptions
+END

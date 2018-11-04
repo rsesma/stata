@@ -1,0 +1,234 @@
+/*
+  rtrend.dlg
+
+*! VERSION 1.2.5  23oct2018
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_medium
+DEFINE _dlght 320
+DEFINE _dlgwd 430
+INCLUDE header
+HELP hlp1, view("help rtrend")
+RESET res1
+
+DEFINE _x _lft
+DEFINE _y _top
+DEFINE _cx 100
+
+
+DIALOG main, label("rtrend - Trend Test") tabtitle("Main")
+BEGIN
+	GROUPBOX	gb_data	_lft	_top	130		90, label("Data type")
+	RADIO		rb_freq	_ilft	_ss		110		., label("Frequency") first default(1) option(data(freq)) onclickon(program type_freq)
+	RADIO		rb_pt	_ilft	_ss		110		., label("Person-time") last option(data(pt)) onclickon(program type_pt) 
+	
+	GROUPBOX	gb_st	_lft3_2	_top	130		90, label("Study type")
+	RADIO		rb_co	+10		_ss		110		., label("Cohort") first default(1) onclickon(program st_co)
+	RADIO		rb_cs	@		_ss		110		., label("Cross-Sectional") middle onclickon(program st_co)
+	RADIO		rb_cc	@		_ss		110		., label("Case-Control") last onclickon(program st_cc)
+
+	GROUPBOX	gb_stat	_lft3_3	_top	130		90, label("Required statistic")
+	RADIO		rb_rr	+10		_ss		110		., label("Risk/Preval. ratio") first default(1)
+	RADIO		rb_or	@		_ss		110		., label("Odds ratio") last
+
+	TEXT  		tx_2k   _lft    +50 	200		., label("Table 2xk or Table kx2")
+
+	TEXT  		tx_resp _lft  	_ms 	_vnwd	., label("Response variable:")
+	TEXT  		tx_exp  _lft3_2	@		_vnwd	., label("Exposure variable:")
+	TEXT  		tx_time _lft3_3	@	 	125		., label("Person-Time variable:")
+	VARNAME		v_resp	_lft   	_ss		_vnwd	., label("Response variable")
+	VARNAME		v_exp	_lft3_2	@  		_vnwd  	., label("Exposure variable")
+	VARNAME		v_time	_lft3_3	@		_vnwd	., label("Person-Time variable")
+
+	TEXT  		tx_metr _lft	_ms	 	_vnwd	., label("Metric:")
+	EDIT		ed_metr	_lft	_ss	 	400		., option(metric)
+	
+	TEXT  		tx_str	_lft 	_ms	 	_vnwd	., label("Stratum variable:")
+	VARNAME		v_str	_lft	_ss	 	_vnwd	., label("Stratum variable") option(by)
+	
+	GROUPBOX	gb_nst	_lft  	_ls	 	405  	55, label("Name of the study")
+	EDIT		ed_nst	_ilft 	_ss	 	385		., option(nst)
+END
+
+INCLUDE ifin
+
+DIALOG opt, tabtitle("Options")
+BEGIN
+	INCLUDE _sp_level
+	
+	GROUPBOX	gb_rc	_lft	40		140		110, label("Reference category")
+	RADIO		rb_rcf	_ilft	_ss		130		., label("First") first default(1) option(rc(f))
+	RADIO		rb_rcl	_ilft	_ss		130		., label("Last") middle option(rc(l))
+	RADIO		rb_rcp	_ilft	_ss		130		., label("Previous") middle option(rc(p))
+	RADIO		rb_rcs	_ilft	_ss		130		., label("Subsequent") last option(rc(s))
+
+	GROUPBOX	gb_ci	160		40		250		110, label("Confidence interval type for proportions")
+	RADIO		rb_none	+10		_ss		190		., label("None") first default(1) option(none)
+	RADIO		rb_wils	@		_ss		190		., label("Wilson") middle option(wilson)
+	RADIO		rb_wald	@		_ss		190		., label("Wald") middle option(wald)
+	RADIO		rb_exac	@		_ss		190		., label("Exact") last option(exact)
+
+	GROUPBOX	gb_zero	_lft	_xls	140		110, label("Zero-cell correction")
+	RADIO		rb_zn	_ilft	_ss		130		., label("None") first default(1) option(zero(n))
+	RADIO		rb_zc	@		_ss		130		., label("Constant") middle option(zero(c))
+	RADIO		rb_zp	@		_ss		130		., label("Proportional") middle option(zero(p))
+	RADIO		rb_zr	@		_ss		130		., label("Reciprocal") last option(zero(r))
+END
+
+PROGRAM type_freq
+BEGIN
+	// hide person-time var
+	call main.tx_time.hide
+	call main.v_time.hide
+	
+	// show study type
+	call main.gb_st.show
+	call main.rb_co.show
+	call main.rb_cs.show
+	call main.rb_cc.show
+	call main.rb_co.seton
+
+	// show required statistic
+	call main.gb_stat.show
+	call main.rb_rr.show
+	call main.rb_or.show
+	call main.rb_rr.seton
+
+	// show 2k/k2 text
+	call main.tx_2k.show
+	
+	// show zero correction
+	call opt.gb_zero.show
+	call opt.rb_zn.show
+	call opt.rb_zc.show
+	call opt.rb_zp.show
+	call opt.rb_zr.show
+	call opt.rb_zn.seton
+
+	// ci for frequency data (4 opt)
+	call opt.rb_wils.show
+	call opt.rb_wald.show
+	call opt.rb_exac.setposition . 120 . .
+	call opt.rb_none.seton
+END
+
+PROGRAM type_pt
+BEGIN
+	// show person-time var
+	call main.tx_time.show
+	call main.v_time.show
+	
+	// hide study type
+	call main.rb_co.seton
+	call main.gb_st.hide
+	call main.rb_co.hide
+	call main.rb_cs.hide
+	call main.rb_cc.hide
+
+	// hide required statistic
+	call main.rb_rr.seton
+	call main.gb_stat.hide
+	call main.rb_rr.hide
+	call main.rb_or.hide
+
+	// hide 2k/k2 text
+	call main.tx_2k.hide
+	
+	// hide zero correction
+	call opt.rb_zn.seton
+	call opt.gb_zero.hide
+	call opt.rb_zn.hide
+	call opt.rb_zc.hide
+	call opt.rb_zp.hide
+	call opt.rb_zr.hide
+
+	// ci for person-time (2 opt)
+	call opt.rb_none.seton
+	call opt.rb_wils.hide
+	call opt.rb_wald.hide
+	call opt.rb_exac.setposition . 80 . .
+END
+
+PROGRAM st_co
+BEGIN
+	// cohort: adapt 2k text
+	call main.tx_2k.setlabel "Table 2xk or Table kx2"
+	// enable required statistic
+	call main.gb_stat.enable
+	call main.rb_rr.enable
+	call main.rb_or.enable
+	// default for cohort is rr
+	call main.rb_rr.seton
+END
+
+PROGRAM st_cc
+BEGIN
+	// case-control: adapt 2k text
+	call main.tx_2k.setlabel "Table 2xk"
+	// default for 
+	call main.rb_or.seton
+	// default for case-control is or
+	call main.gb_stat.disable
+	call main.rb_rr.disable
+	call main.rb_or.disable	
+END
+
+
+PROGRAM command
+BEGIN
+	put "rtrend "
+	// variables
+	require main.v_exp main.v_resp
+	if main.rb_pt {
+		require main.v_time
+	}
+	put main.v_resp " " main.v_exp
+	if main.rb_pt {
+		put " " main.v_time
+	}
+	// ifin
+	put " " /program ifin_output
+	
+	beginoptions
+		option radio(main rb_freq rb_pt)					// data
+		
+		option radio(opt rb_rcf rb_rcl rb_rcp rb_rcs)		// rc
+		
+		optionarg main.v_str								// by
+		
+		optionarg main.ed_metr								// metric
+		
+		if main.rb_freq {
+			// build the st() parameter
+			if main.rb_co & main.rb_rr {
+				put " st(co rr)"
+			}
+			if main.rb_co & main.rb_or {
+				put " st(co or)"
+			}
+			if main.rb_cs & main.rb_rr {
+				put " st(cs pr)"
+			}
+			if main.rb_cs & main.rb_or {
+				put " st(cs or)"
+			}
+			if main.rb_cc {
+				put " st(cc)"
+			}
+			
+			option radio(opt rb_zn rb_zc rb_zp rb_zr)		// zero
+		}
+		
+		// ci type
+		if (main.rb_pt | !main.rb_cc) {
+			option radio(opt rb_none rb_wils rb_wald rb_exac)
+		}
+		
+		INCLUDE _level_opt_pr			// ci level
+		
+		optionarg main.ed_nst			// nst
+	endoptions
+END

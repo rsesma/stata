@@ -1,0 +1,18 @@
+v 3
+d dt  Diagnostic tests.
+d After installation, see help dt.
+d
+d (c)JM. Domenech
+d Programmer: R. Sesma
+d Laboratori d'Estadistica Aplicada, Universitat Autonoma de Barcelona.
+d
+d Distribution-Date: 03jul2018
+d Version 1.1.3 (03jul2018)
+d
+d E-mail: stata@graunt.cat
+f dt.ado
+f dt.sthlp
+f dt.dlg
+f dti.ado
+f dti.sthlp
+f dti.dlg

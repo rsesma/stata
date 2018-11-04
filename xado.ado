@@ -1,4 +1,4 @@
-*! version 1.0.0  R. Sesma
+*! version 1.0.2  04nov2018 R. Sesma
 
 /*
 Update user-defined commands
@@ -11,16 +11,16 @@ program define xado
 	*command name and first letter
 	local command = "`anything'"
 	local letter = substr("`command'",1,1)
-	
+
 	*get default dir values
-	if ("`codedir'"=="") local codedir = "C:\Users\tempo\Google Drive\Stata\_commands\code"
-	if ("`adodir'"=="") local adodir = "C:\ado\plus"
-	local extradir = "C:\ado\plus\_"
-	
+	if ("`codedir'"=="") local codedir = "/Users/r/github/stata"
+	if ("`adodir'"=="") local adodir = "/Users/r/Library/Application Support/Stata/ado/plus"
+	local extradir = "/Users/r/Library/Application Support/Stata/ado/plus/_"
+
 	*build origin and destination path
 	mata: st_local("orig",pathjoin(st_local("codedir"),st_local("command")))
 	mata: st_local("dest",pathjoin(st_local("adodir"),st_local("letter")))
-	
+
 	*copy ado, sthlp & dlg files from origin to destination
 	local files : dir "`orig'" files "*"
 	local n : word count `files'
@@ -29,24 +29,24 @@ program define xado
 		local file : word `i' of `files'
 		*get file extension
 		mata: st_local("ext",pathsuffix(st_local("file")))
-				
+
 		if (upper("`ext'")==".ADO" | upper("`ext'")==".STHLP" | upper("`ext'")==".DLG") {
 			mata: st_local("name",pathbasename(pathjoin(st_local("orig"),st_local("file"))))
 			local extra = (substr("`name'",1,1)=="_")
 			mata: st_local("file1",pathjoin(st_local("orig"),st_local("file")))
 			if (`extra') mata: st_local("file2",pathjoin(st_local("extradir"),st_local("file")))
 			else mata: st_local("file2",pathjoin(st_local("dest"),st_local("file")))
-			
+
 			copy "`file1'" "`file2'", public replace
 			di as txt "file updated: `file'"
-			
+
 			if ("`version'"=="" & upper("`ext'")==".ADO") {
 				*get version from first ado file
 				mata: st_local("version",tokens(cat(st_local("file1"), 1, 1))[1,3])
 			}
 		}
 	}
-	
+
 	*force update
 	program drop _allado
 

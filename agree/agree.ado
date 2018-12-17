@@ -1,4 +1,4 @@
-*! version 1.1.4  11may2018 JM. Domenech, R. Sesma
+*! version 1.1.5  ?dec2018 JM. Domenech, R. Sesma
 
 /*
 Agreement: Passing-Bablok & Bland-Altman methods
@@ -9,9 +9,9 @@ program agree, byable(recall) sortpreserve rclass
 	syntax varlist(min=2 max=2 numeric) [if] [in], /*
 	*/	[PB BA BOth Level(numlist max=1 >=50 <100) list id(varname numeric) pbgraph(string) nst(string)]
 
-	tempvar yx yxpct ai ai_lo ai_up sort d r cusumi sort idv xy yx2 s
+	tempvar yx xy yx2 diff ai ai_lo ai_up sort d r cusumi sort idv  s
 	tempname st res A
-	
+
 	if ("`pb'"!="" & "`ba'"!="" | "`pb'"!="" & "`both'"!="" | /*
 	*/	"`ba'"!="" & "`both'"!="") print_error "invalid data -- only one of pb, ba, both is needed"
 	if ("`pb'"=="" & "`ba'"=="" & "`both'"=="") local show 0
@@ -19,7 +19,7 @@ program agree, byable(recall) sortpreserve rclass
 	if ("`pb'"!="") local show 1
 	if ("`ba'"!="") local show 2
 	if ("`level'"=="") local level 95
-	if ("`show'"=="ba" & "`list'"!="") print_error "list option not allowed for ba option"
+	if (`show'==2 & "`list'"!="") print_error "list option not allowed for ba option"
 	if ("`list'"=="" & "`id'"!="") print_error "id() option is only necessary with list option"
 	if ("`pbgraph'"!="" & "`pbgraph'"!="reg" & "`pbgraph'"!="ci" & "`pbgraph'"!="both") print_error "pbgraph() invalid"
 
@@ -28,15 +28,126 @@ program agree, byable(recall) sortpreserve rclass
 	local x `2'
 	local y `1'
 	if ("`x'"=="`y'") print_error "invalid data -- var X and var Y must be different"
-	
+
 	marksample touse, novarlist			//ifin marksample
 	qui count if `touse'
 	local ncases = r(N)					//total number of cases
 	if (`ncases'==0) print_error "no observations"
 
-	di as res "AGREEMENT: " cond(`show'==0,"PASSING-BABLOK & BLAND-ALTMAN METHODS",cond(`show'==1,"PASSING-BABLOK METHOD","BLAND-ALTMAN METHOD"))
+	di as res _n "AGREEMENT: " _c
+	if (`show'==0) di "PASSING-BABLOK & BLAND-ALTMAN METHODS"
+	if (`show'==1) di "PASSING-BABLOK METHOD"
+	if (`show'==2) di "BLAND-ALTMAN METHOD"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
-	
+
+	quietly {
+		gen `yx' = `y' - `x'
+		gen `yx2' = (`y' + `x')/2
+		gen `diff' = 100*`yx'/`yx2'
+
+		*Lin, L,(1989) A concordance correlation coefficient to evaluate reproductivity,Biometrics, 45:255-268.
+		su `x'
+		local meanx = r(mean)
+		local varx = r(Var)
+		su `y'
+		local meany = r(mean)
+		local vary = r(Var)
+		gen `xy' = (`x' - `meanx')*(`y' - `meany')
+		su `xy' if `touse'
+		local sxy = r(sum)
+		local lin = 2*(`sxy'/(`r(N)'-1))/(`varx' + `vary' + (`meanx'-`meany')^2)
+	}
+
+	* descriptive statistics
+	if (`show'<2) {
+		* passing-bablok
+	}
+	if (`show'==2) {
+		* bland-altman
+		di _n as txt "Bland-Altman: Descriptive Statistics (listwise)"
+		di "{hline 71}"
+		di as txt "Variable    Valid  Miss   Obs      Mean  Std. Dev. [`level'% Conf. Interval]"
+		foreach v of varlist `y' `x' {
+			qui su `v' if `touse'
+			local m = r(mean)
+			local sd = r(sd)
+			local n = r(N)
+			qui ci `v' if `touse', level(`level')
+			di as txt cond("`v'"=="`y'","Y: ","X: ") as res abbrev("`v'",8) _col(13) _c
+			di %5.0f `n' " " %5.0f (`ncases' - `n') " " %5.0f `ncases' " " _c
+			di %9.0g `m' "  " %9.0g `sd' "  " %9.0g `r(lb)' " " %9.0g `r(ub)'
+		}
+		di "{hline 71}"
+	}
+
+	if (`show'==2 | `show'==0) {
+		* bland-altman: absolute values of bias & LoA
+		tempname bias sd t z lo up se
+		qui ttest `y' == `x' if `touse', level(`level')
+		scalar `t' = invttail(`r(df_t)',(100-`level')/200)
+		scalar `z' = invnormal((100+`level')/200)
+		scalar `bias' = r(mu_1) - r(mu_2)
+		scalar `sd' = r(se)*sqrt(r(N_1))
+		scalar `lo' = `bias' - `z'*`sd'
+		scalar `up' = `bias' + `z'*`sd'
+		scalar `se' = `sd'*sqrt(3/r(N_1))
+
+		di _n as txt "Bland-Altman: Absolute values of Bias & Limits of Agreement (LoA) "
+		di "{hline 71}"
+		di as txt "Parameter   Obs   Estimate  Std. Dev.   Std. Err.  [`level'% Conf. Interval]"
+		di as txt "Y-X: Bias " as res %5.0f `r(N_1)' "  " %9.0g `bias' "  " % 9.0g `sd' "   " %9.0g `r(se)' _c
+		di as res _col(53) %9.0g `bias' - `t'*`r(se)' " " %9.0g `bias' + `t'*`r(se)'
+		di as txt "Lower LoA " as res %5.0f `r(N_1)' "  " %9.0g `lo' _col(41) %9.0g `se' _c
+		di as res _col(53) %9.0g `lo' - `t'*`se' " " %9.0g `lo' + `t'*`se'
+		di as txt "Upper LoA " as res %5.0f `r(N_1)' "  " %9.0g `up' _col(41) %9.0g `se' _c
+		di as res _col(53) %9.0g `up' - `t'*`se' " " %9.0g `up' + `t'*`se'
+		di "{hline 71}"
+
+		* bland-altman: percentage values of bias & LoA
+		qui ttest `diff' == 0 if `touse', level(`level')
+		scalar `t' = invttail(`r(df_t)',(100-`level')/200)
+		scalar `z' = invnormal((100+`level')/200)
+		scalar `bias' = r(mu_1)
+		scalar `sd' = r(sd_1)
+		scalar `lo' = `bias' - `z'*`sd'
+		scalar `up' = `bias' + `z'*`sd'
+		scalar `se' = `sd'*sqrt(3/r(N_1))
+
+		di _n as txt "Bland-Altman: Percentage values of Bias & Limits of Agreement (LoA) "
+		di "{hline 71}"
+		di as txt "Parameter   Obs   Estimate  Std. Dev.   Std. Err.  [`level'% Conf. Interval]"
+		di as txt "Y-X: Bias " as res %5.0f `r(N_1)' "  " %9.0g `bias' "  " % 9.0g `sd' "   " %9.0g `r(se)' _c
+		di as res _col(53) %9.0g `bias' - `t'*`r(se)' " " %9.0g `bias' + `t'*`r(se)'
+		di as txt "Lower LoA " as res %5.0f `r(N_1)' "  " %9.0g `lo' _col(41) %9.0g `se' _c
+		di as res _col(53) %9.0g `lo' - `t'*`se' " " %9.0g `lo' + `t'*`se'
+		di as txt "Upper LoA " as res %5.0f `r(N_1)' "  " %9.0g `up' _col(41) %9.0g `se' _c
+		di as res _col(53) %9.0g `up' - `t'*`se' " " %9.0g `up' + `t'*`se'
+		di "{hline 71}"
+
+		* spearman & lin concordance
+		qui spearman `yx' `yx2' if `touse', stats(p)
+		di as txt "Spearman correlation between (Y-X) and (X+Y)/2: r= " as res %7.4f `r(rho)' _c
+		di as txt " (p= " as res %6.4f `r(p)' as txt ")"
+		di as txt "Lin's Concordance Correlation coeff. of Absolute Agreement = " as res %6.4f `lin'
+		di "{hline 71}"
+
+		* test of normality
+		di as txt _n "Tests of Normality (Y-X)   Statistic    p-value"
+		di as txt "{hline 47}"
+		qui swilk `yx' if `touse'
+		di as txt "Shapiro-Wilk" _col(29) "W = " as res %7.4f `r(W)' "  " %6.4f `r(p)'
+		qui su `yx' if `touse', detail
+		local skew = r(skewness)
+		local kurt = r(kurtosis)-3
+		qui sktest `yx' if `touse'
+		di as txt "Skewness" _col(28) "Sk = " as res %7.4f `skew' "  " %6.4f `r(P_skew)'
+		di as txt "Kurtosis-3" _col(28) "Ku = " as res %7.4f `kurt' "  " %6.4f `r(P_kurt)'
+		di as txt "Skewness & Kurtosis" _col(26) "Chi2 = " as res %7.4f `r(chi2)' "  " %6.4f `r(P_chi2)'
+		di as txt "{hline 47}"
+	}
+
+
+/*
 	*Print the number of valid and missing values for each variable
 	qui tabstat `x' `y' if `touse', s(count) save
 	matrix `st' = r(StatTotal)
@@ -46,13 +157,13 @@ program agree, byable(recall) sortpreserve rclass
 	di as txt %12s abbrev("`x'",12) " X {c |} " as res %8.0g `st'[1,1] "   " %8.0g (`ncases'-`st'[1,1])
 	di as txt %12s abbrev("`y'",12) " Y {c |} " as res %8.0g `st'[1,2] "   " %8.0g (`ncases'-`st'[1,2])
 	display as text "{hline 15}{c BT}{hline 21}"
-	
+
 	markout `touse' `x' `y'				//Exclude missing values of list vars
 	qui count if `touse'
 	local nvalid = r(N)
 	di as txt "Valid number of cases (listwise): " as res `nvalid'
 	return scalar N = `nvalid'
-	
+
 	*Descriptive statistics of X and Y
 	quietly {
 		generate `yx' = `y' - `x' if `touse'
@@ -61,7 +172,7 @@ program agree, byable(recall) sortpreserve rclass
 		matrix `st' = r(StatTotal)
 		generate `yx2' = (`y' + `x')/2 if `touse'
 	}
-	
+
 	if (`show'<=1) {
 		matrix rownames `st' = Median Mean Minimum Maximum StdDev
 		matrix colnames `st' = X Y Y-X (Y-X)/X
@@ -71,7 +182,7 @@ program agree, byable(recall) sortpreserve rclass
 		local b_lo = `res'[1,2]
 		local b_up = `res'[1,3]
 
-		*Compute the i elements for the a estimation; use tabstat median 
+		*Compute the i elements for the a estimation; use tabstat median
 		quietly {
 			gen `ai' = `y' - `b'*`x' if `touse'
 			gen `ai_lo' = `y' - `b_up'*`x' if `touse'
@@ -115,7 +226,7 @@ program agree, byable(recall) sortpreserve rclass
 			local cusum = r(max)					//The maximum value marks the test
 			sort `s'
 		}
-	
+
 		//Print passing-bablock results
 		local rlbl1 "Median"
 		local rlbl2 "Mean"
@@ -143,8 +254,8 @@ program agree, byable(recall) sortpreserve rclass
 		return scalar a_ub = `a_up'
 		return scalar b = `b'
 		return scalar b_lb = `b_lo'
-		return scalar b_ub = `b_up'		
-		
+		return scalar b_ub = `b_up'
+
 		di
 		local sqrl = sqrt(`l_sup'+1)
 		local c
@@ -154,8 +265,8 @@ program agree, byable(recall) sortpreserve rclass
 		if ((`cusum'<=1.22*`sqrl') & (`cusum'>1.07*`sqrl')) local c "p < 0.20"
 		if (`cusum'<=1.07*`sqrl') local c "p > 0.20"
 		di as txt "Linearity Test (CUSUM Test for deviation from linearity):   " as res "`c'"
-		return local cusum = "`c'" 
-		
+		return local cusum = "`c'"
+
 		if ("`list'"!="") {
 			if ("`id'"=="") {
 				generate `idv' = _n
@@ -171,7 +282,7 @@ program agree, byable(recall) sortpreserve rclass
 			tabdisp `id_list' if `touse', cellvar( `x' `y' `yx' `yxpct')
 		}
 	}
-	
+
 	local ngraph
 	local ntitle
 	if _by() {
@@ -186,7 +297,7 @@ program agree, byable(recall) sortpreserve rclass
 		local ba = `st'[2,3]
 		local ba_lo = `ba' - invnormal((`level'+100)/200)*`st'[5,3]
 		local ba_up = `ba' + invnormal((`level'+100)/200)*`st'[5,3]
-		
+
 		*Number of cases over and under the interval of agreement
 		qui count if `touse' & `yx' > `ba_up'
 		local nover = r(N)
@@ -194,7 +305,7 @@ program agree, byable(recall) sortpreserve rclass
 		local nunder = r(N)
 		local pover = (`nover'/`nvalid')*100
 		local punder = (`nunder'/`nvalid')*100
-		
+
 		*Print Bland-Altman Interval of Agreement
 		di
 		di as txt "{bf:Bland-Altman Interval of Agreement}"
@@ -208,7 +319,7 @@ program agree, byable(recall) sortpreserve rclass
 		print_pct `punder'
 		di as txt ")"
 		di as txt "{hline 62}"
-		
+
 		return scalar mean = `ba'
 		return scalar mean_lb = `ba_lo'
 		return scalar mean_ub = `ba_up'
@@ -232,10 +343,10 @@ program agree, byable(recall) sortpreserve rclass
 			local chi2 = r(chi2)
 			local P_chi2 = r(P_chi2)
 		}
-		
+
 		di as txt "Spearman correlation between (Y-X) and (X+Y)/2: r= " as res %7.4f `rho' as txt " (p= " as res %6.4f `p' as txt ")"
 	}
-	
+
 	*Lin, L,(1989) A concordance correlation coefficient to evaluate reproductivity,Biometrics, 45:255-268.
 	quietly {
 		*st matrix has the tabstab results
@@ -250,8 +361,8 @@ program agree, byable(recall) sortpreserve rclass
 	}
 	return scalar lin = `lin'
 	di as txt _newline "{bf:Lin's Concordance Correlation coeff.} of Absolute Agreement = " as res %6.4f `lin'
-	
-	if (`show'==2 | `show'==0) {		
+
+	if (`show'==2 | `show'==0) {
 		di as txt _newline "Tests of Normality (Y-X)             p-value"
 		di as txt "{hline 44}"
 		di as txt "Shapiro-Wilk{ralign 14:W} = " as res %7.4f `W' "  " %6.4f `sw_p'
@@ -259,7 +370,7 @@ program agree, byable(recall) sortpreserve rclass
 		di as txt "Kurtosis-3{ralign 16:Ku} = " as res %7.4f `kurt' "  " %6.4f `P_kurt'
 		di as txt "Skewness & Kurtosis{ralign 7:Chi2} = " as res %7.4f `chi2' "  " %6.4f `P_chi2'
 		di as txt "{hline 44}"
-		
+
 		return scalar rho = `rho'
 		return scalar p_rho = `p'
 		return scalar W = `W'
@@ -271,7 +382,7 @@ program agree, byable(recall) sortpreserve rclass
 		return scalar chi2 = `chi2'
 		return scalar p_chi2 = `P_chi2'
 
-				
+
 		//Graphic: Bland-Altman (always)
 		graph twoway (scatter `yx' `yx2', mfcolor(none) msize(medlarge) mcolor(black)) 	/*
 		*/	(function y = `ba', range(`x') lcolor(black) lpattern(solid))			/*
@@ -283,7 +394,7 @@ program agree, byable(recall) sortpreserve rclass
 		*/	title("Bland-Altman Agreement `ntitle'", size(medium) color(black) margin(medium))  /*
 		*/  name("bland_altman`ngraph'", replace)
 	}
-	
+
 	//Graphic: Passing-Bablok (if asked)
 	if ("`pbgraph'"!="" & (`show'<=1)) {
 		if ("`pbgraph'"=="reg") {
@@ -314,10 +425,10 @@ program agree, byable(recall) sortpreserve rclass
 			*/	name("passing_bablok`ngraph'", replace)
 		}
 	}
-	
+
 	if (`show'<=1) return matrix Stats = `st'
 	return scalar level = `level'
-
+	*/
 end
 
 program define print_pct
@@ -331,7 +442,7 @@ end
 
 program define print_error
 	args message
-	display in red "`message'" 
+	display in red "`message'"
 	exit 198
 end
 
@@ -349,11 +460,11 @@ void getpbcoef(string scalar varx, string scalar vary, real scalar level, string
 	real scalar Sij, Sk
 	real scalar N, K, even
 	real scalar b, c, M1, M2, l, u
-	
+
 	//Get X, Y data from current dataset
 	X = st_data(., varx, touse)
 	Y = st_data(., vary, touse)
-	
+
 	//Compute the Sij elements (Passing and Bablok, J. Clin. Chem. Clin. Biochem. / Vol.21,1983 / No.11, pg.711)
 	lfirst = 1
 	len = rows(X)
@@ -377,10 +488,10 @@ void getpbcoef(string scalar varx, string scalar vary, real scalar level, string
 		}
 	}
 	S = sort(S,1)			//Sort the Sij results
-	N = rows(S)				//N: total number of slopes Sij 
+	N = rows(S)				//N: total number of slopes Sij
 	K = colsum(S)[1,2]		//K: number of Sij < -1
 	even = (mod(N,2)==0)	//N is even?
-	
+
 	//b is estimated by the shifted median of the S[i] (Passing and Bablok, pg.712)
 	if (even==1) b = 1/2*(S[N/2+K,1] + S[N/2+1+K,1])	//N is even
 	else b = S[(N+1)/2+K,1]						//N is odd
@@ -390,7 +501,7 @@ void getpbcoef(string scalar varx, string scalar vary, real scalar level, string
 	M2 = N - M1 + 1
 	l = S[M1+K,1]
 	u = S[M2+K,1]
-	
+
 	//Save results in Stata matrix
 	st_matrix(res,(b,l,u))
 }

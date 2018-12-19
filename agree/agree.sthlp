@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.4 11may2018}{...}
+{* *! version 1.1.5 19dec2018}{...}
 {viewerdialog agree "dialog agree"}{...}
 {viewerjumpto "Syntax" "agree##syntax"}{...}
 {viewerjumpto "Description" "agree##description"}{...}
@@ -28,12 +28,10 @@
 {synopt :{opt bo:th}}calculate Passing-Bablock & Bland-Altman methods; the {bf:default}{p_end}
 {synopt :{opt pb}}calculate Passing-Bablok estimation of regression line{p_end}
 {synopt :{opt ba}}calculate Bland-Altman comparison of two measurements methods{p_end}
-{synopt :{opt list}}list input data (the report include X-Y changes){p_end}
+{synopt :{opt line}}show regression line on Bland-Altman graphics{p_end}
+{synopt :{opt ci}}show confidence intervals on Passing-Bablok graphic{p_end}
+{synopt :{opt list}}list input data; the report include X-Y changes (Passing-Bablok only){p_end}
 {synopt :{opt id(varname)}}name of variable with identifier of cases for the list;  default is {bf:{help _n:_n}}{p_end}
-{synopt :{opt pbgraph(type)}}show the Passing-Bablok Regression Line graphic:{break}
-{bf:reg}{space 4}show regression line{break}
-{bf:ci}{space 5}show confidence intervals, lower & upper{break}
-{bf:both}{space 3}show regression line with confidence intervals{break}{p_end}
 {synopt :{opt l:evel(#)}}confidence level (%); default is {bf:level(95)}{p_end}
 {synopt :{opt nst(string)}}name of the study (label){p_end}
 {synoptline}
@@ -45,14 +43,14 @@
 {title:Description}
 
 {p 4 4 2}
-Passing-Bablok and Bland-Altman methods of agreement. The command needs the names of the numeric variables 
+Passing-Bablok and Bland-Altman methods of agreement. The command needs the names of the numeric variables
 with method X (reference) and method Y.
 
 {p 4 4}
 You can click {dialog agree:here} to pop up a {dialog agree:dialog} or type {inp: db agree}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://www.graunt.cat/stata} for install.
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate agree, update} to update the {bf:agree} command.{break}
@@ -70,7 +68,7 @@ If you find any bugs or want to suggest any improvements, please send an e-mail 
 
 {p 4 4}{stata "use http://www.graunt.cat/stata/agree_data.dta":. use http://www.graunt.cat/stata/agree_data.dta}{p_end}
 {p 4 4}{cmd:. agree Instrumental Manual}{p_end}
-{p 4 4}{cmd:. agree Instrumental Manual, both pbgraph(both) nst(Study name)}{p_end}
+{p 4 4}{cmd:. agree Instrumental Manual, both line ci nst(Study name)}{p_end}
 {p 4 4}{cmd:. agree Instrumental Manual, pb list id(Especimen)}{p_end}
 {p 4 4}{cmd:. agree Instrumental Manual, ba}{p_end}
 
@@ -96,11 +94,16 @@ The command stores the following in {cmd:r()}:
 {synopt:{cmd:r(b_ub)}}upper bound of {bf:B} confidence interval{p_end}
 
 {p2col 7 15 19 2: {it:Bland-Altman Interval of Agreement}}{p_end}
-{synopt:{cmd:r(mean)}}Mean of Y-X{p_end}
-{synopt:{cmd:r(mean_lb)}}lower bound of Mean of Y-X CI{p_end}
-{synopt:{cmd:r(mean_ub)}}upper bound of Mean of Y-X CI{p_end}
-{synopt:{cmd:r(nover)}}cases over limit{p_end}
-{synopt:{cmd:r(nunder)}}cases under limit{p_end}
+{synopt:{cmd:r(mean)}}Y-X: Bias{space 29} {it:Absolute values}{p_end}
+{synopt:{cmd:r(mean_se)}}Y-X: Bias std. error{space 18} {it:Absolute values}{p_end}
+{synopt:{cmd:r(LoA_lb)}}lower bound of LoA{space 20} {it:Absolute values}{p_end}
+{synopt:{cmd:r(LoA_ub)}}upper bound of LoA{space 20} {it:Absolute values}{p_end}
+{synopt:{cmd:r(LoA_se)}}std. error of LoA{space 21} {it:Absolute values}{p_end}
+{synopt:{cmd:r(mean_pct)}}Y-X: Bias{space 29} {it:Percentage values}{p_end}
+{synopt:{cmd:r(mean_se_pct)}}Y-X: Bias std. error{space 18} {it:Percentage values}{p_end}
+{synopt:{cmd:r(LoA_lb_pct)}}lower bound of LoA{space 20} {it:Percentage values}{p_end}
+{synopt:{cmd:r(LoA_ub_pct)}}upper bound of LoA{space 20} {it:Percentage values}{p_end}
+{synopt:{cmd:r(LoA_se_pct)}}std. error of LoA{space 21} {it:Percentage values}{p_end}
 {synopt:{cmd:r(rho)}}Spearman correlation between (Y-X) and (X+Y)/2{p_end}
 {synopt:{cmd:r(p_rho)}}significance of Spearman correlation{p_end}
 {synopt:{cmd:r(W)}}Shapiro-Wilk {space 25} {it:Tests of Normality}{p_end}
@@ -123,7 +126,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.4 {hline 2} 11 May 2018
+Version 1.1.5 {hline 2} 19 December 2018
 
 
 {marker authors}{...}
@@ -141,7 +144,7 @@ stata@graunt.cat{break}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Passing-Bablok & Bland-Altman methods: User-written command agree for Stata [computer program].{break}
-V1.1.4. Barcelona: Graunt21; 2018.{break}
+V1.1.5. Barcelona: Graunt21; 2018.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 
 
@@ -149,9 +152,9 @@ Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 {title:References}
 
 {p 0 2}
-Bablok W, Passing H, Bender R, Schneider B. A general regression procedure for method transformation. 
-Application of linear regression procedures for method comparison studies in clinical chemistry. Part III. 
-J Clin Chem Clin Biochem. 1988;26:783-90.{p_end}
+Bablok W, Passing H, Bender R, Schneider B. A general regression procedure for method transformation. Application
+of linear regression procedures for method comparison studies in clinical chemistry. Part III. J Clin
+Chem Clin Biochem. 1988;26:783-90.{p_end}
 
 {p 0 2}
 Bland M, Altman DG. Statistical methods for assessing agreement between two methods of clinical measurement. Lancet. 1986;1:307-10.{p_end}
@@ -161,7 +164,10 @@ Bland M, Altman DG. Comparing two methods of clinical measurement: a personal hi
 
 {p 0 2}
 Dom{c e'}nech JM. Fundamentos de Dise{c n~}o y Estad{c i'}stica. UD 14. Medida  del cambio: An{c a'}lisis de dise{c n~}os con medidas
-intrasujeto. 16{c 170} ed. Barcelona: Signo; 2015.{p_end}
+intrasujeto. 20{c 170} ed. Barcelona: Signo; 2019.{p_end}
+
+{p 0 2}
+Giavarina D. Understanding Bland Altman analysis. Biochem Med (Zagreb). 2015;25(2):141-51.
 
 {p 0 2}
 Lin LI. Concordance Correlation Coefficient to Evaluate Reproducibility. Biometrics. 1989;45:255-68.{p_end}
@@ -170,15 +176,15 @@ Lin LI. Concordance Correlation Coefficient to Evaluate Reproducibility. Biometr
 Lin LI. Assay Validation Using the Concordance Correlation Coefficient. Biometrics. 1992;48:599-604.{p_end}
 
 {p 0 2}
-Passing H, Bablok W. A new biometrical procedure for testing the equality of measurements from two different analytical methods. 
-Application of linear regression procedures for method comparison studies in clinical chemistry. Part I. 
-J Clin Chem Clin Biochem. 1983;21:709-20.{p_end}
+Passing H, Bablok W. A new biometrical procedure for testing the equality of measurements from two different
+analytical methods. Application of linear regression procedures for method comparison studies in clinical
+chemistry. Part I. J Clin Chem Clin Biochem. 1983;21:709-20.{p_end}
 
 {p 0 2}
-Passing H, Bablok W. Comparison of several regression procedures for method comparison studies and determination of sample size. 
-Application of linear regression procedures for method comparison studies in clinical chemistry. Part II. 
-J Clin Chem Clin Biochem. 1984;22:431-45.{p_end}
+Passing H, Bablok W. Comparison of several regression procedures for method comparison studies and determination
+of sample size. Application of linear regression procedures for method comparison studies in clinical
+chemistry. Part II. J Clin Chem Clin Biochem. 1984;22:431-45.{p_end}
 
 {p 0 2}
-Passing H, Bablok W. Application of statistical procedures in analytical instrument testing. 
-J Automat Chem. 1985;7(2):74-9.{p_end}
+Passing H, Bablok W. Application of statistical procedures in analytical instrument testing. J Automat
+Chem. 1985;7(2):74-9.{p_end}

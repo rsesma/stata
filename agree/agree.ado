@@ -1,4 +1,4 @@
-*! version 1.1.5  ?dec2018 JM. Domenech, R. Sesma
+*! version 1.1.5  19dec2018 JM. Domenech, R. Sesma
 
 /*
 Agreement: Passing-Bablok & Bland-Altman methods
@@ -21,9 +21,8 @@ program agree, byable(recall) sortpreserve rclass
 	if ("`level'"=="") local level 95
 	if (`show'==2 & "`list'"!="") print_error "list option not allowed for ba option"
 	if ("`list'"=="" & "`id'"!="") print_error "id() option is only necessary with list option"
-	*if ("`pbgraph'"!="" & "`pbgraph'"!="reg" & "`pbgraph'"!="ci" & "`pbgraph'"!="both") print_error "pbgraph() invalid"
 
-	//X, Y variables
+	// x, y variables
 	tokenize `varlist'
 	local x `2'
 	local y `1'
@@ -90,6 +89,13 @@ program agree, byable(recall) sortpreserve rclass
 	}
 	if (`show'==0 | `show'==2) di "{hline 71}"
 	if (`show'==1) di "{hline 29}"
+
+	* valid number of cases
+	markout `touse' `x' `y'				// exclude missing values of list vars
+	qui count if `touse'
+	di as txt "Valid number of cases (casewise): {bf:`r(N)'}"
+	return scalar N = r(N)				// save
+
 	if (`show'==0 | `show'==1) {
 		* print passing-bablock descriptive statistics
 		di _n as txt "Passing-Bablok: Descriptive Statistics (listwise)"
@@ -114,24 +120,21 @@ program agree, byable(recall) sortpreserve rclass
 		matrix colnames `st' = X Y Y-X (Y-X)/X
 		return matrix Stats = `st'		// save
 	}
-	markout `touse' `x' `y'				// exclude missing values of list vars
-	qui count if `touse'
-	return scalar N = r(N)				// save
 
-	*Lin, L,(1989) A concordance correlation coefficient to evaluate reproductivity,Biometrics, 45:255-268
+	* Lin, L,(1989) A concordance correlation coefficient to evaluate reproductivity,Biometrics, 45:255-268
 	qui gen `xy' = (`x' - `m`x'')*(`y' - `m`y'')
 	qui su `xy' if `touse'
 	local lin = 2*(`r(sum)'/(`r(N)'-1))/(`v`x'' + `v`y'' + (`m`x''-`m`y'')^2)
 	return scalar lin = `lin'			// save
 
 	if (`show'==1 | `show'==0) {
-		*Passing-Bablok results: use Mata to compute b
+		* Passing-Bablok results: use Mata to compute b
 		mata: getpbcoef("`x'","`y'",`level',"`res'","`touse'")
 		local b = `res'[1,1]			//Put Mata results in Stata macros
 		local b_lo = `res'[1,2]
 		local b_up = `res'[1,3]
 
-		*Compute the i elements for the a estimation; use tabstat median
+		* compute the i elements for the a estimation; use tabstat median
 		quietly {
 			gen `ai' = `y' - `b'*`x'
 			gen `ai_lo' = `y' - `b_up'*`x'
@@ -143,7 +146,7 @@ program agree, byable(recall) sortpreserve rclass
 		local a_lo = `A'[1,2]
 		local a_up = `A'[1,3]
 
-		*Correction for inverse confidence interval
+		* correction for inverse confidence interval
 		if (`b_lo'>`b_up') {
 			local t = `b_up'
 			local b_up = `b_lo'
@@ -202,7 +205,7 @@ program agree, byable(recall) sortpreserve rclass
 
 		if (`show'==1) di as txt "Lin's Concordance Correlation coeff. of Absolute Agreement = " as res %6.4f `lin'
 
-		// graphic: Passing-Bablok
+		* graphic: Passing-Bablok
 		local cilo
 		local ciup
 		if ("`ci'"!="") {
@@ -225,7 +228,7 @@ program agree, byable(recall) sortpreserve rclass
 	}
 
 	if (`show'==2 | `show'==0) {
-		* bland-altman: absolute/percentage values of bias & LoA
+		* Bland-Altman: absolute/percentage values of bias & LoA
 		foreach i of numlist 1/2 {
 			di _n as txt "Bland-Altman: " cond(`i'==1,"Absolute","Percentage") _c
 			di as txt " values of Bias & Limits of Agreement (LoA)"
@@ -296,7 +299,6 @@ program agree, byable(recall) sortpreserve rclass
 		di as txt "Shapiro-Wilk" _col(29) "W = " as res %7.4f `r(W)' "  " %6.4f `r(p)'
 		return scalar W = `r(W)'			// save
 		return scalar p_W = `r(p)'
-
 		qui su `yx' if `touse', detail
 		local skew = r(skewness)
 		local kurt = r(kurtosis)-3

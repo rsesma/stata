@@ -1,52 +1,53 @@
 /*
   confound.dlg
 
-*! VERSION 1.1.1  21may2018
+*! VERSION 1.1.2  20dec2018
 
 */
 
 VERSION 12.0
 
-INCLUDE _std_large
-INCLUDE _ht330
+INCLUDE _std_medium
+DEFINE _dlght 385
 INCLUDE header
 HELP hlp1, view("help confound")
 RESET res1
 
 DIALOG main, tabtitle("Model") title("confound - Modelling confounding")
 BEGIN
-	TEXT 		tx_type	_lft	_top	100		.,	label("Regression type:")
-	COMBOBOX	co_type	110		_top	100		., dropdownlist contents(type_contents) values(type_values) onselchange(program change_type)
-	TEXT 		tx_dv 	260		_top	_vnwd	.,	label("Dependent variable:")
-	VARNAME 	vn_dv	370 	@		_vnwd	.,	label("Dependent variable")
-	TEXT 		tx_exp 	_lft	_ls		_vnwd	.,	label("Exposition variable:")
-	TEXT 		tx_iv	_vlx	@		160		.,	label("Independent variables:")
-	VARLIST 	vl_iv	@		_ss		_vlwd	.,	fv label("Independent variables")
-	VARNAME 	vn_exp	_lft 	@		_vnwd	.,	fv label("Exposition variable")
-	DEFINE _x _xsetbu
-	DEFINE _y 35
-	INCLUDE _bu_stset
-		
-	GROUPBOX	gb_opt	_lft  	_xxls	_iwd    175, label("Options")
-	TEXT		tx_ch	_ilft	_ms		65		., label("Change (%):") 
-	EDIT		ed_ch	+70   	@	 	50		., numonly option(change) default(10)
-	CHECKBOX	cb_min	170		@		150	  	., label("Minimum model as reference") default(0)
-	DEFINE _x 330
-	DEFINE _y 110
-	DEFINE _cx 90
+    DEFINE _x _xsetbu
+    DEFINE _y 35
+    INCLUDE _bu_stset
+	TEXT 		tx_type	_lft	_top	_vnwd	., label("Regression type:")
+    TEXT 		tx_dv 	_vlx	@	    _vnwd	., label("Dependent variable:")
+	COMBOBOX	co_type	_lft	_ss	    _vnwd	., dropdownlist contents(type_contents) values(type_values) onselchange(program change_type)
+	VARNAME 	vn_dv	_vlx 	@		_vnwd	., label("Dependent variable")
+	TEXT 		tx_exp 	_lft	_ms		_vnwd	.,	label("Exposition variable:")
+    TEXT 		tx_iv	_vlx	@		160		.,	label("Independent variables:")
+    VARNAME 	vn_exp	_lft 	_ss		_vnwd	.,	fv label("Exposition variable")
+	VARLIST 	vl_iv	_vlx	@		_vlwd	.,	fv label("Independent variables")
+
+	GROUPBOX	gb_opt	_lft  	_ls	    _iwd    215, label("Options")
+    EDIT		ed_ch	_ilft  	_ms	 	50		., numonly option(change) default(10)
+	TEXT		tx_ch	+60	    @		70		., label("Change (%)")
+    DEFINE _x 230
+	DEFINE _y 130
+	DEFINE _cx 100
 	INCLUDE _sp_level
-	TEXT		tx_val	_ilft	_ms		200		., label("List of values for continuous interactions:")
-	EDIT		ed_val	+205   	@	 	255		., option(values) default("p5 p50 p95")
-	TEXT		tx_fix	_ilft	_ms		100		., label("Fixed variables:")
-	VARLIST 	vl_fix	+100	@		360		., label("Fixed variables") option(fixed)
-	TEXT 		tx_usin	_ilft	_ms		460		., label("Stata Data file to store results (working directory is used by default):")
-	FILE		fl_usin	_ilft	_ss		460		., label("Browse...") default("confound_results.dta")/*
+	CHECKBOX	cb_min	_ilft	_ms		_iwd  	., label("Minimum model as reference") default(0)
+    TEXT		tx_val	_ilft	_ms		370		., label("List of values for continuous interactions:")
+    EDIT		ed_val	_ilft  	_ss	 	370	    ., option(values) default("p5 p50 p95")
+    TEXT		tx_fix	_ilft	_ms		100		., label("Fixed variables:")
+	VARLIST 	vl_fix	+110	@		_vlwd   ., label("Fixed variables") option(fixed)
+
+	TEXT 		tx_usin	_ilft	_ms		370		., label("Stata Data file to store results (working directory is used by default):")
+	FILE		fl_usin	_ilft	_ss		370		., label("Browse...") default("confound_results.dta")/*
 					*/								dialogtitle("Save Confound Results Stata Data File") /*
 					*/								filter("Stata Data (*.dta)|*.dta") save option(using)
-	CHECKBOX	cb_repl	_ilft	_ms		250	  	., label("Replace dataset if it already exists") default(1)
-	
-	GROUPBOX	gb_nst	_lft  	+30		_iwd    60, label("Name of the study")
-	EDIT		ed_nst	_ilft   _ms	 	460		., option(nst)
+	CHECKBOX	cb_repl	_ilft	_ss		370	  	., label("Replace dataset if it already exists") default(1)
+
+	GROUPBOX	gb_nst	_lft  	_ls		_iwd    60, label("Name of the study")
+	EDIT		ed_nst	_ilft   _ss	 	370		., option(nst)
 END
 
 INCLUDE ifin
@@ -55,10 +56,10 @@ DIALOG weights, tabtitle(resource "Weights")
 BEGIN
   TEXT     tx_wgttyp _lft      _top      _cwd1     ., label("Weight type:")
   BUTTON   bu_help   _xsetbu   -2        _setbuwd  ., label("Help weights")	onpush(view help weights##|_new)
-  
+
   RADIO    rb_none   _lft      +22       _iwd      ., first label("None") onclickon(program wgt_off) option(NONE)
   RADIO    rb_pw     _lft      _ss       _iwd      ., last label("Sampling weights") onclickon(program wgt_on) option(pweight)
-	
+
   TEXT     tx_wgt    _lft      _ls       _iwd      ., label("Weight:")
   VARLIST  vl_wgt    @         _ss       _iwd      ., numeric label("Weight")
 END
@@ -100,7 +101,7 @@ BEGIN
 		call main.tx_dv.hide
 		call main.vn_dv.hide
 		call main.bu_stset.show
-		
+
 		call weights.rb_none.seton
 		call weights.rb_pw.disable
 	}
@@ -110,7 +111,7 @@ BEGIN
 		call main.bu_stset.hide
 
 		call weights.rb_pw.enable
-	}	
+	}
 END
 
 PROGRAM command

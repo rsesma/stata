@@ -1,13 +1,13 @@
-*! version 1.1.1  21may2018 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.1.2  20dec2018 JM. Domenech, JB.Navarro, R. Sesma
 
 program confound
 	version 12
-	syntax varlist(fv) [if] [in] [pweight], [LINear LOGistic COX CHange(integer 10) 		/*
+	syntax varlist(fv) [if] [in] [pweight], [LINear LOGistic COX CHange(real 10) 		/*
 	*/	MINimum FIXed(varlist numeric) using(string) noreplace VALues(string)	/*
 	*/	Level(numlist max=1 >50 <100) nst(string)]
 
 	if ("`level'"=="") local level 95
-	
+
 	*Check type
 	if ("`linear'"=="" & "`logistic'"=="" & "`cox'"=="") {
 		print_error "missing regression type -- specify one of linear, logistic, cox"
@@ -25,7 +25,7 @@ program confound
 		if ("`type'"=="cox") print_error "weight not necessary for cox type; include weight on the stset command"
 		local w "[`weight'`exp']"
 	}
-	
+
 	*Check filename
 	if ("`using'"=="") local using "confound_results.dta"
 	capture confirm new file `"`using'"'
@@ -40,7 +40,7 @@ program confound
 			exit 198
 		}
 	}
-	
+
 	marksample touse, novarlist		//ifin marksample
 
 	*Dependent, Exposition & Independent variables
@@ -109,12 +109,12 @@ program confound
 	markout `touse' `lvars'				//Exclude missing values of list vars
 	quietly count if `touse'
 	scalar `nvalid' = r(N)				//Number of valid cases
-	
+
 	preserve
 	quietly keep if `touse'			//Select cases a priori
 
 /*	//Check collinearity
-	quietly _rmcoll `exp' `vars', expand		
+	quietly _rmcoll `exp' `vars', expand
 	local lcol 0
 	local temp `r(varlist)'
 	local n_names : word count `temp'
@@ -128,14 +128,14 @@ program confound
 		}
 	}
 	local vcol: list uniq vcol*/
-	
+
 	*Exposition categorical?
 	local exp_vars ""
 	if (strpos("`exp'",".")>0) {
 		tempname exp_cat			//Values of the exposition var
 		qui tabulate `clean_exp', matrow(`exp_cat')
 		local ncat = rowsof(`exp_cat')
-		
+
 		local ib = substr("`exp'",1,strpos("`exp'",".")-1)
 		if ("`ib'"=="i") {
 			local refcat = `exp_cat'[1,1]
@@ -151,7 +151,7 @@ program confound
 		else {
 			print_error "exposition variable invalid"
 		}
-		
+
 		*Exposition dummy variables
 		local exp_dummy ""
 		forvalues i=1/`ncat' {
@@ -170,7 +170,7 @@ program confound
 		local exp_vars = "`exp'"
 		local exp_dummy = "_cnf87`exp'"
 	}
-	
+
 	*Check interactions
 	local int_vars ""
 	foreach in in `inter' {
@@ -181,10 +181,10 @@ program confound
 		if (`nlen'>2) local ok 0
 		local t10 : word 1 of `temp'
 		local t20 : word 2 of `temp'
-		
+
 		local t1 = substr("`t10'",strpos("`t10'",".")+1,.)
 		local t2 = substr("`t20'",strpos("`t20'",".")+1,.)
-		
+
 		if ("`t1'"=="`clean_exp'") {
 			local ok : list t2 in indep
 			local int_var "`t2'"
@@ -198,7 +198,7 @@ program confound
 		}
 		if (`ok'==0) print_error "`in' is not a valid interaction"
 		else local int_vars = "`int_vars' `int_var'"
-		
+
 		*Exclude interaction vars from the list
 		local t_vars ""
 		foreach var in `varlist' {
@@ -206,18 +206,18 @@ program confound
 		}
 		local varlist = "`t_vars'"
 	}
-	
+
 	*Loop to verify fixed variables
 	if ("`fixed'"!="") {
 		foreach var in `fixed' {
 			local is_indep: list var in indep
 			local is_inter: list var in int_vars
-			if (!`is_indep' | `is_inter') print_error "fixed variable `var' is not an independent variable"			
+			if (!`is_indep' | `is_inter') print_error "fixed variable `var' is not an independent variable"
 		}
 	}
 
 	if ("`minimum'"!="" & (`n_cat'>1 | "`int_vars'"!="")) print_error "minimum option is incompatible with interactions or catregorical exposition"
-	
+
 	local nref = `n_cat'
 	if ("`int_vars'"!="") {
 		*Interactions: dummy variables
@@ -248,7 +248,7 @@ program confound
 				forvalues i=1/`len' {
 					local v = `a_values'[`i',1]
 					qui generate _cnf87`var'`i' = `var' - `v'
-					local i_values = "`i_values'_`v'"					
+					local i_values = "`i_values'_`v'"
 				}
 				local i_values = substr("`i_values'",2,.)
 				local int_terms = "`int_terms' `var';`i_values'"
@@ -279,11 +279,11 @@ program confound
 
 	//Get results in Mata
 	mata: getresults("`dep'", "`clean_exp'", "`exp_vars'", "`varlist'", "`type'", "`int_terms'","`fixed_vars'","`w'")
-	
+
 	quietly {
 		tempname time
 		scalar `time' = time[1]
-		
+
 		*Model sequence
 		generate _ref = mod(_n, `nref')
 		replace _ref = `nref' if _ref == 0
@@ -306,7 +306,7 @@ program confound
 			if ("`type'"=="logistic") qui generate pfitHL = 1 - chi2(df_chi2,chi2)
 		}
 		gen Range = ubCI - lbCI
-		
+
 		*Compute Change, RangeDiff and Select
 		generate Change = .
 		generate RangeDiff = .
@@ -326,7 +326,7 @@ program confound
 		else {
 			gsort -Select +Model +_ref +Range +Change, mfirst 			//Sort
 		}
-		
+
 		*Dataset properties
 		local pfit ""
 		if ("`type'"=="logistic") local pfit "pfitHL"
@@ -337,13 +337,13 @@ program confound
 		format `coef' lbCI ubCI Range RangeDiff `pfit' Change %9.0g
 		local len = length(Variables[1])
 		format Variables %-`len's
-		
+
 		if ("`int_vars'"=="" & `n_cat'==1) drop Model Labels
 		if ("`type'"=="logistic" & "`weight'"!="") drop pfitHL		//there's no pfitHL on weighted data
-		
+
 		save `"`using'"', replace		//Save results
 	}
-	
+
 	//Print results
 	di
 	if ("`type'"=="linear") di as res "CONFOUND - Linear regression"
@@ -393,7 +393,7 @@ program confound
 	if ("`minimum'"=="") display as text "Important change: >= " as res "`change'%"
 	else display as text "Unimportant change: <= " as res "`change'%"
 	*if (`lcol') di as txt "{bf:WARNING: } collinearity present in some variable(s)"
-	
+
 	*Print the number of valid and missing values for each variable
 	display		//Print header
 	display as text "    Variable {c |}    Valid    Missing"
@@ -412,13 +412,13 @@ program confound
 	di as txt "A new dataset has been created with the results. Save your data and execute:"
 	di as txt "{cmd:use {c 34}`path'{c 34}, clear} to open the dataset with the results"
 	if ("`type'"=="logistic" & "`weight'"!="") di as txt "For weighted data the Hosmer-Lemeshow test is not computed"
-	
+
 	restore
 end
 
 program define print_error
 	args message
-	display in red "`message'" 
+	display in red "`message'"
 	exit 198
 end
 
@@ -451,8 +451,8 @@ void getresults(string scalar dep, string scalar exp, string scalar exp_vars, st
 	string rowvector inter, v_int, ev, evd, fixed_vars
 	string scalar nameint, term, name, vint
 	real scalar nint, lcat
-	
-	
+
+
 	r.dep = dep
 	r.exp = exp
 	r.names = tokens(indep)
@@ -480,17 +480,17 @@ void getresults(string scalar dep, string scalar exp, string scalar exp_vars, st
 	r.fixed_names = terms_names
 	r.labels = terms_labels
 	if (len==1) r.labels[1,1]=""
-	
+
 	//Fixed variables
 	fixed_vars = tokens(fixed)
 	for (i=1; i<=cols(fixed_vars); i++) {
 		fvar = fixed_vars[1,i]
 		r.names = tokens(subinword(invtokens(r.names),fvar,""))
 	}
-	
+
 	//Weight
 	r.weight = weight
-	
+
 	//Tokenize interactions
 	inter = tokens(int_terms)
 	for (i=1; i<=cols(inter); i++) {
@@ -544,17 +544,17 @@ void getresults(string scalar dep, string scalar exp, string scalar exp_vars, st
 	for (i=1; i<=rows(r.labels); i++) {
 		r.labels[i,1] = strtrim(r.labels[i,1])
 	}
-	
+
 	timer_clear()
 	timer_on(1)
-	
+
 	//Get all the possible combinations
 	for (i=1; i<=cols(r.names); i++) {
 		combinations(i,1,cols(r.names),combs,r.names)
 	}
 	//Compute the regression for each combination
 	executereg(results,vnames,rlabels,combs,r,fixed_vars)
-	
+
 	//Build the results dataset
 	stata("clear")
 	st_addobs(rows(results))
@@ -582,7 +582,7 @@ void getresults(string scalar dep, string scalar exp, string scalar exp_vars, st
 		st_store(.,"df_chi2",results[.,6])
 		st_store(.,"chi2",results[.,7])
 	}
-	
+
 	//Timer: stored in the dataset as the last column
 	timer_off(1)
 	st_store(1,"time",timer_value(1)[1,1])
@@ -596,7 +596,7 @@ string colvector addterm(string colvector fixed, string colvector terms, string 
 	real scalar i, j, lenf, lent
 	string colvector ret
 	string scalar t
-	
+
 	lenf = rows(fixed)
 	lent = rows(terms)
 	ret = J(lenf*lent,1,"")
@@ -658,7 +658,7 @@ void combinations(real scalar elements, real scalar first, real scalar last, str
 			}
 			addcomb(terms,combs)
 		}
-		
+
         //Get solutions not containing first allowed (first).
         combinations(elements, (first+1), last, p_combs2, names)
 
@@ -688,14 +688,14 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 	real matrix eb, eV
 	real scalar i, nvar, nfixed, j, index, m
 	string scalar model, names
-	
+
 	//Declare matrix
 	nfixed = rows(r.fixed)
 	if (r.type=="linear" | r.type=="cox") results = J((rows(combs)+1)*nfixed,5,.)
 	if (r.type=="logistic") results = J((rows(combs)+1)*nfixed,7,.)
 	vnames = J((rows(combs)+1)*nfixed,1,"")
 	if (nfixed>1) labels = J((rows(combs)+1)*nfixed,1,"")
-	
+
 	index = 1
 	for (i=0; i<=rows(combs); i++) {
 		if (i==0){
@@ -703,8 +703,8 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 		}
 		else {
 			comb = combs[i]
-		}		
-		
+		}
+
 		for (j=1; j<=nfixed; j++) {
 			//For each combination, add the fixed terms
 			model = r.fixed[j,1]
@@ -720,7 +720,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 			vnames[index,1] = strtrim(stritrim(names))
 			if (nfixed>1) labels[index,1] = r.labels[j,1]
 			nvar = cols(tokens(names))
-			
+
 			//Execute the regression
 			if (r.type == "linear") stata("regress " + r.dep + " " + model + " " + r.weight,1)
 			if (r.type == "logistic") stata("logit " + r.dep + " " + model + " " + r.weight,1)

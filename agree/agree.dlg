@@ -1,7 +1,7 @@
 /*
   agree.dlg
 
-*! VERSION 1.1.5  19dec2018
+*! VERSION 1.1.6  21dec2018
 
 */
 
@@ -22,17 +22,18 @@ DEFINE _gb_wd	370
 
 DIALOG main, label("agree - Passing-Bablok & Bland-Altman methods") tabtitle("Main")
 BEGIN
-	TEXT  		tx_y 	_lft	_top	_vlx	., label("Y variable:") left
-	TEXT  		tx_x 	_vinc 	_top   	_vlx	., label("X variable:") left
+    RADIO		rb_ba	_lft	_top    _rb_wd	., label("Bland-Altman comparison of two measurements methods") /*
+    */                                              onclickon(program sel_ba) first option(ba)
+    RADIO		rb_pb	_lft	_ss	    _rb_wd	., label("Passing-Bablok estimation of regression line") /*
+    */                                              onclickon(program sel_pb) last option(pb)
+
+	TEXT  		tx_y 	_lft	_ls	_vlx	., label("Y variable:") left
+	TEXT  		tx_x 	_vinc 	@   	_vlx	., label("X variable:") left
 	VARNAME		vary	_lft   	_ss		_vlx 	., label("Y variable")
 	VARNAME		varx	_vinc	@		_vlx 	., label("X variable")
 
-	RADIO		rb_both	_lft	_ls		_rb_wd	., label("Passing-Bablok and Bland-Altman methods") first default(1) option(both)
-	RADIO		rb_pb	_lft	_ss		_rb_wd	., label("Passing-Bablok estimation of regression line") middle option(pb)
-	RADIO		rb_ba	_lft	_ss		_rb_wd	., label("Bland-Altman comparison of two measurements methods") last option(ba)
-
 	GROUPBOX	gb_nst	_lft  	_y_nst	_gb_wd	65, label("Name of the study")
-	EDIT		ed_nst	_ilft   _ms	 	_rb_wd		., option(nst)
+	EDIT		ed_nst	_ilft   _ms	 	_rb_wd	., option(nst)
 END
 
 INCLUDE byifin
@@ -41,13 +42,35 @@ DIALOG opt, tabtitle("Options")
 BEGIN
 	INCLUDE _sp_level
 
-	GROUPBOX	gb_pb	_lft  	_xls    _gb_wd	70, label("Graphics")
+	GROUPBOX	gb_pb	_lft  	_ls    _gb_wd	70, label("Bland-Altman method")
+    CHECKBOX	cb_pct	_ilft	_ss		_rb_wd	., label("Compute Percentage values and graphic") option(pct)
 	CHECKBOX	cb_reg	_ilft	_ss		_rb_wd	., label("Show regression line on Bland-Altman graphics") option(line)
+
+    GROUPBOX	gb_ba	_lft  	_xls    _gb_wd	90, label("Passing-Bablok method")
     CHECKBOX	cb_ci	_ilft	_ss		_rb_wd	., label("Show confidence intervals on Passing-Bablok graphic") option(ci)
-    GROUPBOX	gb_list	_lft  	_xls    _gb_wd	80, label("Passing-Bablok")
 	CHECKBOX	cb_list	_ilft	_ss	    _rb_wd	., label("List input data. Identifier:") onclickon(program enableid) /*
     */                                              onclickoff(program disableid) option(list)
 	VARNAME 	vid		_iilft	_ss		_vlx	., label("Identifier") option(id)
+END
+
+PROGRAM sel_ba
+BEGIN
+	call opt.cb_pct.enable
+    call opt.cb_reg.enable
+
+    call opt.cb_ci.disable
+    call opt.cb_list.disable
+    call opt.vid.disable
+END
+
+PROGRAM sel_pb
+BEGIN
+    call opt.cb_pct.disable
+    call opt.cb_reg.disable
+
+    call opt.cb_ci.enable
+    call opt.cb_list.enable
+    call opt.vid.enable
 END
 
 PROGRAM disableid
@@ -69,9 +92,11 @@ BEGIN
 	put main.vary " " main.varx
 	INCLUDE _ifin_pr
 	beginoptions
-		option radio(main rb_both rb_pb rb_ba)
+		option radio(main rb_ba rb_pb)
 
+        option opt.cb_pct
         option opt.cb_reg
+
         option opt.cb_ci
 		option opt.cb_list
 		optionarg opt.vid

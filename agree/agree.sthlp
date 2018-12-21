@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.6 21dec2018}{...}
+{* *! version 1.1.7 24dec2018}{...}
 {viewerdialog agree "dialog agree"}{...}
 {viewerjumpto "Syntax" "agree##syntax"}{...}
 {viewerjumpto "Description" "agree##description"}{...}
@@ -127,7 +127,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.6 {hline 2} 21 December 2018
+Version 1.1.7 {hline 2} 24 December 2018
 
 
 {marker authors}{...}
@@ -145,7 +145,7 @@ stata@graunt.cat{break}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Passing-Bablok & Bland-Altman methods: User-written command agree for Stata [computer program].{break}
-V1.1.6. Barcelona: Graunt21; 2018.{break}
+V1.1.7s. Barcelona: Graunt21; 2018.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 
 

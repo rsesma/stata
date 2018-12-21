@@ -1,4 +1,4 @@
-*! version 1.1.6  21dec2018 JM. Domenech, R. Sesma
+*! version 1.1.7  24dec2018 JM. Domenech, R. Sesma
 
 /*
 Agreement: Passing-Bablok & Bland-Altman methods
@@ -112,7 +112,7 @@ program agree, byable(recall) sortpreserve rclass
 		foreach i of numlist 1/`tmp' {
 			di _n as txt "Bland-Altman: " cond(`i'==1,"Absolute","Percentage") _c
 			di as txt " values of Bias & Limits of Agreement (LoA)"
-			di "{hline 71}"
+			di "{hline 75}"
 
 			if (`i'==1) {
 				qui ttest `y' == `x' if `touse', level(`level')
@@ -130,15 +130,16 @@ program agree, byable(recall) sortpreserve rclass
 			scalar `lo' = `bias' - `z'*`sd'
 			scalar `up' = `bias' + `z'*`sd'
 			scalar `se' = `sd'*sqrt(3/r(N_1))
+			local title = cond(`i'==1,"Diff. (Y-X):   Bias","100*(Y-X)/[(X+Y)/2]")
 
-			di as txt "Parameter   Obs   Estimate  Std. Dev.   Std. Err.  [`level'% Conf. Interval]"
-			di as txt "Y-X: Bias " as res %5.0f `r(N_1)' "  " %9.0g `bias' "  " % 9.0g `sd' "   " %9.0g `bias_se' _c
-			di as res _col(53) %9.0g `bias' - `t'*`bias_se' " " %9.0g `bias' + `t'*`bias_se'
-			di as txt "Lower LoA " as res %5.0f `r(N_1)' "  " %9.0g `lo' _col(41) %9.0g `se' _c
-			di as res _col(53) %9.0g `lo' - `t'*`se' " " %9.0g `lo' + `t'*`se'
-			di as txt "Upper LoA " as res %5.0f `r(N_1)' "  " %9.0g `up' _col(41) %9.0g `se' _c
-			di as res _col(53) %9.0g `up' - `t'*`se' " " %9.0g `up' + `t'*`se'
-			di "{hline 71}"
+			di as txt "Parameter             Estimate  Std. Dev.   Std. Err.  [`level'% Conf. Interval]"
+			di as txt "`title'  " as res %9.0g `bias' "  " % 9.0g `sd' "   " %9.0g `bias_se' _c
+			di as res _col(57) %9.0g `bias' - `t'*`bias_se' " " %9.0g `bias' + `t'*`bias_se'
+			di as txt _col(11) "Lower LoA  " as res %9.0g `lo' _col(45) %9.0g `se' _c
+			di as res _col(57) %9.0g `lo' - `t'*`se' " " %9.0g `lo' + `t'*`se'
+			di as txt _col(11) "Upper LoA  " as res %9.0g `up' _col(45) %9.0g `se' _c
+			di as res _col(57) %9.0g `up' - `t'*`se' " " %9.0g `up' + `t'*`se'
+			di "{hline 75}"
 
 			*Number of cases over and under the interval of agreement
 			qui count if `touse' & `yx' > `up'
@@ -159,7 +160,7 @@ program agree, byable(recall) sortpreserve rclass
 				_lin, y(`y') x(`x') touse(`touse')
 				return scalar lin = `r(lin)'			// save
 			}
-			di "{hline 71}"
+			di "{hline 75}"
 
 			* save results
 			local c = cond(`i'==1,"","_pct")
@@ -174,14 +175,14 @@ program agree, byable(recall) sortpreserve rclass
 			* graphic: Bland-Altman
 			local vx = cond(`i'==1,"`yx'","`diff'")
 			local name = cond(`i'==1,"abs","pct")
-			local title = cond(`i'==1,"","/Average %")
+			local title = cond(`i'==1,"Difference (Y-X)","100*(Y-X)/Average")
 			local reg = cond("`line'"=="","","(lfit `vx' `yx2')")
 			graph twoway (scatter `vx' `yx2', mfcolor(none) msize(medlarge) mcolor(black)) `reg'	/*
 			*/	(function y = `bias', range(`x') lcolor(black) lpattern(solid))			/*
 			*/	(function y = `up', range(`x') lcolor(black) lpattern(dash))	/*
 			*/	(function y = `lo', range(`x') lcolor(black) lpattern(dash)) 			/*
 			*/	(function y = 0, range(`x') lcolor(black) lpattern(dash_dot)) if `touse', 			/*
-			*/	legend(off) ytitle("Difference (Y-X)`title'", size(medium) margin(vsmall)) /*
+			*/	legend(off) ytitle("`title'", size(medium) margin(vsmall)) /*
 			*/  xtitle("Average (X+Y)/2", size(medium) margin(small))	/*
 			*/	title("Bland-Altman Agreement `ntitle'", size(medium) color(black) margin(medium))  /*
 			*/  name("ba_`name'`ngraph'", replace)

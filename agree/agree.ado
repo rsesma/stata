@@ -62,7 +62,7 @@ program agree, byable(recall) sortpreserve rclass
 			matrix `D' = (`D'[1..2,1...], J(2,2,.))			// keep only 2 rows, add ci columns
 			local i 1
 			foreach v of varlist `y' `x' {
-				ci `v'				// use ci command to get conf. int.
+				ci `v' if `touse'				// use ci command to get conf. int.
 				matrix `D'[`i',6] = r(lb)
 				matrix `D'[`i',7] = r(ub)
 				local ++i
@@ -104,7 +104,7 @@ program agree, byable(recall) sortpreserve rclass
 			}
 		}
 		di _n "{hline 71}"
-		di as txt "Valid number of cases (casewise): {bf:`nvalid'}"
+		di as txt "Valid number of cases (listwise): {bf:`nvalid'}"
 
 		* Bland-Altman: absolute/percentage values of bias & LoA
 		qui gen `diff' = 100*`yx'/`yx2'
@@ -186,6 +186,28 @@ program agree, byable(recall) sortpreserve rclass
 			*/	title("Bland-Altman Agreement `ntitle'", size(medium) color(black) margin(medium))  /*
 			*/  name("ba_`name'`ngraph'", replace)
 		}
+
+		* test of normality
+		di as txt _n "Tests of Normality (Y-X)   Statistic    p-value"
+		di as txt "{hline 47}"
+		qui swilk `yx' if `touse'
+		di as txt "Shapiro-Wilk" _col(29) "W = " as res %7.4f `r(W)' "  " %6.4f `r(p)'
+		return scalar W = `r(W)'			// save
+		return scalar p_W = `r(p)'
+		qui su `yx' if `touse', detail
+		local skew = r(skewness)
+		local kurt = r(kurtosis)-3
+		qui sktest `yx' if `touse'
+		di as txt "Skewness" _col(28) "Sk = " as res %7.4f `skew' "  " %6.4f `r(P_skew)'
+		di as txt "Kurtosis-3" _col(28) "Ku = " as res %7.4f `kurt' "  " %6.4f `r(P_kurt)'
+		di as txt "Skewness & Kurtosis" _col(26) "Chi2 = " as res %7.4f `r(chi2)' "  " %6.4f `r(P_chi2)'
+		di as txt "{hline 47}"
+		return scalar sk = `skew'			// save
+		return scalar p_sk = `r(P_skew)'
+		return scalar ku = `kurt'
+		return scalar p_ku = `r(P_kurt)'
+		return scalar chi2 = `r(chi2)'
+		return scalar p_chi2 = `r(P_chi2)'
 	}
 
 	if ("`pb'"!="") {
@@ -216,7 +238,7 @@ program agree, byable(recall) sortpreserve rclass
 			}
 		}
 		di _n "{hline 80}"
-		di as txt "Valid number of cases (casewise): {bf:`nvalid'}"
+		di as txt "Valid number of cases (listwise): {bf:`nvalid'}"
 
 		* Passing-Bablok results: use Mata to compute b
 	    mata: getpbcoef("`x'","`y'",`level',"`R'","`touse'")

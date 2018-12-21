@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.5 19dec2018}{...}
+{* *! version 1.1.6 21dec2018}{...}
 {viewerdialog agree "dialog agree"}{...}
 {viewerjumpto "Syntax" "agree##syntax"}{...}
 {viewerjumpto "Description" "agree##description"}{...}
@@ -25,15 +25,17 @@
 {synoptset 16 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt :{opt bo:th}}calculate Passing-Bablock & Bland-Altman methods; the {bf:default}{p_end}
+{synopt :{opt ba}}calculate Bland-Altman comparison of two measurements methods; the {bf:default}{p_end}
 {synopt :{opt pb}}calculate Passing-Bablok estimation of regression line{p_end}
-{synopt :{opt ba}}calculate Bland-Altman comparison of two measurements methods{p_end}
+{synopt :{opt l:evel(#)}}confidence level (%); default is {bf:level(95)}{p_end}
+{synopt :{opt nst(string)}}name of the study (label){p_end}
+{syntab:{it:Bland-Altman method}}
+{synopt :{opt pct}}compute percentage values and graphic{p_end}
 {synopt :{opt line}}show regression line on Bland-Altman graphics{p_end}
+{syntab:{it:Passing-Bablok method}}
 {synopt :{opt ci}}show confidence intervals on Passing-Bablok graphic{p_end}
 {synopt :{opt list}}list input data; the report include X-Y changes (Passing-Bablok only){p_end}
 {synopt :{opt id(varname)}}name of variable with identifier of cases for the list;  default is {bf:{help _n:_n}}{p_end}
-{synopt :{opt l:evel(#)}}confidence level (%); default is {bf:level(95)}{p_end}
-{synopt :{opt nst(string)}}name of the study (label){p_end}
 {synoptline}
 {phang}
 {cmd:by} is allowed; see {manhelp by D}.
@@ -68,9 +70,8 @@ If you find any bugs or want to suggest any improvements, please send an e-mail 
 
 {p 4 4}{stata "use http://www.graunt.cat/stata/agree_data.dta":. use http://www.graunt.cat/stata/agree_data.dta}{p_end}
 {p 4 4}{cmd:. agree Instrumental Manual}{p_end}
-{p 4 4}{cmd:. agree Instrumental Manual, both line ci nst(Study name)}{p_end}
-{p 4 4}{cmd:. agree Instrumental Manual, pb list id(Especimen)}{p_end}
-{p 4 4}{cmd:. agree Instrumental Manual, ba}{p_end}
+{p 4 4}{cmd:. agree Instrumental Manual, ba pct line nst(Study name)}{p_end}
+{p 4 4}{cmd:. agree Instrumental Manual, pb ci list id(Especimen)}{p_end}
 
 
 {marker results}{...}
@@ -126,7 +127,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.5 {hline 2} 19 December 2018
+Version 1.1.6 {hline 2} 21 December 2018
 
 
 {marker authors}{...}
@@ -144,7 +145,7 @@ stata@graunt.cat{break}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Passing-Bablok & Bland-Altman methods: User-written command agree for Stata [computer program].{break}
-V1.1.5. Barcelona: Graunt21; 2018.{break}
+V1.1.6. Barcelona: Graunt21; 2018.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 
 

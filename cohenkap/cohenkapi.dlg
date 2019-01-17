@@ -1,7 +1,7 @@
 /*
   cohenkapi.dlg
 
-*! VERSION 1.1.1  04may2018
+*! VERSION 1.1.2  17jan2019
 
 */
 
@@ -68,7 +68,7 @@ BEGIN
   TEXT     tx_r7     rlft  ms    rw    ., label("7") right
   TEXT     tx_r8     rlft  ms    rw    ., label("8") right
   TEXT     tx_r9     rlft  ms    rw    ., label("9") right
-  
+
   FRAME    fr        70    80    380 235
   EDIT     ed_r1c1   lft   top   wid   ., numonly
   EDIT     ed_r1c2   sep   @     @     ., numonly
@@ -164,7 +164,7 @@ BEGIN
   COMBOBOX co_me	+120    @	70	   ., dropdownlist contents(ci_descrip) default("wilson") values(ci_values)
   TEXTBOX  tx_me 	 +72 	-5	200    40, label("method to calculate confidence intervals for proportions") left
 
-  
+
   GROUPBOX	gb_nst	 10    360   440   60, label("Name of the study")
   EDIT		ed_nst	 20    ms	 420   ., option(nst)
 END
@@ -204,7 +204,7 @@ BEGIN
 		if main.cb_order {
 			put " ordered"
 		}
-		
+
 		INCLUDE _level_main_pr
 
 		if !main.co_me.isdefault() {

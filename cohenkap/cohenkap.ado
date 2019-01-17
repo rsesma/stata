@@ -1,14 +1,14 @@
-*! version 1.1.1  04may2018 JM. Domenech, R. Sesma
+*! version 1.1.2  17jan2019 JM. Domenech, R. Sesma
 
 program define cohenkap, byable(recall)
 	version 12
 	syntax varlist(min=2 max=2 numeric) [if] [in], /*
 	*/	[Wilson Exact WAld Level(numlist max=1 >50 <100) ordered nst(string)]
-	
+
 	tokenize `varlist'
 	local y `1'
 	local x `2'
-	
+
 	if ("`y'"=="`x'") print_error "X and Y variables can't be the same"
 
 	marksample touse					//ifin marksample
@@ -38,6 +38,6 @@ end
 
 program define print_error
 	args message
-	display in red "`message'" 
+	display in red "`message'"
 	exit 198
 end

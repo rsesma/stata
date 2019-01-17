@@ -1,7 +1,7 @@
 /*
   cohenkap.dlg
 
-*! VERSION 1.1.1  04may2018
+*! VERSION 1.1.2  17jan2019
 
 */
 
@@ -32,7 +32,7 @@ BEGIN
 	INCLUDE _sp_level
 	COMBOBOX	co_me	_lft	_mls	70	 ., dropdownlist contents(ci_descrip) default("Wilson") values(ci_values)
 	TEXT  		tx_me 	+72	 	@ 		310  ., label("method to calculate confidence intervals for proportions") left
-	
+
 	GROUPBOX	gb_nst	_lft  	_y_nst	370    60, label("Name of the study")
 	EDIT		ed_nst	_ilft   _ms	 	350		., option(nst)
 END
@@ -53,7 +53,7 @@ LIST ci_values
 		wald
 	END
 
-	
+
 PROGRAM command
 BEGIN
 	INCLUDE _by_pr
@@ -72,4 +72,3 @@ BEGIN
 		optionarg main.ed_nst
 	endoptions
 END
-

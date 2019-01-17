@@ -1,4 +1,4 @@
-*! version 1.1.1  04may2018 JM. Domenech, R. Sesma
+*! version 1.1.2  17jan2019 JM. Domenech, R. Sesma
 
 program define cohenkapi, rclass
 	version 12
@@ -7,7 +7,7 @@ program define cohenkapi, rclass
 	*/	 _vy(varname) _vx(varname) _values(numlist)]
 
 	tempname d t r agr
-	
+
 	if ("`level'"=="") local level 95
 	if ("`wilson'"=="" & "`exact'"=="" & "`wald'"=="") local method = 1
 	*Check parameters
@@ -16,7 +16,7 @@ program define cohenkapi, rclass
 	if ("`wilson'"!="") local method = 1
 	if ("`exact'"!="") local method = 2
 	if ("`wald'"!="") local method = 3
-	
+
 	*Build data matrix
 	local k 0
 	tokenize `anything', parse("\")
@@ -46,8 +46,8 @@ program define cohenkapi, rclass
 	local k = colsof(`d')			//Number of categories
 	if (`k'<2) print_error "too few rating categories"
 	if (`k'>9) print_error "too much rating categories"
-	if (`k'==2 & "`ordered'"!="") print_error "ordered option not applicable for 2 categories"	
-		
+	if (`k'==2 & "`ordered'"!="") print_error "ordered option not applicable for 2 categories"
+
 	*Get labels
 	local len = 11*`k'
 	local rtitle = cond("`_vy'"=="","RatingY",abbrev("`_vy'",10))
@@ -58,14 +58,14 @@ program define cohenkapi, rclass
 		}
 		else {
 			local v : word `i' of `_values'
-			local lbl`i' : label (`_vy') `v' 10 
+			local lbl`i' : label (`_vy') `v' 10
 		}
 	}
-	
+
 	*Print title
 	di "{bf:KAPPA & WEIGHTED KAPPA}"
 	if ("`nst'"!="") di as text "{bf:STUDY:} `nst'"
-	
+
 	*Print table
 	di
 	di as txt _col(12) "{c |}{center `len':`ctitle'}"
@@ -80,13 +80,13 @@ program define cohenkapi, rclass
 		if (`i'<`z') di _newline as txt "{ralign 10:`lbl`i''} {c |} " _c
 		else di _newline as txt "{ralign 10:Total} {c |} " _c
 		foreach j of numlist 1/`z' {
-			di as res %10.0g `t'[`i',`j'] cond(`j'==`k'," {c |} "," ") _c 
+			di as res %10.0g `t'[`i',`j'] cond(`j'==`k'," {c |} "," ") _c
 		}
 		if (`i'==`k') di _newline "{hline 11}{c +}{hline `len'}{hline 1}{c +}{hline 11}" _c
 	}
-	
+
 	mata: get_results("`d'", "`r'", "`ordered'"!="", `level')
-	
+
 	local warning 0
 	if (`k'>2) {
 		*nxn table: general case
@@ -108,7 +108,7 @@ program define cohenkapi, rclass
 				local rlab`z' = "`lbl`i''-R"
 			}
 		}
-		
+
 		local len = rowsof(`r')
 		foreach i of numlist 1/`len' {
 			di as txt _newline "{ralign 12:`rlab`i''}{c |}" _c
@@ -132,7 +132,7 @@ program define cohenkapi, rclass
 			}
 		}
 		di as txt _newline "{hline 12}{c BT}{hline 9}{c BT}{hline 8}{c BT}{hline 8}{c BT}{hline 8}{c BT}{hline 8}{c BT}{hline 17}"
-		
+
 		*Stored results
 		local names "po kappa se0 se1 p lb ub"
 		if ("`ordered'"!="") {
@@ -146,7 +146,7 @@ program define cohenkapi, rclass
 			}
 		}
 		else {
-			local rnames 
+			local rnames
 			foreach i of numlist 2/`len' {
 				local rnames = "`rnames' `rlab`i''"
 			}
@@ -179,7 +179,7 @@ program define cohenkapi, rclass
 			local warning 1
 		}
 		di as txt _newline "{hline 8}{c BT}{hline 8}{c BT}{hline 8}{c BT}{hline 8}{c BT}{hline 20}"
-		
+
 		local n11 = `d'[1,1]
 		local n12 = `d'[1,2]
 		local n21 = `d'[2,1]
@@ -226,14 +226,14 @@ program define cohenkapi, rclass
 		local pi_a = 100*(2*`n11' + `n21' + `n12')/(2*`n')
 		local pi = `pi_p' - `pi_a'
 		local pabak = 2*`po' - 1
-		
+
 		local lbl1 = "Specific Agreement (+)"
 		local lbl2 = "Specific Agreement (-)"
 		local lbl3 = "Global Agreement (+)"
 		local lbl4 = "kappa  minimum "
 		local lbl5 = "maximum "
 		local c = cond(`method'==1,"Wilson",cond(`method'==2,"Exact","Wald"))
-		
+
 		di
 		di as txt "{hline 22}{c TT}{hline 10}{c TT}{hline 28}"
 		di as txt "{col 23}{c |} Estimate {c |} " %4.0g `level' "% Confidence Interval"
@@ -256,7 +256,7 @@ program define cohenkapi, rclass
 		di as txt _newline "{hline 22}{c BT}{hline 10}{c BT}{hline 28}"
 
 		tempname od
-		matrix `od' = ((`d21',`d12',`bias',`bak')\(`pi_p',`pi_a',`pi',`pabak'))		
+		matrix `od' = ((`d21',`d12',`bias',`bak')\(`pi_p',`pi_a',`pi',`pabak'))
 		di
 		foreach i of numlist 1/2 {
 			if (`i'==1) {
@@ -276,11 +276,11 @@ program define cohenkapi, rclass
 				if (`j'==2) print_pct `v', col(16)
 				if (`j'==2) di as txt " {c |}  " _c
 				if (`j'==3) print_pct `v'
-				if (`j'==4) di as res _col(34) "{c |} " %6.4f `bak'
+				if (`j'==4) di as res _col(34) "{c |} " %6.4f `v'
 			}
 		}
 		di as txt "{hline 22}{c BT}{hline 10}{c BT}{hline 28}"
-		
+
 		*Stored results
 		local names "po kappa se0 se1 p lb ub"
 		foreach j of numlist 2/7 {
@@ -321,14 +321,14 @@ end
 
 program define get_cip, rclass
 	syntax anything, method(integer) level(real)
-	
+
 	tokenize `anything'
 	local a `1'
 	local b `2'
-	
+
 	local alpha = (`level'+100)/200
 	local z = invnormal(`alpha')
-	
+
 	local p = `a'/`b'
 	if (`method'==1) {
 		local wa = 2*`a' + `z'^2
@@ -348,7 +348,7 @@ program define get_cip, rclass
 		local lb = `p' - `z'*`se'
 		local ub = `p' + `z'*`se'
 	}
-	
+
 	return scalar p = 100*`p'
 	return scalar lb = 100*`lb'
 	return scalar ub = 100*`ub'
@@ -357,7 +357,7 @@ end
 
 program define print_error
 	args message
-	display in red "`message'" 
+	display in red "`message'"
 	exit 198
 end
 
@@ -366,11 +366,11 @@ version 12
 mata:
 void get_results(string scalar data, string scalar result, real scalar ordered, real scalar level)
 {
-	real matrix d, r 
+	real matrix d, r
 	real scalar k, i, a1, a0, b1, b0
-	
+
 	d = st_matrix(data)		//Stata matrix with frequency results
-	k = rows(d)	
+	k = rows(d)
 	r = get_kappa("unw", d, k, level)					//Unweighted kappa
 	if (ordered==1) {
 		r = r \ get_kappa("lin", d, k, level)			//Weighted: lineal
@@ -405,7 +405,7 @@ real matrix get_kappa(string scalar type, real matrix d, real matrix k, real sca
 	p = d :/ n				//proportion pi matrix
 	pi_ = rowsum(p)			//row totals
 	p_i = colsum(p)'		//column totals
-	
+
 	//Weights (18.31 & 18.30 formulas)
 	w = J(k,k,.)
 	for (i=1; i<=k; i++) {
@@ -425,7 +425,7 @@ real matrix get_kappa(string scalar type, real matrix d, real matrix k, real sca
 			pe = pe + w[i,j]*pi_[i]*p_i[j]
 		}
 	}
-	
+
 	kappa = (po - pe)/(1-pe)	//Weighted Kappa (18.29)
 
 	//Compute wi and wj summatories (18.33 & 18.34)
@@ -437,7 +437,7 @@ real matrix get_kappa(string scalar type, real matrix d, real matrix k, real sca
 			wj[1,i] = wj[1,i] + pi_[j]*w[j,i]
 		}
 	}
-	
+
 	//SE0 (18.32)
 	se0 = 0
 	for (i=1; i<=k; i++) {
@@ -448,7 +448,7 @@ real matrix get_kappa(string scalar type, real matrix d, real matrix k, real sca
 	se0 = sqrt(se0 - pe^2)/((1-pe)*sqrt(n))
 
 	z = kappa / se0				//z value (18.35)
-	
+
 	//SE1 (18.36)
 	se1=0
 	for (i=1; i<=k; i++) {
@@ -459,7 +459,7 @@ real matrix get_kappa(string scalar type, real matrix d, real matrix k, real sca
 	se1 = sqrt(se1-(kappa-pe*(1-kappa))^2)/((1-pe)*sqrt(n))
 	lb = kappa - invnormal((level+100)/200)*se1
 	ub = kappa + invnormal((level+100)/200)*se1
-	
-	return((100*po,kappa,se0,se1,2*(1-normal(abs(z))),lb,ub))	
+
+	return((100*po,kappa,se0,se1,2*(1-normal(abs(z))),lb,ub))
 }
 end

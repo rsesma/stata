@@ -1,4 +1,4 @@
-*! version 1.1.1  04may2018
+*! version 1.1.2  17jan2019
 program cohenkapi__dlg
 	version 12.0
 	gettoken subcmd 0 : 0
@@ -8,7 +8,7 @@ end
 program enableDisable
 	syntax , clsname(string)
 	local dlg .`clsname'
-	local k = ``dlg'.main.sp_cat.value' 
+	local k = ``dlg'.main.sp_cat.value'
 		// the actual value of the spinner: number of categories
 
 	//enable & disable cells
@@ -33,7 +33,7 @@ program genCommand
 	syntax , clsname(string)
 	local dlg .`clsname'
 	local cmdstring cmd
-	local k = ``dlg'.main.sp_cat.value' 
+	local k = ``dlg'.main.sp_cat.value'
 		// the actual value of the spinner: number of categories
 
 	local command ""

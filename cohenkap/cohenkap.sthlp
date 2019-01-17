@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.1 04may2018}{...}
+{* *! version 1.1.2 17jan2019}{...}
 {viewerdialog cohenkap "dialog cohenkap"}{...}
 {viewerdialog cohenkapi "dialog cohenkapi"}{...}
 {vieweralsosee "[R] kappa" "help kappa"}{...}
@@ -20,7 +20,7 @@
 {title:Syntax}
 
 {p 8 4 2}
-{cmd:cohenkap} {it:{help varname:varnameY}} {it:{help varname:varnameX}} 
+{cmd:cohenkap} {it:{help varname:varnameY}} {it:{help varname:varnameX}}
 [{cmd:,} {it:{help cohenkap##options:options}}]
 
 {phang}Immediate command
@@ -69,11 +69,11 @@ The command needs two variables with the values for each rater to compute the re
 {cmd:cohenkap}; see {help immed}. The immediate command needs {it: k} numlists, one for each category, separated by {bf:'\'}.
 
 {p 4 4}
-You can click {dialog cohenkap:here} to pop up a {dialog cohenkap:dialog} or type {inp: db cohenkap}. For the 
+You can click {dialog cohenkap:here} to pop up a {dialog cohenkap:dialog} or type {inp: db cohenkap}. For the
 immediate command, you can click {dialog cohenkapi:here} to pop up a {dialog cohenkapi:dialog} or type {inp: db conhenkapi}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://www.graunt.cat/stata} for install.
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate cohenkap, update} to update the {bf:cohenkap} command.{break}
@@ -175,7 +175,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.1 {hline 2} 04 May 2018
+Version 1.1.2 {hline 2} 17 January 2019
 
 
 {marker authors}{...}
@@ -193,7 +193,7 @@ stata@graunt.cat{p_end}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Weighted kappa: User-written command cohenkap for Stata [computer program].{break}
-V1.1.1. Barcelona: Graunt21; 2018.{break}
+V1.1.2. Barcelona: Graunt21; 2019.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 
 

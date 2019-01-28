@@ -1,4 +1,4 @@
-*! version 1.1.2  20dec2018 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.1.3  28jan2019 JM. Domenech, JB.Navarro, R. Sesma
 
 program confound
 	version 12
@@ -685,8 +685,8 @@ end
 version 12
 mata:
 void executereg(real colvector results, string colvector vnames, string colvector labels, string colvector combs, struct confound_res scalar r, string rowvector fixed_vars) {
-	real matrix eb, eV
-	real scalar i, nvar, nfixed, j, index, m
+	real matrix eb, eV, F
+	real scalar i, nvar, nfixed, j, index, m, ok
 	string scalar model, names
 
 	//Declare matrix
@@ -735,16 +735,29 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 			if (r.type == "logistic") {
 				if (r.weight == "") {
 					//gof can only be computed if there's no active weight
-					stata("estat gof, group(10)",1)
-					m = st_numscalar("r(m)")
-					if (comb=="" & m==2) {
-						//Special case: the minimum model has m=2, pFit must be 1 -> df=1,chi2=-1
-						results[index,6] = 1
-						results[index,7] = -1
+					ok = 1
+					if (comb=="" & nfixed==1) {
+						stata("tab " + model + ", matrow(__Freq)",1)
+						F = st_matrix("__Freq")
+						if (rows(F)==2) {
+							ok = 0
+							//Special case: binary variable has perfect adjustment
+							results[index,6] = 1
+							results[index,7] = -1
+						}
 					}
-					else {
-						results[index,6] = st_numscalar("r(df)")
-						results[index,7] = st_numscalar("r(chi2)")
+					if (ok==1) {
+						stata("estat gof, group(10)",1)
+						m = st_numscalar("r(m)")
+						if (comb=="" & m==2) {
+							//Special case: the minimum model has m=2, pFit must be 1 -> df=1,chi2=-1
+							results[index,6] = 1
+							results[index,7] = -1
+						}
+						else {
+							results[index,6] = st_numscalar("r(df)")
+							results[index,7] = st_numscalar("r(chi2)")
+						}
 					}
 				}
 			}

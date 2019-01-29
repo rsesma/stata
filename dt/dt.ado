@@ -1,4 +1,4 @@
-*! version 1.1.3  03jul2018 JM. Domenech, R. Sesma
+*! version 1.1.4  ?jan2019 JM. Domenech, R. Sesma
 /*
 dt: Diagnostics Tests
 Uses the dti inmediate command to compute and print results
@@ -6,13 +6,13 @@ Uses the dti inmediate command to compute and print results
 
 program define dt, byable(recall)
 	version 12
-	syntax varlist [if] [in], /*
+	syntax varlist [if] [in] [fw], /*
 	*/	[ST(string) Wilson Exact WAld P(numlist min=1 >0 <100)   /*
 	*/	valtest(numlist integer min=2 max=2) valref(numlist integer min=2 max=2) /*
 	*/	m1(numlist integer max=1 >0) n(numlist integer max=1 >0) /*
 	*/  Level(numlist max=1 >50 <100) nst(string)]
 
-	if ("`st'"=="bt") print_error "st() invalid -- bayes theorem only available on immediate command" 
+	if ("`st'"=="bt") print_error "st() invalid -- bayes theorem only available on immediate command"
 
 	tokenize `varlist'
 	local test `1'			//Diagnostic Test variable
@@ -20,20 +20,20 @@ program define dt, byable(recall)
 
 	*Mark observations [if/in]
 	marksample touse, novarlist
-	qui count if `touse'			//Count number of total cases
+	qui sum `touse' if `touse' [`weight'`exp']			//Count number of total cases
 	local total = r(N)
 	if (`total'==0) print_error "no observations"
-	
+
 	*Default values for positive, negative values for diagnostic test & reference criterion
 	if ("`valtest'"=="") local valtest "0 1"
 	if ("`valref'"=="") local valref "0 1"
 	*Check values exist on variables
 	qui levelsof `test', local(vtest)
 	local lexist : list valtest in vtest
-	if (`lexist'==0) print_error "`valtest' are not valid values of `test' variable" 
+	if (`lexist'==0) print_error "`valtest' are not valid values of `test' variable"
 	qui levelsof `ref', local(vref)
 	local lexist : list valref in vref
-	if (`lexist'==0) print_error "`valref' are not valid values of `ref' variable" 
+	if (`lexist'==0) print_error "`valref' are not valid values of `ref' variable"
 
 	*Recode to ensure negative code is 0 and positive is 1
 	tempvar test_r ref_r
@@ -44,7 +44,7 @@ program define dt, byable(recall)
 
 	*Get data
 	tempname d
-	qui tabulate `test_r' `ref_r' if `touse', matcell(`d')
+	qui tabulate `test_r' `ref_r' if `touse' [`weight'`exp'], matcell(`d')
 	local valid = r(N)
 
 	local a1 = `d'[2,2]
@@ -57,6 +57,6 @@ end
 
 program define print_error
 	args message
-	display in red "`message'" 
+	display in red "`message'"
 	exit 198
 end

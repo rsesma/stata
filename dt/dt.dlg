@@ -48,18 +48,19 @@ BEGIN
 
 	GROUPBOX	gb_p	_lft   _yp		370    50, label("List of hypothetical population prevalence (%)")
 	EDIT		ed_p	_ilft  _var_inc	350		., label("List of hypothetical population prevalence") option(p)
-	
+
 	GROUPBOX	gb_prev	 _lft   _yprev	370    50, label("Population Sample")
 	TEXT  		tx_m1 	 _ilft  +20		100  	., label("Total cases (m1):")
 	EDIT		ed_m1	 +105   @	    40		., label("Total cases (m1)") numonly option(m1)
-	TEXT  		tx_n 	 +100   @ 		100  	., label("Size of sample (n):")
-	EDIT		ed_n	 +105    @	    40		., label("Size of sample (n)") numonly option(n)
+	TEXT  		tx_n 	 +85    @ 		115  	., label("Size of sample (n):")
+	EDIT		ed_n	 +120   @	    40		., label("Size of sample (n)") numonly option(n)
 
 	GROUPBOX	gb_nst	_lft  	_y_nst	370    60, label("Name of the study")
 	EDIT		ed_nst	_ilft   _ms	 	350		., option(nst)
 END
 
 INCLUDE byifin
+INCLUDE weights_f
 
 DIALOG opt, tabtitle("Options")
 BEGIN
@@ -88,7 +89,7 @@ BEGIN
 	//Void m1,n controls
 	call main.ed_m1.setvalue ""
 	call main.ed_n.setvalue ""
-	
+
 	//Show/hide m1,n,prev controls
 	if main.rb_cs {
 		call main.gb_prev.hide
@@ -113,7 +114,10 @@ BEGIN
 	put "dt "
 	require main.v_test main.v_ref
 	put main.v_test " " main.v_ref
-	put " " /program ifin_output
+
+    INCLUDE _ifin_pr
+    INCLUDE _weights_pr
+
 	beginoptions
 		if main.rb_cs {
 			put " st(cs)"
@@ -123,32 +127,32 @@ BEGIN
 		}
 
 		if (!main.ed_tvn.iseq("0") | !main.ed_tvp.iseq("1")) {
-			put " valtest(" 
+			put " valtest("
 			put main.ed_tvn
-			put " " 
+			put " "
 			put main.ed_tvp
 			put ")"
 		}
-	
+
 		if (!main.ed_rvn.iseq("0") | !main.ed_rvp.iseq("1")) {
-			put " valref(" 
+			put " valref("
 			put main.ed_rvn
-			put " " 
+			put " "
 			put main.ed_rvp
 			put ")"
 		}
 		optionarg main.ed_p
-		
+
 		if main.rb_cc {
 			optionarg main.ed_m1 main.ed_n
 		}
-		
+
 		if !opt.co_me.isdefault() {
 			put " " opt.co_me
 		}
-		
+
 		INCLUDE _level_opt_pr
-		
+
 		optionarg main.ed_nst
 	endoptions
 END

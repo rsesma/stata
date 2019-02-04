@@ -21,7 +21,7 @@
 {phang}Syntax for {cmd:dt} - cross-sectional & case-control studies
 
 {p 8 12 2}
-{cmd:dt} {it:{help varname:var_test}} {it:{help varname:var_reference}} {ifin} [{cmd:,} {it:{help dt##options:options}}]
+{cmd:dt} {it:{help varname:var_test}} {it:{help varname:var_reference}} {ifin} {weight}[{cmd:,} {it:{help dt##options:options}}]
 
 
 {phang}Immediate command
@@ -65,8 +65,8 @@ This option is needed for Bayes theorem{p_end}
 {synopt :{opt n(#)}}size of population sample{break}
 {bf:m1} and {bf:n} options go together, {cmd:n > m1}{p_end}
 {synoptline}
-{phang}
-{cmd:by} is allowed; see {manhelp by D}.
+{p 4 4 2}{cmd:by} is allowed; see {manhelp by D}.{break}
+{bf:fweight} is allowed; see {help weight:weight}.{p_end}
 
 
 {marker description}{...}

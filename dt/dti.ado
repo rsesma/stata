@@ -1,7 +1,7 @@
-*! version 1.1.3  03jul2018 JM. Domenech, R. Sesma
+*! version 1.1.4  04feb2019 JM. Domenech, R. Sesma
 /*
 dti: Diagnostics Tests (immediate command)
-For cross-sectional and case-control studies 4 elements are provided: a1 a0 b1 b0 
+For cross-sectional and case-control studies 4 elements are provided: a1 a0 b1 b0
 for bayes theorem 2 elements (sensibility and specificity) or 4 elements (a1 a0 b1 b0) are provided
 */
 
@@ -16,7 +16,7 @@ program define dti, rclass
 
 	*Study type
 	if ("`st'"=="") local st = "cs"
-	if ("`st'"!="cs" & "`st'"!="cc" & "`st'"!="bt") print_error "st() invalid -- invalid value" 
+	if ("`st'"!="cs" & "`st'"!="cc" & "`st'"!="bt") print_error "st() invalid -- invalid value"
 
 	*Tokenize & test parameters
 	tokenize `anything'
@@ -48,7 +48,7 @@ program define dti, rclass
 		local n0 = `a0' + `b0'
 		local m1t = `a1' + `a0'
 		local m0 = `b1' + `b0'
-		local nt = `a1' + `a0' + `b1' + `b0'		
+		local nt = `a1' + `a0' + `b1' + `b0'
 	}
 	if ("`wilson'"=="" & "`exact'"=="" & "`wald'"=="") local method = "wilson"
 	if ("`wilson'"!="" & ("`exact'"!="" | "`wald'"!="")) print_error "only one of wilson, exact, wald options is allowed"
@@ -63,7 +63,7 @@ program define dti, rclass
 		if (`m1'>=`n') print_error "n must be greater than m1"
 	}
 	if ("`st'"=="bt" & "`p'"=="") print_error "p() option is necessary for bayes theorem, st(bt)"
-	
+
 	*Print & compute results
 	di
 	if ("`st'"=="cs") di as res "DIAGNOSTIC TESTS: CROSS-SECTIONAL STUDY"
@@ -76,7 +76,7 @@ program define dti, rclass
 		di as txt "Total cases: " as res `_total'
 	}
 	di
-	
+
 	*Table data
 	if ("`_ref'"=="") {
 		local coltitle = "Reference Criterion"
@@ -100,7 +100,7 @@ program define dti, rclass
 		local row2: label (`_test') `1'
 		local row2 = abbrev("`row2'",16)
 	}
-	
+
 	if ("`st'"=="cs" | ("`st'"=="bt" & `len'==4)) {
 		di as txt _col(18) "{c |}{center 21:{bf:`coltitle'}}{c |}"
 		di as txt "{ralign 16:{bf:`rowtitle'}} {c |}{ralign 9:`col1'} {c |}{ralign 9:`col2'} {c |}" _col(45) "TOTAL"
@@ -129,10 +129,10 @@ program define dti, rclass
 			di as txt "{hline 19}{c +}{hline 10}{c +}{hline 10}{c RT}"
 			di as txt _col(14) "TOTAL {c |} " as res %8.0f `m0' " {c |} " %8.0f `m1t' " {c |} " as txt _col(47) "TOTAL"
 			di as txt _col(20) "{c LT}{hline 10}{c +}{hline 10}{c +}{hline 10}"
-			di as txt " POPULATION SAMPLE {c |} " as res %8.0f (`n'-`m1') " {c |} " %8.0f `m1' " {c |} " %8.0f `n' 
+			di as txt " POPULATION SAMPLE {c |} " as res %8.0f (`n'-`m1') " {c |} " %8.0f `m1' " {c |} " %8.0f `n'
 		}
 	}
-		
+
 	if ("`st'"=="cs" | "`st'"=="cc") {
 		tempname r pr
 		quietly {
@@ -177,12 +177,12 @@ program define dti, rclass
 			}
 
 		}
-		
+
 		di
 		di as txt "{hline 19}{c TT}{hline 10}{c TT}{hline 28}"
 		di as txt _col(20) "{c |} Estimate {c |} `level'% Confidence Interval"
 		di as txt "{hline 19}{c +}{hline 10}{c +}{hline 28}" _c
-		
+
 		local m = proper("`method'")
 		local c1 "Sensitivity"
 		local c2 "Specificity"
@@ -200,7 +200,7 @@ program define dti, rclass
 			}
 			di as txt " (`m')" _c
 		}
-		
+
 		local c5 "Likelihood Ratio +"
 		local c6 "-"
 		foreach i of numlist 5/6 {
@@ -219,20 +219,20 @@ program define dti, rclass
 				*/ as txt " to " as res %7.0g 1/`r'[`i',2] _c
 			}
 		}
-		
+
 		if ("`st'"=="cs") {
 			di as txt _newline "{ralign 18:Odds ratio} {c |} "   /*
 				*/ as res %7.0g `r'[7,1] "  {c |} " %7.0g `r'[7,2] 	 /*
 				*/ as txt " to " as res %7.0g `r'[7,3] _c
 		}
-		
+
 		if (`lcont') {
 			di as txt _newline "{hline 19}{c +}{hline 10}{c +}{hline 28}" _c
 			local c1 "Sample prevalence"
 			local c2 "Predictive value +"
 			local c3 "-"
 			local c4 "Efficiency"
-			
+
 			local ini = cond("`st'"=="cs",8,7)
 			local fin = rowsof(`r')
 			local count 1
@@ -251,7 +251,7 @@ program define dti, rclass
 
 				if ("`st'"=="cs" | `i'==`ini') di as txt " (`m')" _c
 				if ("`st'"=="cc" & `i'>`ini' & `i'<`fin') di as txt " (Asymp)*" _c
-				
+
 				local count = `count' + 1
 			}
 		}
@@ -260,7 +260,7 @@ program define dti, rclass
 			di as txt "(*) Monsour, Evans & Kupper. Stat Med.1991;443-56."
 			di as txt "(*) Assumed constant Sensibility and Specificity"
 		}
-		
+
 		if ("`p'"!="") {
 			di
 			di as txt "  Pre-test   {c |}{rcenter 45:Post-test Probability of disease*}"
@@ -275,7 +275,7 @@ program define dti, rclass
 				if (`first') matrix `pr' = (`i',r(pvp),r(lbp),r(ubp),r(pvn),r(lbn),r(ubn))
 				else matrix `pr' = `pr' \ (`i',r(pvp),r(lbp),r(ubp),r(pvn),r(lbn),r(ubn))
 				local first 0
-				
+
 				di as res _col(6) %5.0g `i' as txt "%" _col(14) "{c |}"  		/*
 				*/	as res _col(19) %6.0g r(pvp) as txt "%" _col(37) "{c |}" 	/*
 				*/	as res _col(40) %6.0g r(pvn) as txt "%"
@@ -287,10 +287,10 @@ program define dti, rclass
 			di as txt "(*) Assumed constant Sensibility and Specificity"
 		}
 	}
-	
+
 	if ("`st'"=="bt") {
 		if (`len'==4) {
-			qui cii `m1t' `a1', level(95) wilson		//Sensitivity 
+			qui cii `m1t' `a1', level(95) wilson		//Sensitivity
 			local se = r(mean)
 			qui cii `m0' `b0', level(95) wilson			//Specificity
 			local sp = r(mean)
@@ -304,17 +304,17 @@ program define dti, rclass
 		local sp_pct = 100*`sp'
 		local fp_pct = 100*`fp'
 		local fn_pct = 100*`fn'
-		
+
 		if (`len'==4) di
 		di as txt "{ralign 14:Sensibility} = " _c
 		print_pct `se_pct'
 		di as txt "{ralign 22:Likelihood Ratio +} = " as res %7.0g `lrp'
-		
+
 		di as txt "{ralign 14:Sensibility} = " _c
 		print_pct `sp_pct'
 		if (`lrp'>=1 & `lrn'<1) di as txt "{ralign 22:-} = " as res %7.0g `lrn'
 		else di as txt "{ralign 22:inverse +} = " as res %7.0g 1/`lrp'
-		
+
 		di as txt "{ralign 14:False positive} = " _c
 		print_pct `fp_pct'
 		if (`lrp'>=1 & `lrn'<1) di as txt "{ralign 22:inverse -} = " as res %7.0g 1/`lrn'
@@ -330,7 +330,7 @@ program define dti, rclass
 		di as txt "  Hypothetical  {c |}    Predictive Values*   {c |} classified {c |}"
 		di as txt "   Prevalence   {c |}  Positive  {c |}  Negative  {c |}(Efficiency){c |}"
 		di as txt "{hline 16}{c +}{hline 12}{c +}{hline 12}{c +}{hline 12}{c RT}"
-		
+
 		tempname pr
 		local first 1
 		foreach i in `p' {
@@ -338,7 +338,7 @@ program define dti, rclass
 			if (`first') matrix `pr' = (`i',r(pvp),r(pvn),r(eff))
 			else matrix `pr' = `pr' \ (`i',r(pvp),r(pvn),r(eff))
 			local first 0
-			
+
 			di as res _col(7) %6.0g `i' as txt "%" _col(17) "{c |}" 	/*
 			*/		_col(20) as res %7.0g r(pvp) as txt "%" _col(30) "{c |}" 	/*
 			*/		_col(33) as res %7.0g r(pvn) as txt "%" _col(43) "{c |}" 	/*
@@ -347,16 +347,16 @@ program define dti, rclass
 		di as txt "{hline 16}{c BT}{hline 12}{c BT}{hline 12}{c BT}{hline 12}{c BRC}"
 		di as txt "(*) Assumed constant Sensibility and Specificity"
 	}
-	
+
 	*Stored results
-	if ("`st'"!="bt" | ("`st'"=="bt" & `len'==4)) {		
+	if ("`st'"!="bt" | ("`st'"=="bt" & `len'==4)) {
 		return scalar a1= `a1'
 		return scalar b1= `b1'
 		return scalar a0= `a0'
 		return scalar b0= `b0'
 		return scalar m1= `m1t'
 		return scalar m0= `m0'
-		if ("`st'"=="cs" | "`st'"=="bt") {		
+		if ("`st'"=="cs" | "`st'"=="bt") {
 			return scalar n1= `n1'
 			return scalar n0= `n0'
 			return scalar n= `nt'
@@ -364,10 +364,10 @@ program define dti, rclass
 		if ("`st'"=="cc" & "`m1'"!="" & "`n'"!="") {
 			return scalar m1_sample= `m1'
 			return scalar m0_sample= `n' - `m1'
-			return scalar n_sample= `n'			
+			return scalar n_sample= `n'
 		}
 	}
-	if ("`st'"=="cs" | "`st'"=="cc") { 
+	if ("`st'"=="cs" | "`st'"=="cc") {
 		local i 1
 		foreach res in se sp fp fn lrp lrn {
 			return scalar `res' = `r'[`i',1]
@@ -378,7 +378,7 @@ program define dti, rclass
 		if ("`st'"=="cs") {
 			return scalar or = `r'[7,1]
 			return scalar lb_or = `r'[7,2]
-			return scalar ub_or = `r'[7,3]			
+			return scalar ub_or = `r'[7,3]
 		}
 		if ("`st'"=="cs" | ("`st'"=="cc" & ("`m1'"!="" & "`n'"!=""))) {
 			local i = cond("`st'"=="cs",8,7)
@@ -404,7 +404,7 @@ program define dti, rclass
 		return scalar lrp = `lrp'
 		return scalar lrn = `lrn'
 		matrix colnames `pr' = prev pvp pvn eff
-		return matrix P = `pr'		
+		return matrix P = `pr'
 	}
 	return scalar level = `level'
 
@@ -422,9 +422,9 @@ end
 program define getpv, rclass
 	version 12
 	syntax anything(id="argument numlist"), Level(numlist max=1 >50 <100) [ext noic]
-	
+
 	tempname sigp sep sign sen z temp
-	
+
 	*Predictive Values for a given prevalence by Monsour, Evans y Kupper, 1991
 	tokenize `anything'
 	local p = `1'
@@ -437,7 +437,7 @@ program define getpv, rclass
 	scalar `z' = invnormal((`level'+100)/200)
 	scalar `temp' = 0
 	if ("`ext'"!="") scalar `temp' = 1/(`n'*`p'*(1-`p'))
-	
+
 	scalar `sigp' = (1-`sp')*(1-`p')/(`se'*`p')
 	return scalar pvp = 100*(1/(1+`sigp'))
 	scalar `sign' = (1-`se')*`p'/(`sp'*(1-`p'))
@@ -457,7 +457,7 @@ program define getpv_bayes, rclass
 	syntax anything(id="argument numlist")
 
 	tempname pvp pvn
-	
+
 	*Predictive Values for a given prevalence - Bayes theorem
 	tokenize `anything'
 	local p = `1'
@@ -473,6 +473,6 @@ end
 
 program define print_error
 	args message
-	display in red "`message'" 
+	display in red "`message'"
 	exit 198
 end

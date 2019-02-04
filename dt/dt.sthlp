@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.3 03jul2018}{...}
+{* *! version 1.1.4 04feb2019}{...}
 {viewerdialog dt "dialog dt"}{...}
 {viewerdialog dti "dialog dti"}{...}
 {viewerjumpto "Syntax" "dt##syntax"}{...}
@@ -78,16 +78,16 @@ Diagnostic Tests for Cross-sectional, Case-Control studies and Bayes theorem.
 {dlgtab:Cross-sectional & Case-Control}
 
 {p 4 4}
-Cross-sectional and case-control studies are available. The command needs the diagnostic test and 
+Cross-sectional and case-control studies are available. The command needs the diagnostic test and
 reference criterion variables to compute the results.
 
 {p 4 4}
-For case-control studies it is possible to provide {bf:m1, n} options to compute the prevalence in a 
-population sample. Monsour, Evans and Kupper (1991) confidence 
+For case-control studies it is possible to provide {bf:m1, n} options to compute the prevalence in a
+population sample. Monsour, Evans and Kupper (1991) confidence
 intervals are computed for positive and negative predictive values for case-control estudies.
 
 {p 4 4}
-{cmd:dti} is the immediate form of {cmd:dt}; see {help immed}. 
+{cmd:dti} is the immediate form of {cmd:dt}; see {help immed}.
 
 {p 4 4}
 The sequence of {it:#a1}, {it:#a0}, {it:#b1} and {it:#b0} for {cmd:dti} come from a contingency table:{break}
@@ -107,11 +107,11 @@ For the Bayes theorem, the immediate command needs the Sensitivity (%) and Speci
 list of hypothetical population prevalences is also needed to compute the results.
 
 {p 4 4}
-You can click {dialog dt:here} to pop up a {dialog dt:dialog} or type {inp: db dt}. For the 
+You can click {dialog dt:here} to pop up a {dialog dt:dialog} or type {inp: db dt}. For the
 immediate command, you can click {dialog dti:here} to pop up a {dialog dti:dialog} or type {inp: db dti}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://www.graunt.cat/stata} for install.
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate dt, update} to update the {bf:dt} command.{break}
@@ -216,7 +216,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.3 {hline 2} 3 July 2018
+Version 1.1.4 {hline 2} 4 February 2019
 
 
 {marker authors}{...}
@@ -234,7 +234,7 @@ stata@graunt.cat{p_end}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Diagnostic tests: User-written command dt for Stata [computer program].{break}
-V1.1.3. Barcelona: Graunt21; 2018.{break}
+V1.1.4. Barcelona: Graunt21; 2019.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 
 

@@ -1,4 +1,4 @@
-*! version 1.2.4  10apr2018 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.2.5  13feb2019 JM. Domenech, JB.Navarro, R. Sesma
 
 program allsets
 	version 12
@@ -9,7 +9,7 @@ program allsets
 	*/	nohierarchical nst(string)]
 
 	tempname nvalid nrows time ncases m r
-	
+
 	*Check type
 	if ("`linear'"=="" & "`logistic'"=="" & "`cox'"=="") {
 		print_error "missing regression type -- specify one of linear, logistic, cox"
@@ -20,10 +20,10 @@ program allsets
 	if ("`linear'"!="") local type "linear"
 	if ("`logistic'"!="") local type "logistic"
 	if ("`cox'"!="") local type "cox"
-	
+
 	*Check weight
 	if ("`weight'"!="" & "`type'"=="cox") print_error "weight not necessary for cox type; include weight on the stset command"
-	
+
 	*Check filename
 	if ("`using'"=="") local using "allsets_results.dta"
 	capture confirm new file `"`using'"'
@@ -40,13 +40,13 @@ program allsets
 	}
 	if ("`hierarchical'"!="") local hierarch 0
 	else local hierarch 1
-	
+
 	marksample touse, novarlist		//ifin marksample
 
 	if ("`maxvar'"=="") local maxvar 0		//maximum number of variables; ALL by default
 	if ("`minvar'"=="") local minvar 1		//minimum number of variables; 1 by default
 	if (`maxvar'>0 & `minvar'>`maxvar') print_error "minvar option can't be greater than maxvar"
-	
+
 	*Dependent & Independent variables
 	if ("`type'"!="cox") gettoken dep vars: varlist
 	else local vars `varlist'
@@ -54,7 +54,7 @@ program allsets
 	local error 0
 	if ("`type'"!="cox") local error: list dep in vars	//Dependent var can't be one of the independent
 	if (`error') print_error "dependent variable `dep' can't be one of the independent variables"
-	
+
 	*Loop to get the independent and interaction variables
 	local indep ""
 	local inter ""
@@ -75,8 +75,8 @@ program allsets
 	if (`hierarch') {
 		foreach in in `inter' {
 			local temp : subinstr local in "#" " "
-			if (strpos("`temp'","#")>0) print_error "`in' is not a valid interaction" 
-			
+			if (strpos("`temp'","#")>0) print_error "`in' is not a valid interaction"
+
 			local terms ""
 			local nlen : word count `temp'
 			forvalues i = 1/`nlen'{
@@ -84,7 +84,7 @@ program allsets
 				cleanvarname `t'
 				local terms = "`terms'" + " `r(v_name)'"
 			}
-			
+
 			local ok : list terms in indep
 			if (`ok'==0) print_error "`in' is not a valid interaction, terms missing in the model"
 		}
@@ -111,7 +111,7 @@ program allsets
 	quietly count if `touse'
 	scalar `ncases' = r(N)				//Total number of cases
 	if (`ncases'==0) print_error "no observations"
-	
+
 	*Count number of valid values of each var & number of valid cases
 	matrix `m' = J(`: list sizeof lvars', 2, .)
 	local i 1
@@ -124,7 +124,7 @@ program allsets
 	markout `touse' `lvars'				//Exclude missing values of list vars
 	quietly count if `touse'
 	scalar `nvalid' = r(N)				//Number of valid cases
-	
+
 	preserve
 	quietly keep if `touse'				//Select cases a priori
 
@@ -143,10 +143,10 @@ program allsets
 			exit 198
 		}
 	}
-	
+
 	//Get results in Mata
 	mata: getresults("`dep'", "`vars'", "`inter'","`type'",`hierarch',"`fixed_vars'",`minvar',`maxvar',"`weight'","`exp'")
-	
+
 	//Mata code creates a new dataset with the results
 	if (`maxvar'==0) scalar `nrows' = _N
 	if (`maxvar'>0) {
@@ -230,7 +230,7 @@ program allsets
 			order NVar Variables pValue AIC BIC HarrellC _2ll
 			sort AIC
 			qui drop HR
-		}	
+		}
 		label variable HarrellC "Harrell's C"
 		label variable _2ll "-2 Log likelihood"
 		format AIC BIC %9.1f
@@ -242,7 +242,7 @@ program allsets
 	format pValue %5.3f
 	if (`minvar'==1 & `maxvar'==0) qui drop pValue			//pValue only for minvar,maxvar calls
 	qui drop iCat
-	
+
 	*use tabstat to compute summary results
 	if (`maxvar'==0) {
 		qui tabstat `sumvars', statistics(min max) save
@@ -250,7 +250,7 @@ program allsets
 	}
 	else {
 		qui tabstat `sumvars', statistics(min max) save
-		matrix `rmax' = r(StatTotal) 
+		matrix `rmax' = r(StatTotal)
 		qui tabstat `sumvars' if NVar<=`maxvar', statistics(min max) save
 		matrix `r' = r(StatTotal)
 		qui drop if NVar>`maxvar' & NVar<.
@@ -262,15 +262,15 @@ program allsets
 	format Variables `fmt'
 	quietly save `"`using'"', replace		//Save results
 	local path = c(filename)				//Saved results path directory
-	
+
 	if (`maxvar'==1) {
 		*Save in nrows the real number of combinations in case maxvar=1
 		qui count if !missing(NVar)
 		local nrows = r(N)
 	}
-	
+
 	restore     //Restore original data
-	
+
 	//Print results
 	if ("`type'"=="linear") di "ALLSETS - Linear regression"
 	if ("`type'"=="logistic") di "ALLSETS - Logistic regression"
@@ -298,7 +298,7 @@ program allsets
 	if (`minvar'!=1) di as txt "Minimum number of variables included in the combinations: " as result `minvar'
 	if (`maxvar'>0) di as txt "Maximum number of variables included in the combinations: " as result `maxvar'
 	display as text "Total time: " as result %4.1f `time' as text " seconds"
-	
+
 	//Check collinearity
 	qui _rmcoll `vars' if `touse', expand
 	if (strpos("`r(varlist)'","o.")>0) {
@@ -332,14 +332,14 @@ end
 
 program print_matrix
 	syntax [anything], m(name) rsize(integer) [formats(string) rname(string)]
-	
+
 	*print data of matrix m
 	local ncols = colsof(`m')
 	local nrows = rowsof(`m')
 	local cnames : colnames `m'
 	local rnames : rownames `m'
 	local def_fmt "%9.0g"
-	
+
 	*print row title and column labels
 	di
 	di as txt "{ralign `rsize':`rname'} {c |} " _c
@@ -354,7 +354,7 @@ program print_matrix
 		local s2 = `s2' + `size'+1
 	}
 	di as txt _n "{hline `s1'}{c +}{hline `s2'}" _c
-	
+
 	*print row labels and matrix data
 	foreach i of numlist 1/`nrows' {
 		local rlbl : word `i' of `rnames'
@@ -376,13 +376,13 @@ program cleanvarname, rclass
 		*If there's #. get the name without the #.
 		local var : subinstr local var "." " ", all
 		local var : word 2 of `var'
-	} 
+	}
 	return local v_name = "`var'"
 end
 
 program define print_error
 	args message
-	display in red "`message'" 
+	display in red "`message'"
 	exit 198
 end
 
@@ -417,7 +417,7 @@ void getresults(string scalar dep, string scalar indep, string scalar inter, str
 	real scalar					len
 	real scalar					nrows
 	real scalar					maxncomb
-	
+
 	r.dep = dep
 	r.names = tokens(indep)
 	r.inter = tokens(inter)
@@ -431,10 +431,10 @@ void getresults(string scalar dep, string scalar indep, string scalar inter, str
 		r.weight = "[" + weight + exp + "]"
 		r.exp = exp
 	}
-	
+
 	timer_clear()
 	timer_on(1)
-	
+
 	if (r.type == "linear") {
 		//rmse of the maximum model: needed to compute Cp
 		stata("regress " + dep + " " + indep + " " + r.weight,1)
@@ -472,7 +472,7 @@ void getresults(string scalar dep, string scalar indep, string scalar inter, str
 		st_store(.,"pValue",results[.,7])
 		st_store(.,"b",results[.,8])
 		st_store(.,"iCat",results[.,9])
-		
+
 	}
 	if (r.type=="logistic") {
 		x = st_addvar(("str" + strofreal(len),"float","float","float","float","float","float","float","float","float","float","float","float","float"), /*
@@ -504,7 +504,7 @@ void getresults(string scalar dep, string scalar indep, string scalar inter, str
 		st_store(.,"HR",results[.,7])
 		st_store(.,"iCat",results[.,8])
 	}
-	
+
 	//Timer: stored in the dataset as the last column
 	timer_off(1)
 	st_store(1,"time",timer_value(1)[1,1])
@@ -554,7 +554,7 @@ void combinations(real scalar elements, real scalar first, real scalar last, str
 			}
 			addcomb(terms,combs)
 		}
-		
+
         //Get solutions not containing first allowed (first).
         combinations( elements, (first+1), last, p_combs2, r )
 
@@ -609,7 +609,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 	string scalar	c
 	string scalar	hr, invhr, censind
 	real scalar		len
-	real colvector	mselect		
+	real colvector	mselect
 	real matrix		som
 	real matrix 	wauc, freq
 	string rowvector	terms
@@ -619,7 +619,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 	real scalar		ires, icat
 	real matrix		coef
 	string matrix	coef_names
-	
+
 	//Declare matrix
 	nrows = rows(combs)
 	len = nrows
@@ -635,7 +635,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 		}
 	}
 
-	
+
 	if (r.type == "linear") {
 		results = J(len,9,.)
 	}
@@ -647,17 +647,17 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 	}
 	vnames = J(len,1,"")
 	mselect = results[.,1]
-	
+
 	ires = 1
 	icat = 0
 	for (i=1; i<=rows(combs); i++) {
 		lexe = 1
 		comb = combs[i]
-		
+
 		if (r.hierarchical==1) {
 			//Exclude non hierarchical combinations -- all the terms in an interaction must be in the combination
 			for (j=1; j<=cols(r.inter); j++) {
-				if (strpos(comb,r.inter[j])>0) {
+				if (strpos(" "+comb+" "," "+r.inter[j]+" ")>0) {
 					terms = tokens(subinstr(r.inter[j],"#"," "))
 					for (k=1; k<=cols(terms); k++) {
 						term = terms[k]
@@ -690,7 +690,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 				}
 			}
 		}
-			
+
 		mselect[ires]=lexe
 		if (lexe==1){
 			vnames[ires,1] = strtrim(stritrim(comb))
@@ -832,7 +832,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 				results[ires,5] = nvar
 				results[ires,6] = pValue
 			}
-			
+
 			if (maxvar==1) {
 				if ((i==nrows) | cols(coef)==2 | (r.type == "cox" & cols(coef)==1)) {
 					if (r.type == "linear") results[ires,8] = coef[1,1]
@@ -844,7 +844,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 					if (r.type == "linear") results[ires,9] = icat
 					if (r.type == "logistic") results[ires,12] = icat
 					if (r.type == "cox") results[ires,8] = icat
-					
+
 					k = cols(coef)-1
 					if (r.type == "cox") k = cols(coef)
 					for (j=2; j<=k; j++) {

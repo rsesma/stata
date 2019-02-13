@@ -1,7 +1,7 @@
 /*
   allsets.dlg
 
-*! VERSION 1.2.4  10apr2018
+*! VERSION 1.2.5  13feb2019
 
 */
 
@@ -26,7 +26,7 @@ BEGIN
 	DEFINE _x _xsetbu
 	DEFINE _y 35
 	INCLUDE _bu_stset
-		
+
 	GROUPBOX	gb_opt	_lft  	_xxls	500    210, label("Options")
 	CHECKBOX	cb_hr	_ilft	_ss		250	  	., label("Only hierarchical models") default(1)
 	TEXT		tx_fix	_ilft	_ms		100		., label("Fixed variables:")
@@ -42,7 +42,7 @@ BEGIN
 					*/								dialogtitle("Save Allsets Results Stata Data File") /*
 					*/								filter("Stata Data (*.dta)|*.dta") save option(using)
 	CHECKBOX	cb_repl	_ilft	_ms		250	  	., label("Replace dataset if it already exists") default(1)
-	
+
 	GROUPBOX	gb_nst	_lft  	+40		500    60, label("Name of the study")
 	EDIT		ed_nst	_ilft   _ms	 	480		., option(nst)
 END
@@ -53,10 +53,10 @@ DIALOG weights, tabtitle(resource "Weights")
 BEGIN
   TEXT     tx_wgttyp _lft      _top      _cwd1     ., label("Weight type:")
   BUTTON   bu_help   _xsetbu   -2        _setbuwd  ., label("Help weights")	onpush(view help weights##|_new)
-  
+
   RADIO    rb_none   _lft      +22       _iwd      ., first label("None") onclickon(program wgt_off) option(NONE)
   RADIO    rb_pw     _lft      _ss       _iwd      ., last label("Sampling weights") onclickon(program wgt_on) option(pweight)
-	
+
   TEXT     tx_wgt    _lft      _ls       _iwd      ., label("Weight:")
   VARLIST  vl_wgt    @         _ss       _iwd      ., numeric label("Weight")
 END
@@ -89,7 +89,7 @@ BEGIN
 	call weights.tx_wgt.setlabel "Weight:"
 END
 
-	
+
 PROGRAM change_type
 BEGIN
 	//Show/hide and move controls
@@ -106,7 +106,7 @@ BEGIN
 		call main.tx_iv.setposition 150 . . .
 		call main.vl_iv.setposition 150 . 340 .
 		call main.bu_stset.hide
-	}	
+	}
 END
 
 PROGRAM command
@@ -119,7 +119,7 @@ BEGIN
 		varlist main.vn_dv main.vl_iv
 	}
 	put " " /program ifin_output
-	
+
 	//Weights
 	if !weights.rb_none {
 		require weights.vl_wgt

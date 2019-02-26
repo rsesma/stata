@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.4.1 11may2018}{...}
+{* *! version 1.4.2 26feb2019}{...}
 {viewerdialog mar "dialog mar"}{...}
 {viewerjumpto "Syntax" "mar##syntax"}{...}
 {viewerjumpto "Description" "mar##description"}{...}
@@ -198,7 +198,9 @@ If you find any bugs or want to suggest any improvements, please send an e-mail 
 
 {p 4 4}
 The zip file available for download on {browse "http://www.graunt.cat/stata/Comando_mar_para_Stata.zip"} contains a pdf file with
-examples of meta-analysis solved with the {cmd:mar} command (in spanish). The zip file also contains an excel file with example data.
+examples of meta-analysis solved with the {cmd:mar} command (in spanish). The zip file also contains an excel file with example data. If
+the direct download fails, copy the download link (http://www.graunt.cat/stata/Comando_mar_para_Stata.zip) and paste in the 
+address bar of your web browser.
 
 {it:RAW data}
 {p 4 4}{stata "use http://www.graunt.cat/stata/AngMio.dta":. use http://www.graunt.cat/stata/AngMio.dta}{p_end}
@@ -256,7 +258,7 @@ Peto results are stored for {bf:raw} data and {bf:or} risk measure.{p_end}
 {title:Version}
 
 {p 4}
-Version 1.4.1 {hline 2} 11 May 2018
+Version 1.4.2 {hline 2} 26 February 2019
 
 
 {marker authors}{...}
@@ -274,7 +276,7 @@ stata@graunt.cat
 
 {p 4 6 2}
 Dom{c e'}nech JM. Meta-Analysis OR, RR, RD, IR, ID, B, MD & R Combined: User-written command mar for Stata [computer program].{break}
-V1.4.1. Barcelona: Graunt21; 2018.{break}
+V1.4.2. Barcelona: Graunt21; 2019.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata
 
 

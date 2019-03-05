@@ -1,7 +1,7 @@
 /*
   mar.dlg
 
-*! VERSION 1.4.2 26feb2019
+*! VERSION 1.4.3 05mar2019
 
 */
 
@@ -26,7 +26,7 @@ DEFINE _y_gbcc 	85
 DEFINE _y_cc 	90
 DEFINE _y_nst 	290
 DEFINE _x _ilft
-DEFINE _y 190
+DEFINE _y 195
 DEFINE _cx 100
 
 DIALOG main, label("mar - Meta-Analysis") tabtitle("Main")
@@ -41,15 +41,15 @@ BEGIN
 	CHECKBOX	cb_peto		+170    @		130     ., label("Peto's odds ratio") onclickon(program peto_on) onclickoff(program peto_off)
 	COMBOBOX	co_md_std	 270	@		130		., dropdownlist contents(md_std_descrip) values(md_std_values) /*
 													*/	default("None") label("Standardization")
-	GROUPBOX	gb_opt		_lft   +40		390    170, label("Options")
+	GROUPBOX	gb_opt		_lft   +40		390    180, label("Options")
 	CHECKBOX	cb_tables	_ilft  _ss		130     ., label("Print crosstab tables")
-	TEXT  		tx_zero  	_ilft  _ss    	120		., label("Zero-cell correction:") left
-	COMBOBOX	co_zero	  	+130   @	    120  	., dropdownlist contents(zero_descrip) values(zero_values) /*
+	COMBOBOX	co_zero	  	_ilft  _ss	    130  	., dropdownlist contents(zero_descrip) values(zero_values) /*
 													*/	default("n") label("Zero-cell correction") option(zero)
+	TEXT  		tx_zero  	+140    @    	200		., label("Zero-cell correction") left
 	CHECKBOX	cb_exp		_ilft  _ms		340     ., label("Print exponential values values for slope measures, Exp(b)")
-	TEXT  		tx_date  	_ilft  _ms    	170		., label("Print format for date variable:") left
-	COMBOBOX	co_date  	+170    @	    130  	., dropdownlist contents(date_descrip) values(date_values) /*
+	COMBOBOX	co_date  	_ilft  _ms	    130  	., dropdownlist contents(date_descrip) values(date_values) /*
 													*/	default("YMD") option(date) label("Print format for date variable")
+	TEXT  		tx_date  	+140    @    	200		., label("Print format for date variable") left
 	INCLUDE _sp_level
 	CHECKBOX	cb_keep		_ilft  _ms		250     ., label("Add result variables to current dataset")
 													
@@ -61,16 +61,16 @@ INCLUDE ifin
 
 DIALOG opt1, tabtitle("Additional analyses and Graphics")
 BEGIN
-	GROUPBOX	gb_print 	_lft  _top		390    85, label("Print")
-	CHECKBOX	cb_influ	_ilft _ss		150     ., label("Influence Analysis") onclickon(program enablemethod) onclickoff(program disablemethod)
-	CHECKBOX	cb_cumul	_ilft _ss		150     ., label("Cumulative Meta-Analysis") onclickon(program enablemethod) onclickoff(program disablemethod)
-	TEXT  		tx_cumul    +165   @        100		., label("Cumulative variable:") left
-	EDIT		ed_cumul    +110   @	    90      ., option("cum") label("Cumulative Variable order")
-	CHECKBOX	cb_rev      @     _ss	    100     ., label("Reverse order")
-	TEXT  		tx_method  	_lft  +40    	120		., label("Method of weighting:") left
+	GROUPBOX	gb_print 	_lft  _top		390    90, label("Print")
+	CHECKBOX	cb_influ	_ilft _ss		200     ., label("Influence Analysis") onclickon(program enablemethod) onclickoff(program disablemethod)
+	CHECKBOX	cb_cumul	_ilft _ss		200     ., label("Cumulative Meta-Analysis") onclickon(program enablemethod) onclickoff(program disablemethod)
+	TEXT  		tx_cumul    45    _ss       120		., label("Cumulative variable:") left
+	EDIT		ed_cumul    +125   @	    90      ., option("cum") label("Cumulative Variable order")
+	CHECKBOX	cb_rev      +100   @	    100     ., label("Reverse order")
+	TEXT  		tx_method  	_lft  +35    	120		., label("Method of weighting:") left
 	COMBOBOX	co_method  	+130   @	    260  	., dropdownlist contents(method_descrip) values(method_values) option(method) /*
 													*/	default("IoV Fixed Effects Model") label("Method of weighting") onselchange(program methodchange)
-	GROUPBOX	gb_graph _lft  	 +25	390    215, label("Graphics")
+	GROUPBOX	gb_graph  _lft   +25	390    215, label("Graphics")
 	CHECKBOX	cb_forest _ilft  _ss	125     ., label("Forest plot") onclickon(program enablemethod) onclickoff(program disablemethod)
 	TEXT  		tx_forest +180   @      115		., label("Ordered by variable:") left
 	EDIT		ed_forest +120   @	    65      ., default("se") option("forest") label("Order variable forest plot")
@@ -89,8 +89,8 @@ END
 DIALOG opt2, tabtitle("Publication Bias")
 BEGIN
 	GROUPBOX	gb_bias	_lft   _top	390    180, label("Publication Bias")
-	CHECKBOX	cb_beg	_ilft  _ss	120     ., label("Begg publication bias") onclickon(program enablemethod) onclickoff(program disablemethod)
-	TEXT  		tx_method2  +130 @  240		., label("") left
+	CHECKBOX	cb_beg	_ilft  _ss	200     ., label("Begg publication bias") onclickon(program enablemethod) onclickoff(program disablemethod)
+	TEXT  		tx_method2  45 _ss  300		., label("") left
 	CHECKBOX	cb_egg	_ilft  _ss	200     ., label("Egger publication bias")
 	CHECKBOX	cb_nus	_ilft  _ss	200     ., label("Number of Unpublished Studies")
 	TEXT  		tx_nus  +210    @   80		., label("p-value >")

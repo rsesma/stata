@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.4.2 26feb2019}{...}
+{* *! version 1.4.3 05mar2019}{...}
 {viewerdialog mar "dialog mar"}{...}
 {viewerjumpto "Syntax" "mar##syntax"}{...}
 {viewerjumpto "Description" "mar##description"}{...}
@@ -258,7 +258,7 @@ Peto results are stored for {bf:raw} data and {bf:or} risk measure.{p_end}
 {title:Version}
 
 {p 4}
-Version 1.4.2 {hline 2} 26 February 2019
+Version 1.4.3 {hline 2} 05 March 2019
 
 
 {marker authors}{...}
@@ -276,7 +276,7 @@ stata@graunt.cat
 
 {p 4 6 2}
 Dom{c e'}nech JM. Meta-Analysis OR, RR, RD, IR, ID, B, MD & R Combined: User-written command mar for Stata [computer program].{break}
-V1.4.2. Barcelona: Graunt21; 2019.{break}
+V1.4.3. Barcelona: Graunt21; 2019.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata
 
 

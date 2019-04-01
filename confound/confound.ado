@@ -1,4 +1,4 @@
-*! version 1.1.3  28jan2019 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.1.4  01apr2019 JM. Domenech, JB.Navarro, R. Sesma
 
 program confound
 	version 12
@@ -694,7 +694,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 	if (r.type=="linear" | r.type=="cox") results = J((rows(combs)+1)*nfixed,5,.)
 	if (r.type=="logistic") results = J((rows(combs)+1)*nfixed,7,.)
 	vnames = J((rows(combs)+1)*nfixed,1,"")
-	if (nfixed>1) labels = J((rows(combs)+1)*nfixed,1,"")
+	labels = J((rows(combs)+1)*nfixed,1,"")			//labels is created always - disabled: if (nfixed>1)
 
 	index = 1
 	for (i=0; i<=rows(combs); i++) {
@@ -718,7 +718,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 			names = names + " " + comb
 
 			vnames[index,1] = strtrim(stritrim(names))
-			if (nfixed>1) labels[index,1] = r.labels[j,1]
+			labels[index,1] = r.labels[j,1]			//labels is created always - disabled: if (nfixed>1)
 			nvar = cols(tokens(names))
 
 			//Execute the regression
@@ -736,7 +736,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 				if (r.weight == "") {
 					//gof can only be computed if there's no active weight
 					ok = 1
-					if (comb=="" & nfixed==1) {
+					if (comb=="" & nfixed==1 & cols(tokens(model))==1) {
 						stata("tab " + model + ", matrow(__Freq)",1)
 						F = st_matrix("__Freq")
 						if (rows(F)==2) {
@@ -761,7 +761,6 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 					}
 				}
 			}
-
 			index = index+1
 		}
 	}

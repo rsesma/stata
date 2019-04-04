@@ -1,176 +1,169 @@
-*! version 1.1.3  22oct2018 JM. Domenech, R. Sesma
-
+*! version 1.1.4.?  ?apr2019 JM. Domenech, R. Sesma
+*statmis0: version 1.1.3  22oct2018
 /*
 statmis: missing statistics
 */
 
 program define statmis, rclass
 	version 12
-	syntax [varlist] [if] [in], [excluded nst(string)]
+	syntax [varlist] [if] [in], [excluded GENerate(name) NOGENerate NOREPort nst(string)]
 
-	tempname res values freq tmp
+	tempname V F
+	tempvar nmis
 
-	*Drop _NMiss variable if exists
-	capture confirm variable _NMiss
-	if (!_rc) drop _NMiss
-	
-	*Delete _NMiss of the variable list
-	local nmis "_NMiss"
-	local varlist : list varlist - nmis
-	
-	*Build the list of variables; excluded param means all variables EXCEPT those of varlist
-	if ("`excluded'"=="") qui ds `varlist'
-	else qui ds `varlist', not
-	local vlist = r(varlist)
-	
-	if ("`vlist'"==".") {
-		display in red "no variables selected" 
+	if ("`generate'"!="" & "`nogenerate'"!="") {
+		di in red "options -generate()- and -nogenerate- may not be specified together"
 		exit 198
 	}
 	
-	marksample touse, novarlist
-
-	*Check for missing values by variable
-	local vmiss				//List of temporary variables with missing count
-	foreach v of varlist `vlist'{
-		tempvar `v'_miss
-		local vmiss : list vmiss | `v'_miss
-		
-		capture confirm numeric variable `v'
-		if (_rc==0) {
-			qui generate ``v'_miss' = missing(`v') if `touse' & `v'<.z		//On numeric vars .z is Not Applicable, not missing
+	qui {
+		* build the list of variables; exclude total missing values by subject variable of the list
+		local not = cond("`excluded'"=="","",", not")			// excluded param means all variables EXCEPT those of varlist
+		ds `varlist' `not'
+		if ("`r(varlist)'"=="") {
+			noisily di in red "no variables selected"
+			exit 198
 		}
-		else {
-			qui generate ``v'_miss' = missing(`v') if `touse'
-		}
-	}
-	*Total missing values by subject: _NMiss variable
-	qui egen _NMiss = rowtotal(`vmiss') if `touse'
-	label variable _NMiss "Total missing values by subject"
-	qui tabulate _NMiss if `touse', matrow(`values') matcell(`freq')		//_NMiss statistics
-	local n = r(N)			//Total number of subjects
-
-	*Build results matrix
-	local first 1
-	foreach v of varlist `vlist'{
-		capture confirm numeric variable `v'
-		local str = cond(_rc!=0,"str","")
+		ds `r(varlist)', not(varl "Total missing values by subject")
+		local vlist = r(varlist)
 		
-		count_miss `v' `touse', `str'
-		if (`first') matrix define `res' = r(res)
-		else matrix define `res' = `res' \ r(res)
-		local first 0
+		* selection
+		marksample touse, novarlist
+		count if `touse'
+		local ntot = r(N)			// total number of rows
+		if (`ntot'==0) {
+			noisily di in red "no observations"
+			exit 198
+		}
+		
+		ds `vlist', not(type str#)
+		local vnum = r(varlist)		// list of numeric variables
+		ds `vlist', has(type str#)
+		local vstr = r(varlist)		// list of string variables
+		ds `vlist', has(type str#)
+		local vstr = r(varlist)		// list of string variables
+		ds `vlist', has(format %td*)
+		local vdaily = r(varlist)	// list of daily variables
+		ds `vlist', has(format %tc*)
+		local vclock = r(varlist)	// list of clock variables
+		
+		recode `vnum' (.z=0), prefix(__Miss_)
+		egen `nmis' = rowmiss(__Miss_* `vstr') if `touse'
+		drop __Miss_*
 	}
 
+	preserve
+	qui keep if `touse'
+	
 	*Print results
 	di as res "STATISTICS OF MISSING VALUES"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
-	di
-	di as txt "{col 14}{c |}{col 19}Missing values{col 37}{c |}{col 40}Not{col 45}{c |}  Valid values"
-	di as txt "    Variable {c |} System  User Percent {c |} Appl.{col 45}{c |}  Freq. Percent{col 67}Mean{col 79}Min{col 90}Max"
-	di as txt "{hline 13}{c +}{hline 22}{c +}{hline 7}{c +}{hline 47}" _c
 	
-	local rows = rowsof(`res')
-	local cols = colsof(`res')
-	foreach i of numlist 1/`rows' {
-		local v : word `i' of `vlist'
-		local name = abbrev("`v'",12)
-		di as txt _newline "{ralign 12:`name'} {c |} " _c
-		
-		capture confirm numeric variable `v'
-		local str = (_rc!=0)
+	if ("`noreport'"=="") {
+		di
+		di as txt "{col 14}{c |}{col 19}Missing values{col 37}{c |}{col 40}Not{col 45}{c |}  Valid values"
+		di as txt "    Variable {c |} System  User Percent {c |} Appl.{col 45}{c |}  Freq. Percent{col 67}Mean{col 79}Min{col 90}Max"
+		di as txt "{hline 13}{c +}{hline 22}{c +}{hline 7}{c +}{hline 47}" _c
+		local nsys 0
+		local num 0
+		local nval 0
+		local nna 0
+		foreach v of varlist `vlist'{
+			local name = abbrev("`v'",12)
+			di as txt _newline "{ralign 12:`name'} {c |} " _c
+			
+			* count number of missings, sysmis, usermis, not applicable (.z) and valid values
+			local lnum : list v in vnum
+			qui count if missing(`v')	// count # of missing values
+			local mis = r(N)
+			qui count if !missing(`v')	// count # of valid values
+			local val = r(N)
+			if (`lnum') {
+				* numeric/date var
+				qui count if `v'>. & `v'<.z			// count # of usermis
+				local um = r(N)
+				qui count if `v'==.z				// count # of not applicables (.z)
+				local na = r(N)
+				local sys = `mis' - `um' - `na'		// # of sysmis
+			}
+			else {
+				* string variable
+				local sys = `mis'					// # of sysmis
+				local um = 0						// string variables don't have user-mising or not applicables
+				local na = 0
+				local ntotal = `sys'+`val'			// total number of expected values
+				local pct_miss = 100*(`sys') / `ntotal'			//% of missing values			
+			}
+			local ntotal = `sys'+`um'+`val'		// total number of expected values (without the Not Applicables)
+			local pct_miss = 100*(`sys' + `um') / `ntotal'	// % of missing values
+			local pct_val = 100*`val'/`ntotal'				// % of valid values	
 
-		local f : format `v'
-		local f = subinstr("`f'","-","",.)
-		local daily = substr("`f'",1,3)=="%td"		//date-daily variable
-		local clock = substr("`f'",1,3)=="%tc"		//clock-daily variables
-		di as res %6.0f `res'[`i',1] " " _c
-		if (!`str') di %5.0f `res'[`i',2] " " _c
-		di _col(30) %6.2f `res'[`i',3] " {c |} " _c
-		if (!`str') di %5.0f `res'[`i',4] _c
-		di _col(45) "{c |} " _c
-		di as res %6.0f `res'[`i',5] "  " %6.2f `res'[`i',6] " " _c
-		if (!`str' & !`daily' &!`clock') di %9.0g `res'[`i',7] _c
-		if (!`str' & !`daily' &!`clock') di _col(73) %9.0g `res'[`i',8] "  " %9.0g `res'[`i',9] _c
-		if (`daily') di _col(72) %tdDD/NN/CCYY `res'[`i',8] " " %tdDD/NN/CCYY `res'[`i',9] _c
+			di as res %6.0f `sys' _c
+			if (`lnum') di _col(23) %5.0f `um' _c
+			di _col(30) %6.2f `pct_miss' _col(37) "{c |}" _c
+			if (`lnum') di _col(39) %5.0f `na' _c
+			di _col(45) "{c |}" _c
+			di _col(47) %6.0f `val' _col(55) %6.2f `pct_val' _c
+			
+			local tc : list v in vclock
+			local td : list v in vdaily
+			if (`lnum' & !`tc') {
+				qui sum `v'
+				if (`td') di _col(72) %tdDD/NN/CCYY `r(min)' " " %tdDD/NN/CCYY `r(max)' _c
+				else di _col(62) %9.0g `r(mean)' "  " %9.0g `r(min)' "  " %9.0g `r(max)' _c
+			}
+			
+			local nsys = `nsys' + `sys'
+			local num = `num' + `um'
+			local nval = `nval' + `val'
+			local nna = `nna' + `na'
+		}
+		di as txt _newline "{hline 13}{c +}{hline 22}{c +}{hline 7}{c +}{hline 47}"
+		local pmiss = 100*(`nsys'+`num')/(`nsys'+`num'+`nval')		// percent of missing values
+		local pvalid = 100*(`nval')/(`nsys'+`num'+`nval')			// percent of valid values
+		di as txt "{ralign 12:Total} {c |} " as res %6.0f `nsys' " " %5.0f `num'    /*
+				*/  _col(30) %6.2f 100 * (`nsys'+`num')/(`nsys'+`num'+`nval') 		/*
+				*/	_col(37) "{c |}" %6.0f `nna' _col(45) "{c |} " %6.0f `nval'  	/*
+				*/  _col(55) %6.2f 100*`nval'/(`nsys'+`num'+`nval')
 	}
-
-	mata: st_matrix("`tmp'",colsum(st_matrix("`res'")))
-	local nsys = `tmp'[1,1]			//Total number of sysmis
-	local nuser = `tmp'[1,2]		//Total number of user-missing
-	local na = `tmp'[1,4]			//Total number of Not Appl.
-	local nval = `tmp'[1,5]			//Total number of valid values
-	local pmiss = 100*(`nsys'+`nuser')/(`nsys'+`nuser'+`nval')		//Percent of missing values
-	local pvalid = 100*(`nval')/(`nsys'+`nuser'+`nval')				//Percent of valid values
 	
-	di as txt _newline "{hline 13}{c +}{hline 22}{c +}{hline 7}{c +}{hline 47}"
-	di as txt "{ralign 12:Total} {c |} " as res %6.0f `nsys' " " %5.0f `nuser'    /*
-			*/  _col(30) %6.2f `pmiss' _col(37) "{c |}" %6.0f `na' _col(45) "{c |} "  /*
-			*/  %6.0f `nval' _col(55) %6.2f `pvalid'
-			  
+	local vname = cond("`generate'"=="","_NMiss","`generate'")
+	
+	* total missing values table
 	di
 	di as res "Total missing values by subject"
-	di as txt "{ralign 12:_NMiss} {c |}{ralign 11:Freq.} Percent"
+	local t = cond(("`nogenerate'"==""),"`vname'","")
+	di as txt "{ralign 12:`t'} {c |}{ralign 11:Freq.} Percent"
 	di as txt "{hline 13}{c +}{hline 19}"
-	local len = rowsof(`values')
+	qui tabulate `nmis', matrow(`V') matcell(`F')		// _NMiss statistics
+	local len = rowsof(`V')
 	foreach i of numlist 1/`len'{
-		di as txt %12.0f `values'[`i',1] " {c |} " as res %9.0f `freq'[`i',1] _col(28) %6.2f 100*`freq'[`i',1]/`n'
+		di as txt %12.0f `V'[`i',1] " {c |} " as res %9.0f `F'[`i',1] _col(28) %6.2f 100*`F'[`i',1]/`ntot'
 	}
 	di as txt "{hline 13}{c +}{hline 19}"
-	di as txt _col(8) "Total {c |} " %9.0f `n' _col(28) "100.00"
+	di as txt _col(8) "Total {c |} " %9.0f `ntot' _col(28) "100.00"
 	
-	di
-	di as txt "A new variable named {bf:_NMiss} has been added to the dataset."
-	di as txt "It can be used to identify and drop observations with missing values"
-
-	return scalar nsysmis = `nsys'
-	return scalar nuser = `nuser'
-	return scalar nmissing = `nsys' + `nuser'
-	return scalar pmissing = `pmiss'
-	return scalar na = `na'
-	return scalar nvalid = `nval'
-	return scalar pvalid = `pvalid'
+	restore
 	
-end
-
-program define count_miss, rclass
-	version 12
-	syntax varlist, [str]
-
-	tokenize `varlist'
-	local v `1'
-	local touse `2'
-	
-	tempname r
-	matrix define `r' = J(1,9,.)
-	quietly {
-		qui count if `touse' & !missing(`v')	//Count # of valid values
-		matrix `r'[1,5] = r(N)
-		if ("`str'"=="") {
-			*Numeric/Date var
-			count if `touse' & `v'==.			//Count # of sysmis
-			matrix `r'[1,1] = r(N)
-			count if `touse' & `v'>. & `v'<.z	//Count # of usermis
-			matrix `r'[1,2] = r(N)
-			local ntotal = `r'[1,1]+`r'[1,2]+`r'[1,5]			//Total number of expected values (without the Not Applicables)
-			matrix `r'[1,3] = 100*(`r'[1,1]+`r'[1,2])/`ntotal'	//% of missing values
-			count if `touse' & `v'==.z			//Count #  of not applicable
-			matrix `r'[1,4] = r(N)
-					
-			su `v' if `touse' 		//Get mean, minimum and maximum for each numeric/date variable using summarize
-			matrix `r'[1,7] = r(mean)
-			matrix `r'[1,8] = r(min)
-			matrix `r'[1,9] = r(max)
+	if ("`nogenerate'"=="") {
+		quietly {
+			capture confirm variable `vname'
+			if (!_rc) drop `vname'
+			gen `vname' = `nmis'
+			label variable `vname' "Total missing values by subject"
 		}
-		else {
-			*String var
-			qui count if `touse' & missing(`v')		//Count # of sysmis
-			matrix `r'[1,1] = r(N)
-			local ntotal = `r'[1,1]+`r'[1,5]		//Total number of expected values
-			matrix `r'[1,3] = 100*(`r'[1,1])/`ntotal'	//% of missing values			
-		}
-		matrix `r'[1,6] = 100*`r'[1,5]/`ntotal'			//% of valid values	
+		di
+		di as txt "A new variable named {bf:`vname'} has been added to the dataset."
+		di as txt "It can be used to identify and drop observations with missing values"
 	}
 	
-	return matrix res = `r'	
+	if ("`noreport'"=="") {
+		return scalar nsysmis = `nsys'
+		return scalar nuser = `num'
+		return scalar nmissing = `nsys' + `num'
+		return scalar pmissing = `pmiss'
+		return scalar na = `nna'
+		return scalar nvalid = `nval'
+		return scalar pvalid = `pvalid'
+	}
 end

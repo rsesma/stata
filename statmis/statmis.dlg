@@ -1,7 +1,7 @@
 /*
   statmis.dlg
 
-*! VERSION 1.1.4.?  ?apr2019
+*! VERSION 1.1.4  08apr2019
 
 */
 
@@ -41,7 +41,7 @@ BEGIN
 	CHECKBOX 	ck_nogen	_lft	_ms		_iwd	., label("Do not generate variable to count missing values")		///
 														option(nogenerate) onclickon(opt.ed_nmiss.disable)	///
 														onclickoff(opt.ed_nmiss.enable)
-	CHECKBOX 	ck_noreport	@		_ms		@		., label("Do not display detailed statistics table")	///
+	CHECKBOX 	ck_noreport	@		_ms		@		., label("Do not display detailed missing statistics table")	///
 														option(noreport) 
 END
 

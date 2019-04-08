@@ -1,5 +1,5 @@
-*! version 1.1.4.?  ?apr2019 JM. Domenech, R. Sesma
-*statmis0: version 1.1.3  22oct2018
+*! version 1.1.4 08apr2019 JM. Domenech, R. Sesma
+
 /*
 statmis: missing statistics
 */
@@ -40,8 +40,7 @@ program define statmis, rclass
 		local vnum = r(varlist)		// list of numeric variables
 		ds `vlist', has(type str#)
 		local vstr = r(varlist)		// list of string variables
-		ds `vlist', has(type str#)
-		local vstr = r(varlist)		// list of string variables
+		if ("`r(varlist)'"=="") local vstr
 		ds `vlist', has(format %td*)
 		local vdaily = r(varlist)	// list of daily variables
 		ds `vlist', has(format %tc*)
@@ -147,8 +146,7 @@ program define statmis, rclass
 	
 	if ("`nogenerate'"=="") {
 		quietly {
-			capture confirm variable `vname'
-			if (!_rc) drop `vname'
+			capture drop `vname'
 			gen `vname' = `nmis'
 			label variable `vname' "Total missing values by subject"
 		}

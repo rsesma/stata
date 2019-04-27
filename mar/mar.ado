@@ -1,4 +1,4 @@
-*! version 1.4.3 05mar2019 JM. Domenech, R. Sesma
+*! version 1.4.4 27apr2019 JM. Domenech, R. Sesma
 
 /*
 META-ANALYSIS: OR,RR,RD,IR,ID,B,MD,R COMBINED
@@ -526,6 +526,7 @@ program define mar, rclass
 		di as txt "{hline 24}{c +}{hline 12}{c +}{hline 9}{c +}{hline 22}"
 	}
 
+	if ("`type'"=="raw" & "`stat'"=="or") local title = "OR"
 	local z " "
 	if ("`type'"=="raw" & `lzeros' & "`zero'"!="n") local z "*"
 	if ("`type'"=="raw" & "`stat'"=="or") {
@@ -534,7 +535,7 @@ program define mar, rclass
 		*/	%6.4f `peto'[1,5] " {c |} " %9.0g `peto'[1,3] "  " %9.0g `peto'[1,4] 
 		if (`peto'[1,1] < 1) di as txt "{ralign 23:1/OR} {c |}  " as res %9.0g 1/`peto'[1,1] " {c |} " /*
 		*/	 _col(48)"{c |} " %9.0g 1/`peto'[1,4] "  " %9.0g 1/`peto'[1,3] 
-		di as txt "{ralign 24:SE(lnOR)}{c |}  " as res %9.0g `peto'[1,2] " {c |} " _col(48) "{c |}"
+		di as txt "{ralign 24:SE(lnOR_peto)}{c |}  " as res %9.0g `peto'[1,2] " {c |} " _col(48) "{c |}"
 		di as txt " Homogeneity Chi-Square {c |}  " as res %9.0g `peto'[1,6] " {c |}  " %6.4f `peto'[1,7] " {c |}"
 		return scalar stat_peto = `peto'[1,1]		//RETURNED RESULTS
 		return scalar se_peto = `peto'[1,2]

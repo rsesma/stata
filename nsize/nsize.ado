@@ -1,4 +1,4 @@
-*! version 1.2.8  11may2018 JM. Domenech, R. Sesma
+*! version 1.2.9.dlg  ?may2019 JM. Domenech, R. Sesma
 /*
 SAMPLE SIZE & POWER
 **PROPORTIONS
@@ -38,7 +38,7 @@ program define nsize
 	*/	"`type'"!="ci1p" & "`type'"!="ci2p" & "`type'"!="ci1m" &	/*
 	*/	"`type'"!="ci2m" & "`type'"!="co1c" & "`type'"!="co2c" &	/*
 	*/	"`type'"!="co2r" & "`type'"!="co2i" & "`type'"!="ncr")	print_error "type `type' invalid"
-	
+
 	nsize_`type' `rhs'
 end
 
@@ -79,7 +79,7 @@ program define nsize_cop, rclass
 	if ("`alpha'"=="") local alpha 5
 	if ("`beta'"!="" & "`n'"!="") print_error "invalid data -- n and beta not compatible"
 	if ("`beta'"=="") local beta 20 15 10
-	
+
 	*Title
 	di as res "SAMPLE SIZE & POWER DETERMINATION: " /*
 	*/	cond("`type'"=="co1p","One single proportion","Two-independent proportions")
@@ -194,7 +194,7 @@ program define nsize_cop, rclass
 			print_pct `p2', nopercent col(42) newline
 			local c1 : word `i' of `rlbl'
 			return scalar `c1'_2 = `r'[`i',1]
-			return scalar `c1'_1 = `r'[`i',2]			
+			return scalar `c1'_1 = `r'[`i',2]
 		}
 		di as txt "{hline 18}{c BT}{hline 16}{c BT}{hline 17}"
 	}
@@ -209,7 +209,7 @@ program define nsize_c1pe
 	syntax [anything], p0(numlist max=1 >0 <100) p1(numlist max=1 >0 <100)  		/*
 	*/	 delta(numlist max=1) [n(numlist integer max=1 >1) Alpha(numlist max=1 >0 <=50) 	/*
 	*/	 NONINF SUPER Beta(numlist max=1 >0 <=50) nst(string)]
-	
+
 	nsize_cpe c1pe, p0(`p0') p1(`p1') delta(`delta') n(`n') alpha(`alpha') /*
 	*/	beta(`beta') noninf("`noninf'") super("`super'") nst(`nst')
 end
@@ -240,7 +240,7 @@ program define nsize_cpe, rclass
 	else if ("`super'"!="") local lim 2
 	else local lim 3
 	if ("`alpha'"=="") local alpha 5
-	
+
 	local power = ("`type'"=="c1pe" & "`n'"!="") | ("`type'"=="c2pe" & ("`n1'"!="" | "`n0'"!=""))
 	if ("`type'" == "c1pe") {
 		if ("`beta'"!="" & "`n'"!="") print_error "options beta and n are incompatible"
@@ -255,7 +255,7 @@ program define nsize_cpe, rclass
 			if ("`n1'"=="") local n1 = round(`n0'/`r')				//Compute n1 from n0, r
 		}
 	}
-	
+
 	*Title
 	di as res "SAMPLE SIZE & POWER DETERMINATION: " /*
 	*/	cond("`type'"=="c1pe","One single proportion (equivalence)", /*
@@ -267,7 +267,7 @@ program define nsize_cpe, rclass
 	di as txt "Proportion (%) of events in:    Reference Treatment = `p0'%"
 	di as txt "Proportion (%) of events in: Experimental Treatment = `p1'%"
 	di as txt "{ralign 51:`c' limit} = `delta'%"
-	
+
 	local p0 = `p0'/100
 	local p1 = `p1'/100
 	local delta = `delta'/100
@@ -307,7 +307,7 @@ program define nsize_cpe, rclass
 				}
 				local lfirst 0
 			}
-		
+
 			*Print & Store results
 			local crows n0 n1 n
 			local ccols 80 85 90
@@ -362,7 +362,7 @@ program define nsize_cpe, rclass
 			*Compute results
 			if ("`type'"=="c1pe") nsize__utils get_power `p0' `p1' `delta' `n', type("`type'") alpha(`alpha') lim(`lim')
 			if ("`type'"=="c2pe") nsize__utils get_power `p0' `p1' `delta' `n0' `n1', type("`type'") alpha(`alpha') lim(`lim')
-			
+
 			*Print & Store results
 			if ("`type'"=="c1pe") di as txt "Sample size: n = `n'"
 			if ("`type'"=="c2pe") di as txt "Sample size: n0 = `n0'; n1 = `n1' (Ratio n0/n1 = `r')"
@@ -382,7 +382,7 @@ program define nsize_cpe, rclass
 		di as txt _newline "{bf:WARNING!} Test not computable -- delta(`delta') must be " _c
 		if (`lim'==1) di as txt "on the interval (`min1',`max1') or (`min2',`max2')"
 		if (`lim'==2) di as txt "on the interval (`min1',`max1')"
-		if (`lim'==3) di as txt "greater than `min1'"		
+		if (`lim'==3) di as txt "greater than `min1'"
 	}
 end
 
@@ -403,7 +403,7 @@ program define nsize_copp, rclass
 	if ("`n'"!="" & "`pd'"=="" & "`p0'"=="" & "`ora'"=="") print_error "missing option pd(), p0() or ora()"
 	if ("`alpha'"=="") local alpha 5
 	if ("`beta'"=="") local beta 20 15 10
-	
+
 	local type 0
 	if ("`pd'"!="") {
 		local pd = `pd'/100
@@ -417,11 +417,11 @@ program define nsize_copp, rclass
 		local pd = ((`or'+1)*`p0'*(1-`p0')/(1+(`or'-1)*`p0'))*((sqrt(1+4*(`ora'-1)*`p1'*`q1')-1)/(2*(`ora'-1)*`p1'*`q1'))
 	}
 	if ("`pd'"!="") local diff= `pd'*(`or'-1)/(`or'+1)		//Estimate of the difference of proportions P1-P0
-	
+
 	*Title
 	di "{bf:SAMPLE SIZE & POWER: Paired proportions}"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
-	
+
 	*Header
 	di
 	di as txt "Expected Response/Exposure Odds Ratio:    OR = " %5.2f `or'
@@ -436,11 +436,11 @@ program define nsize_copp, rclass
 	if (`type'==2) {
 		di as txt "{col 5}Proportion Difference (estimated): P1-P0 = " _c
 		local v = `diff'*100
-		print_pct `v', astxt newline 	
+		print_pct `v', astxt newline
 		di as txt "{col 5}Proportion of exposed in Controls:    P0 = " _c
 		local v = `p0'*100
-		print_pct `v', astxt newline 	
-		di as txt "{col 19}Marginal Odds Ratio:   ORa = `ora'" 
+		print_pct `v', astxt newline
+		di as txt "{col 19}Marginal Odds Ratio:   ORa = `ora'"
 		di as txt "{col 5}Proportion of Discordant pairs"
 		di as txt "{col 15}Fleiss-Levin estimation:    Pd = " _c
 		local v = `pd'*100
@@ -461,7 +461,7 @@ program define nsize_copp, rclass
 				local lfirst 0
 			}
 		}
-		
+
 		*Print & Store results
 		local rows = rowsof(`res')
 		local cols = colsof(`res')
@@ -499,7 +499,7 @@ program define nsize_copp, rclass
 				else {
 					if (`i'==3)	di as txt _newline "Continuity correction" _col(23) "{c |}" _col(`i1') "{c |}" _c
 					if (`i'==3)	di as txt _newline "{ralign 21:Discordant    Cases} {c |}" _c
-					if inlist(`i',2,4)	di as txt _newline "{ralign 21:Discordant Controls} {c |}" _c						
+					if inlist(`i',2,4)	di as txt _newline "{ralign 21:Discordant Controls} {c |}" _c
 				}
 			}
 			else {
@@ -518,21 +518,21 @@ program define nsize_copp, rclass
 					if inlist(`i',4,8,12) di as txt _newline "{ralign 21:Total Controls} {c |}" _c
 				}
 			}
-			
+
 			foreach j of numlist 1/`cols' {
 				if (`cols'>2) di as res %6.0f `res'[`i',`j'] " " cond(`j'==3,"{c |}","") _c
 				else di as res %10.0f `res'[`i',`j'] _col(40) cond(`j'==1,"{c |}","") _c
 			}
-			
+
 			if (`i'==1 & "`pd'"=="" & `r'==1) | (`i'==2 & "`pd'"=="" & `r'>1) |		/*
 			*/	(`i'==2 & "`pd'"!="" & `r'==1) | (`i'==4 & "`pd'"!="" & `r'==1) |	/*
 			*/	(`i'==4 & "`pd'"!="" & `r'>1) | (`i'==8 & "`pd'"!="" & `r'>1) {
 				di as txt _newline "{hline 22}{c +}{hline `i2'}{c +}{hline `i2'}" _c
-			}			
+			}
 		}
 		di as txt _newline "{hline 22}{c BT}{hline `i2'}{c BT}{hline `i2'}"
 		if ("`pd'"!="") di as txt "(*) Recommended method"
-		
+
 		//Stored results
 		if (`cols'==2) matrix colnames `res' = TwoSided OneSided
 		else matrix colnames `res' = TwoSided_80 TwoSided_85 TwoSided_90 OneSided_80 OneSided_85 OneSided_90
@@ -557,7 +557,7 @@ program define nsize_copp, rclass
 			nsize__utils get_power `or' `n' `r' `pd', type("copp") alpha(`a')
 			local p`i' = r(p)
 		}
-		
+
 		*Print & Store results
 		di as txt _col(3) "Sample Size (Total number of Cases):     n = `n'"
 		di as txt _newline "METHOD: Normal (Connett approach)"
@@ -624,17 +624,17 @@ program define nsize_com, rclass
 		if ("`n0'"!="" | "`n1'"!="") {
 			if ("`n1'"!="" & "`n0'"!="") local r = `n0'/`n1'		//Compute r from n0, n1
 			if ("`n0'"=="") local n0 = round(`n1'*`r')				//Compute n0 from n1, r
-			if ("`n1'"=="") local n1 = round(`n0'/`r')				//Compute n1 from n0, r			
+			if ("`n1'"=="") local n1 = round(`n0'/`r')				//Compute n1 from n0, r
 		}
 	}
 	if ("`alpha'"=="") local alpha 5
-	
+
 	*Title
 	if ("`type'" == "co1m") di as txt "{bf:SAMPLE SIZE (MEAN) & POWER DETERMINATION: One sample}"
 	if ("`type'" == "co2m") di as txt "{bf:SAMPLE SIZE (MEAN) & POWER DETERMINATION: Two-independent samples}"
 	if ("`type'" == "c2me") di as txt "{bf:SAMPLE SIZE (EQUIVALENCE MEANS) & POWER DETERMINATION: Two-independent samples}"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
-	di 
+	di
 	di as txt "Common standard deviation = `sd'"
 	if ("`effect'"!="") di as txt "Minimum expected effect size = `effect'"
 	if ("`eqlim'"!="")  di as txt "Equivalence limits = `eqlim'"
@@ -650,7 +650,7 @@ program define nsize_com, rclass
 			foreach b of numlist `beta' {
 				if ("`type'"=="co1m" | "`type'"=="co2m") local a = `alpha'/`i'
 				else local a = `alpha'
-				if ("`type'"=="c2me") local b = `b'/`i'				
+				if ("`type'"=="c2me") local b = `b'/`i'
 				nsize__utils get_nsize `sd' `effect' `eqlim', type(`type') alpha(`a') beta(`b') r(`r')
 				if ("`type'"=="co1m" | "`type'"=="c2me") {
 					if (`lfirst') matrix `res' = (r(n))
@@ -664,7 +664,7 @@ program define nsize_com, rclass
 				if r(warn) local warning 1
 			}
 		}
-		
+
 		*Print results
 		local rows = rowsof(`res')
 		local cols = colsof(`res')
@@ -719,7 +719,7 @@ program define nsize_com, rclass
 						}
 					}
 					di
-				}				
+				}
 			}
 			if ("`type'"=="c2me") {
 				foreach i of numlist 1/`cols' {
@@ -733,7 +733,7 @@ program define nsize_com, rclass
 			}
 			local c "(*)"
 		}
-		
+
 		//Store results
 		foreach i of numlist 1/`rows' {
 			local c1 : word `i' of `crows'
@@ -774,7 +774,7 @@ program define nsize_com, rclass
 				local beta1 = r(beta)
 				local beta2 = 2*r(beta)
 			}
-			
+
 			*Print & Store results
 			di as txt "Alpha Risk = `alpha'%"
 			di
@@ -783,7 +783,7 @@ program define nsize_com, rclass
 			di as txt " Two-Sided Test: Pow = " _c
 			print_pct `pow2'
 			di as txt " (Beta Risk = " _c
-			print_pct `beta2' 
+			print_pct `beta2'
 			di as txt ")"
 			local pow1 = (100-`beta1')
 			di as txt " One-Sided Test: Pow = " _c
@@ -791,7 +791,7 @@ program define nsize_com, rclass
 			di as txt " (Beta Risk = " _c
 			print_pct `beta1'
 			di as txt ")"
-			
+
 			return scalar p1 = 100-`beta1'
 			return scalar p2 = 100-`beta2'
 		}
@@ -813,7 +813,7 @@ program define nsize_com, rclass
 				else matrix `res' = `res' \ (`e2',`e1')
 				local lfirst 0
 			}
-			
+
 			*Print results
 			local rows = rowsof(`res')
 			local cols = colsof(`res')
@@ -823,7 +823,7 @@ program define nsize_com, rclass
 			if (`rows'>1) {
 				local rlbl1 "Power  80%"
 				local rlbl2 "85%"
-				local rlbl3 "90%"			
+				local rlbl3 "90%"
 				di
 				di as txt "{ralign 12:Alpha Risk} {c |}{center 21:`c1'}{c |}{center 21:`c2'}"
 				di as txt "{ralign 12:= `alpha'%} {c |}{center 21:`c3'}{c |}{center 21:`c3'}"
@@ -846,7 +846,7 @@ program define nsize_com, rclass
 					*/		cond("`type'"=="c2me","Eq","Effect") " = " as res %9.0g `res'[1,`i']
 				}
 			}
-			
+
 			//Store results
 			local crows = cond(`rows'>1,"_80 _85 _90","")
 			local ccols = "_2 _1"
@@ -881,13 +881,13 @@ program define nsize_cokm, rclass
 		if ("`means'"!="" & `ms'!=`ns') print_error "means and nk must have the same number of elements"
 		if ("`means'"=="" & `ns'!= 1) print_error "nk() invalid -- list not allowed"
 	}
-	
+
 	*Title
 	di as txt "{bf:SAMPLE SIZE (MEAN) & POWER: k-independents samples (ANOVA)}"
 	if ("`nst'"!="") display as text "{bf:STUDY:} `nst'"
-	
+
 	*Header
-	di 
+	di
 	di as txt "Common standard deviation = `sd'"
 	if ("`means'"=="") {
 		di as txt "Minimum expected effect size = `effect'"
@@ -905,7 +905,7 @@ program define nsize_cokm, rclass
 			else di as txt "Group `j': " %9.0g `m' " " %4.0f `n'
 		}
 	}
-	
+
 	if ("`nk'"=="") {
 		*Sample Size
 		*Compute results
@@ -933,7 +933,7 @@ program define nsize_cokm, rclass
 	else {
 		*Power, Print & Store results
 		nsize__utils get_power `sd' `c' `effect', type(cokm) means(`means') nk(`nk')
-		di 
+		di
 		di as txt "Alpha   Power"
 		di as txt "   5%   " _c
 		print_pct `r(p5)', newline
@@ -949,7 +949,7 @@ program define nsize_ci1p
 	syntax [anything], p0(numlist >0 <100) 		/*
 	*/	[APre(numlist) ns(numlist integer >1)  	/*
 	*/	 cl(numlist >=50 <100) n(numlist integer >1) nst(string)]
-	
+
 	nsize_ci ci1p, p0(`p0') apre(`apre') ns(`ns') cl(`cl') n(`n') nst(`nst')
 end
 
@@ -958,7 +958,7 @@ program define nsize_ci2p
 	syntax [anything], p0(numlist max=1 >0 <100) p1(numlist max=1 >0 <100)	/*
 	*/	[APre(numlist) r(numlist max=1 >0) cl(numlist >=50 <100)  	/*
 	*/	 n0(numlist max=1 integer >1) n1(numlist max=1 integer >1) nst(string)]
-	
+
 	nsize_ci ci2p, p0(`p0') p1(`p1') apre(`apre') n0(`n0') n1(`n1') r(`r') cl(`cl') nst(`nst')
 end
 
@@ -967,7 +967,7 @@ program define nsize_ci1m
 	syntax [anything], sd(numlist max=1 >0)		/*
 	*/	[APre(numlist) ns(numlist max=1 integer >1)  	/*
 	*/	 cl(numlist >=50 <100) n(numlist integer >1) nst(string)]
-	
+
 	nsize_ci ci1m, sd(`sd') apre(`apre') ns(`ns') cl(`cl') n(`n') nst(`nst')
 end
 
@@ -976,7 +976,7 @@ program define nsize_ci2m
 	syntax [anything], sd(numlist max=1 >0)		/*
 	*/	[APre(numlist) n0(numlist max=1 integer >1) n1(numlist max=1 integer >1)  	/*
 	*/	 cl(numlist >=50 <100) r(numlist max=1 >0) nst(string)]
-	
+
 	nsize_ci ci2m, sd(`sd') apre(`apre') n0(`n0') n1(`n1') r(`r') cl(`cl') nst(`nst')
 end
 
@@ -985,7 +985,7 @@ program define nsize_ci, rclass
 	syntax anything(name=type), [p0(numlist) p1(numlist) sd(numlist) 	/*
 	*/	apre(numlist) ns(numlist) cl(numlist) n(numlist) 	/*
 	*/	n0(numlist) n1(numlist) r(numlist) nst(string)]
-	
+
 	if ("`apre'"!="") {
 		local i : list sizeof p0
 		if (`i'>1) print_error "p0() invalid -- single number required"
@@ -1015,7 +1015,7 @@ program define nsize_ci, rclass
 			if ("`n0'"!="" | "`n1'"!="") {
 				if ("`n1'"!="" & "`n0'"!="") local r = `n0'/`n1'		//Compute r from n0, n1
 				if ("`n0'"=="") local n0 = round(`n1'*`r')				//Compute n0 from n1, r
-				if ("`n1'"=="") local n1 = round(`n0'/`r')				//Compute n1 from n0, r			
+				if ("`n1'"=="") local n1 = round(`n0'/`r')				//Compute n1 from n0, r
 			}
 		}
 	}
@@ -1026,15 +1026,15 @@ program define nsize_ci, rclass
 		}
 		if ("`type'"=="ci2p" | "`type'"=="ci2m") local cl 90 95 97.5 99
 		if ("`type'"=="ci1m") local cl 90 95 99
-	}	
-	
+	}
+
 	*Title
 	if ("`type'" == "ci1p") di as res "SAMPLE SIZE: Estimation of population proportion"
 	if ("`type'" == "ci2p") di as res "SAMPLE SIZE: CI of difference between two proportions (independent samples)"
 	if ("`type'" == "ci1m") di as res "SAMPLE SIZE: Estimation of population mean"
 	if ("`type'" == "ci2m") di as res "SAMPLE SIZE: Difference between two means (independent samples)"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
-	
+
 	*Header
 	di
 	if ("`type'" == "ci1p") {
@@ -1059,7 +1059,7 @@ program define nsize_ci, rclass
 	}
 	di as txt "NORMAL method"
 	di
-	
+
 	*Compute results
 	tempname res t
 	if ("`apre'"!="") {
@@ -1084,7 +1084,7 @@ program define nsize_ci, rclass
 			}
 			local i = `i'+`z'
 		}
-		
+
 		*Print & Store results
 		local rows = rowsof(`res')
 		local cols = colsof(`res')
@@ -1143,14 +1143,14 @@ program define nsize_ci, rclass
 			local pos = cond(`cols'==1,18,32)
 			if (`cols'==1) local line "{hline 16}{c +}{hline 18}"
 			else local line "{hline 16}{c +}{hline 10}{c +}{hline 10}{c +}{hline 10}{c +}{hline 10}"
-			
+
 			di as txt _col(17) "{c |}NUMBER of subjects"
 			di as txt "PRECISION" _col(17) "{c |}{col `pos'}Confidence level"
 			di as txt "of CI({c 177}d){col 12}Group{c |}" _c
 			if (`cols'>1) di as txt "{ralign 8:90}% {c |}{ralign 8:95}% {c |}{ralign 8:97.5}% {c |}{ralign 8:99}%"
 			else di as txt "{ralign 9:`cl'}%"
 			di as txt "`line'" _c
-			
+
 			local rownames
 			local z 1
 			foreach a of numlist `apre' {
@@ -1165,12 +1165,12 @@ program define nsize_ci, rclass
 					}
 					local rownames = "`rownames' `c'_`a'"
 				}
-				local z = `z'+1				
+				local z = `z'+1
 				if (`row'<`rows') di as txt _newline "`line'" _c
 			}
 			local line = subinstr("`line'","+","BT",.)
 			di as txt _newline "`line'"
-			
+
 			matrix colnames `res' = `cl'
 			matrix rownames `res' = `rownames'
 		}
@@ -1207,7 +1207,7 @@ program define nsize_ci, rclass
 				local i = `i'+1
 			}
 		}
-		
+
 		*Print & Store results
 		local rows = rowsof(`res')
 		local cols = colsof(`res')
@@ -1234,7 +1234,7 @@ program define nsize_ci, rclass
 				else di as txt _newline "{hline 8}{c BT}{hline `len'}" _c
 			}
 			di
-			
+
 			matrix rownames `res' = `ns'
 			matrix colnames `res' = `p0'
 			return matrix Precision = `res'
@@ -1258,7 +1258,7 @@ program define nsize_ci, rclass
 			}
 			if (`cols'>1) di as txt _newline "{hline 8}{c BT}{hline 10}{c BT}{hline 10}{c BT}{hline 10}"
 			else di as txt _newline "{hline 8}{c BT}{hline 16}"
-			
+
 			foreach i of numlist 1/`cols' {
 				local c : word `i' of `cl'
 				local c = subinstr("`c'",".","",.)
@@ -1296,7 +1296,7 @@ program define nsize_ci, rclass
 			if (`cols'>1) di as txt _col(23) "{c |}" _col(32) "{c |}"_col(41) "{c |}" _c
 			if (`cols'>1) di as txt _newline "{hline 13}{c BT}{hline 8}{c BT}{hline 8}{c BT}{hline 8}{c BT}{hline 8}"
 			else di as txt _newline "{hline 13}{c BT}{hline 16}"
-			
+
 			foreach i of numlist 1/`cols' {
 				local c : word `i' of `cl'
 				local c = subinstr("`c'",".","",.)
@@ -1331,7 +1331,7 @@ program define nsize_cor, rclass
 	syntax anything(name=type), [cr(numlist) cr0(numlist) 	/*
 	*/	cr1(numlist) effect(numlist) alpha(numlist) beta(numlist) 	/*
 	*/	n0(numlist) n1(numlist) nst(string)]
-	
+
 	if ("`cr1'"=="" & "`effect'"=="") print_error "option cr1 or effect missing"
 	if ("`cr1'"!="" & "`effect'"!="") print_error "options cr1 and effect are incompatible"
 	if ("`cr1'"=="" & "`effect'"!="") {
@@ -1350,7 +1350,7 @@ program define nsize_cor, rclass
 		}
 	}
 	if ("`alpha'"=="") local alpha 5
-	
+
 	*Title & Header
 	di as res "SAMPLE SIZE & POWER DETERMINATION: " cond("`type'"=="co1c","One","Two") /*
 	*/			" correlation coefficient" cond("`type'"=="co1c","","s")
@@ -1386,7 +1386,7 @@ program define nsize_cor, rclass
 				local first 0
 			}
 		}
-		
+
 		*Print & Store results
 		local cols = colsof(`res')
 		local c = cond("`type'"=="co2c","SAMPLE SIZE by group","SAMPLE SIZE")
@@ -1401,7 +1401,7 @@ program define nsize_cor, rclass
 				di as res %6.0f `res'[1,`i'] cond(`i'==3,"  {c |}"," ") _c
 			}
 			display _newline "{hline 13}{c BT}{hline 22}{c BT}{hline 22}"
-			
+
 			local cnames "80_2 85_2 90_2 80_1 85_1 90_1"
 			foreach i of numlist 1/`cols' {
 				local c : word `i' of `cnames'
@@ -1444,9 +1444,9 @@ program define nsize_ncr, rclass
 	*/	 nst(string)]
 
 	if ("`alpha'" == "") local alpha 5
-	local def = ("`beta'"=="") 
+	local def = ("`beta'"=="")
 	if ("`beta'" == "") local beta 20 15 10
-	
+
 	*Title & Header
 	di as res "NUMBER OF COMMUNITIES (RISK): Intervention trials"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
@@ -1458,7 +1458,7 @@ program define nsize_ncr, rclass
 		di as txt "Alpha Risk= `alpha'%"
 		di as txt "Beta Risk = `beta'%"
 	}
-	
+
 	*Compute results (no power results)
 	tempname res
 	local first 1
@@ -1472,7 +1472,7 @@ program define nsize_ncr, rclass
 			local first 0
 		}
 	}
-	
+
 	*Print results
 	local rows = rowsof(`res')
 	local cols = colsof(`res')
@@ -1499,7 +1499,7 @@ program define nsize_ncr, rclass
 	}
 	if (`def') di _newline "{hline 21}{c BT}{hline 22}{c BT}{hline 22}"
 	else di _newline "{hline 21}{c BT}{hline 16}{c BT}{hline 16}"
-	
+
 	*Store results
 	local ccols "80_2 85_2 90_2 80_1 85_1 90_1"
 	foreach i of numlist 1/`rows'{
@@ -1510,7 +1510,7 @@ program define nsize_ncr, rclass
 			else return scalar nc_`c' = `res'[`i',`j']
 		}
 	}
-	
+
 end
 
 program define nsize_co2r, rclass
@@ -1552,7 +1552,7 @@ program define nsize_co2r, rclass
 		if ("`pe1'"=="" & "`or'"=="") print_error "missing option pe1() or or()"
 		if ("`pe1'"!="" & "`or'"!="") print_error "option pe1() is incompatible with option or()"
 		if ("`n1'"!="" | "`n0'"!="") print_error "options n1 and n0 are incompatible with case-control studies"
-		local size = ("`m1'"=="" & "`m0'"=="") 
+		local size = ("`m1'"=="" & "`m0'"=="")
 		if (!`size' & "`beta'"!="") print_error "option beta is incompatible with power results"
 		if ("`m1'"!="" & "`m0'"!="" & "`r'"!="") print_error "option r() is incompatible with options m1, m0"
 	}
@@ -1574,7 +1574,7 @@ program define nsize_co2r, rclass
 		local m1 = ceil(`m1')
 	}
 	if (`r'<=0) print_error "r() invalid -- invalid number, outside of allowed range"
-	
+
 	*Title
 	di as res "SAMPLE SIZE (RISK) & POWER: Two-independent samples"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
@@ -1590,7 +1590,7 @@ program define nsize_co2r, rclass
 		local p0 = `pe0'
 		if ("`pe1'"!="") local p1 = `pe1'
 	}
-	if ("`or'"!="") local p1 = (100*(`p0'/(100-`p0'))*`or')/(((`p0'/(100-`p0'))*`or')+1)		
+	if ("`or'"!="") local p1 = (100*(`p0'/(100-`p0'))*`or')/(((`p0'/(100-`p0'))*`or')+1)
 	local rr = `p1'/`p0'
 	local or = (`p1'/(100-`p1'))/(`p0'/(100-`p0'))
 	local rd = `p1'-`p0'
@@ -1607,7 +1607,7 @@ program define nsize_co2r, rclass
 		di as txt "                          Cases    (Group 1)= " trim(string(`p1',"%5.0g")) "%"
 		di as txt "Minimum expected: OR= " trim(string(`or',"%9.0g"))
 	}
-	
+
 	tempname res t
 
 	local warning 0
@@ -1630,7 +1630,7 @@ program define nsize_co2r, rclass
 				if (r(warning)) local warn 1
 			}
 		}
-		
+
 		*Print results
 		if ("`pe'"!="") local pe_text = "(pe= " + string(`pe',"%5.2f") + "%)"
 		local rows = rowsof(`res')
@@ -1667,7 +1667,7 @@ program define nsize_co2r, rclass
 		}
 		if (`cols'>2) di as txt _newline "{hline 22}{c BT}{hline 21}{c BT}{hline 21}"
 		else di as txt _newline "{hline 22}{c BT}{hline 16}{c BT}{hline 16}"
-		
+
 		local nm = cond(`cohort',"n","m")
 		matrix rownames `res' = Norm_`c0' Norm_`c1' Norm_`nm' NormCor_`c0' NormCor_`c1' NormCor_`nm' ArcSin_`c0' ArcSin_`c1' ArcSin_`nm'
 		if (`cols'>2) matrix colnames `res' = TwoSided_80 TwoSided_85 TwoSided_90 OneSided_80 OneSided_85 OneSided_90
@@ -1692,13 +1692,13 @@ program define nsize_co2r, rclass
 		else {
 			if ((`m0'*`p0'/100)<10 | (`m0'*(1-`p0'/100))<10 | (`m1'*`p1'/100)<10 | (`m1'*(1-`p1'/100))<10) local warn 1
 		}
-		
+
 		*Print results
 		if ("`pe'"!="") local pe_text = string(`pe',"%5.2f")
 		di as txt "Sample size: `c0' = " cond(`cohort',"`n0'","`m0'") " ; `c1' = "  cond(`cohort',"`n1'","`m1'") /*
 		*/			" (Ratio `c0'/`c1' = " trim(string(`r',"%9.0g")) cond("`pe'"!=""," [pe= `pe_text'%])",")")
 		di as txt "Alpha Risk = `alpha'%"
-		
+
 		local rows = rowsof(`res')
 		local cols = colsof(`res')
 		di as txt _col(19) "{c |}{center 33:POWER (%)}"
@@ -1715,12 +1715,12 @@ program define nsize_co2r, rclass
 			}
 		}
 		di as txt _newline "{hline 18}{c BT}{hline 16}{c BT}{hline 16}"
-		
+
 		matrix rownames `res' = Normal NormalCor ArcoSinus
 		matrix colnames `res' = TwoSided OneSided
 		return matrix Power = `res'
 	}
-    
+
 	if (`warning' | `warn') {
 		di as txt "(*)WARNING: Applicability conditions for Normal method not granted"
 		if (`warning') di as txt "P0 and P1 must be >=20 and <=80"
@@ -1735,7 +1735,7 @@ program define nsize_co2i, rclass
 	*/	[i1(numlist max=1 >0) id(numlist max=1) ir(numlist max=1 >0)	/*
 	*/	 r(numlist max=1 >0) Alpha(numlist max=1 >0 <=50) Beta(numlist max=1 >0 <=50) 	/*
 	*/	 n1(numlist integer max=1 >1) n0(numlist integer max=1 >1) nst(string)]
-	
+
 	if ("`i1'"=="" & "`ir'"=="" & "`id'"=="") print_error "missing option i1() or ir() or id()"
 	if ("`i1'"!="" & ("`ir'"!="" | "`id'"!="")) print_error "option i1() is incompatible with options ir, id"
 	if ("`ir'"!="" & ("`i1'"!="" | "`id'"!="")) print_error "option ir() is incompatible with options i1, id"
@@ -1771,7 +1771,7 @@ program define nsize_co2i, rclass
 	*Title
 	di as res "SAMPLE SIZE (RATE) & POWER: Two-independent samples"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
-	
+
 	*Header
 	di
 	di as txt "Rate of events in: UnExposed (Group 0)= " trim(string(`i0',"%9.0g"))
@@ -1781,7 +1781,7 @@ program define nsize_co2i, rclass
 	di as txt "Minimum expected: IR= " trim(string(`ir',"%6.0g")) ";   ID= " trim(string(`id',"%9.0g"))
 
 	tempname res t
-	
+
 	local warn 0
 	local warning 0
 	if (`i0'*`d'<0.2 | `i1'*`d'<0.2 | `i0'*`d'>0.8 | `i1'*`d'>0.8) local warning 1
@@ -1800,7 +1800,7 @@ program define nsize_co2i, rclass
 				if (r(warning)) local warn 1
 			}
 		}
-		
+
 		*Print results
 		local rows = rowsof(`res')
 		local cols = colsof(`res')
@@ -1835,7 +1835,7 @@ program define nsize_co2i, rclass
 		}
 		if (`cols'>2) di as txt _newline "{hline 22}{c BT}{hline 21}{c BT}{hline 21}"
 		else di as txt _newline "{hline 22}{c BT}{hline 16}{c BT}{hline 16}"
-		
+
 		matrix rownames `res' = Norm_n0 Norm_n1 Norm_n NormCor_n0 NormCor_n1 NormCor_n ArcSin_n0 ArcSin_n1 ArcSin_n
 		if (`cols'>2) matrix colnames `res' = TwoSided_80 TwoSided_85 TwoSided_90 OneSided_80 OneSided_85 OneSided_90
 		else matrix colnames `res' = TwoSided OneSided
@@ -1858,7 +1858,7 @@ program define nsize_co2i, rclass
 		*Print results
 		di as txt "Sample size: n0 = `n0' ; n1 = `n1' (Ratio n0/n1 = " trim(string(`r',"%4.0g")) ")"
 		di as txt "Alpha Risk = `alpha'%"
-		
+
 		local rows = rowsof(`res')
 		local cols = colsof(`res')
 		di as txt _col(19) "{c |}{center 33:POWER (%)}"
@@ -1875,7 +1875,7 @@ program define nsize_co2i, rclass
 			}
 		}
 		di as txt _newline "{hline 18}{c BT}{hline 16}{c BT}{hline 16}"
-		
+
 		matrix rownames `res' = Normal NormalCor ArcoSinus
 		matrix colnames `res' = TwoSided OneSided
 		return matrix Power = `res'
@@ -1896,7 +1896,7 @@ program define print_pct
 	local fmt = cond(abs(`p')<10,cond(abs(`p')<1,"%`a'.0g","%`a'.2f"),"%`a'.1f")
 	local c = cond("`col'"=="","","_col(`col')")
 	local as = cond("`astxt'"=="","as res","as txt")
-	
+
 	di `as' `c' `fmt' `p' _c
 	if ("`percent'"=="") di as txt "%" _c
 	if ("`newline'"!="") di as txt " "
@@ -1904,6 +1904,6 @@ end
 
 program define print_error
 	args message
-	di as err "`message'" 
+	di as err "`message'"
 	exit 198
 end

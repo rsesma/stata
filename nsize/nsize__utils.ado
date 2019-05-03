@@ -1,4 +1,4 @@
-*! version 1.2.8  11may2018
+*! version 1.2.9.dlg  ?may2019
 program nsize__utils
 	version 12.0
 	gettoken subcmd 0 : 0
@@ -6,9 +6,108 @@ program nsize__utils
 end
 
 
+program define showHide
+	syntax , [clsname(string)]
+	local dlg .`clsname'
+	local type = "``dlg'.main.co_type.value'"
+	
+	`dlg'.main.tx_type.setlabel "`type'"
+	
+	`dlg'.onOff.setfalse				// set false to block events when seton sample size by default
+	
+	local l co1p co2p c1pe c2pe copp
+	local l: list l - type
+	
+	* show controls for selected type
+	s_h , clsname(`dlg') type(`type') show
+	
+	* hide controls for non-selected types
+	foreach j in `l' {
+		s_h , clsname(`dlg') type(`j') hide
+	}
+	
+	* sample size is the default
+	`dlg'.main.`type'_size.seton
+	onOff, clsname(`clsname') size
+	
+	`dlg'.onOff.settrue
+end
+
+program define s_h
+	syntax , clsname(string) type(string) [show hide]
+	local dlg .`clsname'
+	
+	if ("`type'"=="co1p" | "`type'"=="co2p" | "`type'"=="copp") local l gb1 size power
+	if ("`type'"=="c1pe" | "`type'"=="c2pe") local l gb1 size power gb2 equ non sup
+	foreach j in `l' {
+		`dlg'.main.`type'_`j'.`show'`hide'
+	}
+	
+	if ("`type'"=="co1p") local l p p1 ef a b n
+	if ("`type'"=="co2p") local l p0 p1 ef a b n
+	if ("`type'"=="c1pe") local l p0 p1 d a b n
+	if ("`type'"=="c2pe") local l p0 p1 d r a b n0 n1
+	if ("`type'"=="copp") local l or pd p0 ora r a b n
+	foreach j in `l' {
+		`dlg'.main.`type'_`j'_de.`show'`hide'
+		`dlg'.main.`type'_`j'_ed.`show'`hide'
+		`dlg'.main.`type'_`j'_tx.`show'`hide'
+	}
+end
+
+program define onOff
+	syntax , clsname(string) [power size]
+	local dlg .`clsname'
+	local type = "``dlg'.main.co_type.value'"
+
+	* enable / disable controls by sample size / power
+
+	if ("`size'"!="") {
+		if ("`type'"=="co1p") | ("`type'"=="co2p") | ("`type'"=="c1pe")  | ("`type'"=="copp"){
+			`dlg'.main.`type'_power.setoff
+			`dlg'.main.`type'_n_ed.disable
+			`dlg'.main.`type'_b_ed.enable
+		}
+		if ("`type'"=="c2pe") {
+			`dlg'.main.`type'_power.setoff
+			`dlg'.main.`type'_n0_ed.disable
+			`dlg'.main.`type'_n1_ed.disable
+			`dlg'.main.`type'_b_ed.enable
+		}
+	}
+	
+	if ("`power'"!="") {
+		if ("`type'"=="co1p") | ("`type'"=="co2p") | ("`type'"=="c1pe")  | ("`type'"=="copp") {	
+			`dlg'.main.`type'_size.setoff
+			`dlg'.main.`type'_n_ed.enable
+			`dlg'.main.`type'_b_ed.disable
+		}
+		if ("`type'"=="c2pe") {
+			`dlg'.main.`type'_size.setoff
+			`dlg'.main.`type'_n0_ed.enable
+			`dlg'.main.`type'_n1_ed.enable
+			`dlg'.main.`type'_b_ed.disable
+		}
+	}
+end
+
+program define test
+	syntax , clsname(string)
+	local dlg .`clsname'
+	local type = "``dlg'.main.co_type.value'"
+
+	* set delta text for c1p2, c2pe types
+	if (``dlg'.main.`type'_equ.value') local c "Equivalence limit"
+	if (``dlg'.main.`type'_non.value') local c "Non-Inferiority limit"
+	if (``dlg'.main.`type'_sup.value') local c "Superiority limit"
+	
+	`dlg'.main.`type'_d_tx.setlabel "`c'"
+end
+
+
 program define get_nsize, rclass
 	syntax anything, type(string) [alpha(numlist) beta(numlist) r(numlist) lim(numlist) PD(numlist) means(numlist) n(numlist)]
-	
+
 	if ("`type'"!="cokm" & "`type'"!="ci1p" & "`type'"!="ci2p" & 	/*
 	*/	"`type'"!="ci1m" & "`type'"!="ci2m") {
 		local za = invnormal((100-`alpha')/100)

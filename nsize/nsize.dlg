@@ -6,16 +6,17 @@
 */
 
 VERSION 12.0
+SYNCHRONOUS_ONLY
 
 INCLUDE _std_medium
 DEFINE _dlgwd 430
-DEFINE _dlght 470
+DEFINE _dlght 510
 INCLUDE header
 HELP hlp1, view("help nsize")
 RESET res1
 
 DEFINE _ini 60
-DEFINE _nst 400
+DEFINE _nst 445
 DEFINE _de 60
 DEFINE _ide +70
 DEFINE _edw 70
@@ -23,12 +24,34 @@ DEFINE _iedw +80
 DEFINE _tx 240
 DEFINE _gb 410
 
+SCRIPT PREINIT
+BEGIN
+	create BOOLEAN isLoading
+	.isLoading.settrue
+	/* set true when dialog is loading to block events that might be triggered by the initial populating of the
+	 * variable combobox. */
+	 
+	create BOOLEAN onOff
+	.onOff.settrue
+	
+	create STRING cmd
+	create STRING dlgName
+	dlgName.setvalue class _dlg_rsrcname
+END
+
+SCRIPT POSTINIT
+BEGIN
+	.isLoading.setfalse
+	program showHide
+END
+
+
 DIALOG main, label("nsize - Sample Size & Power") tabtitle("Main")
 BEGIN
 	TEXT  		tx_capt		_lft	_top	100 	., label("Type:")
-	COMBOBOX	co_type		_lft	_ss		370		., dropdownlist contents(descrip) values(values) default("co1p") onselchangelist(list_actions)
+	COMBOBOX	co_type		_lft	_ss		370		., dropdownlist contents(descrip) values(values) default("co1p") onselchange(program showHide)
 	TEXT 		tx_type 	+380	@ 		40 		., label("")
-	
+
 	// co1p controls
 	GROUPBOX	co1p_gb1	_lft  	_ini	_gb    	140
 	TEXT  		co1p_p_de 	_ilft	_ss 	_de		., label("p ") right
@@ -43,11 +66,11 @@ BEGIN
 	TEXT  		co1p_a_de 	_ilft	_xls 	_de		., label("alpha ") right
     EDIT  		co1p_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
     TEXT  		co1p_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
-	CHECKBOX 	co1p_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program co1p_size)
+	CHECKBOX 	co1p_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
 	TEXT  		co1p_b_de 	_ilft	_ms 	_de		., label("beta ") right
     EDIT  		co1p_b_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
     TEXT  		co1p_b_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
-	CHECKBOX 	co1p_power	_lft 	_xls 	_gb		60, label("Power ") groupbox onclickon(program co1p_power)
+	CHECKBOX 	co1p_power	_lft 	_xls 	_gb		60, label("Power ") groupbox onclickon(program onOff_power)
 	TEXT  		co1p_n_de 	_ilft	_ms 	_de		., label("n ") right
     EDIT  		co1p_n_ed 	_ide	@ 		_edw   	., numonly label("n") option(n)
     TEXT  		co1p_n_tx 	_iedw	@ 		_tx	   	., label("Sample Size")
@@ -66,11 +89,11 @@ BEGIN
 	TEXT  		co2p_a_de 	_ilft	_xls 	_de		., label("alpha ") right
     EDIT  		co2p_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
     TEXT  		co2p_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
-	CHECKBOX 	co2p_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program co2p_size)
+	CHECKBOX 	co2p_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
 	TEXT  		co2p_b_de 	_ilft	_ms 	_de		., label("beta ") right
     EDIT  		co2p_b_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
     TEXT  		co2p_b_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
-	CHECKBOX 	co2p_power	_lft 	_xls 	_gb		60, label("Power ") groupbox onclickon(program co2p_power)
+	CHECKBOX 	co2p_power	_lft 	_xls 	_gb		60, label("Power ") groupbox onclickon(program onOff_power)
 	TEXT  		co2p_n_de 	_ilft	_ms 	_de		., label("n ") right
     EDIT  		co2p_n_ed 	_ide	@ 		_edw	., numonly label("n") option(n)
     TEXT  		co2p_n_tx 	_iedw	@ 		_tx	   	., label("Sample Size")
@@ -90,18 +113,81 @@ BEGIN
     EDIT  		c1pe_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
     TEXT  		c1pe_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
 	GROUPBOX 	c1pe_gb2  	_lft 	_xls 	_gb 	55, label("Test ")
-	RADIO 		c1pe_non	_ilft   _ss  	120   	., first label("Equivalence") onclickon(call main.c1pe_d_tx.setlabel "Equivalence limit")
-	RADIO 		c1pe_sup	+130  	@   	120   	., middle label("Non-Inferiority") onclickon(call main.c1pe_d_tx.setlabel "Non-Inferiority limit")
-	RADIO 		c1p3_equ	+130   	@   	120   	., last label("Superiority") onclickon(call main.c1pe_d_tx.setlabel "Superiority limit")
-	CHECKBOX 	c1pe_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program c1pe_size)
+	RADIO 		c1pe_equ	_ilft   _ss  	120   	., first label("Equivalence") onclickon(program test) option("")
+	RADIO 		c1pe_non	+130  	@   	120   	., middle label("Non-Inferiority") onclickon(program test) option(noninf)
+	RADIO 		c1pe_sup	+130   	@   	120   	., last label("Superiority") onclickon(program test) option(super)
+	CHECKBOX 	c1pe_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
 	TEXT  		c1pe_b_de 	_ilft	_ms 	_de		., label("beta ") right
     EDIT  		c1pe_b_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
     TEXT  		c1pe_b_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
-	CHECKBOX 	c1pe_power	_lft 	_xls 	_gb		60, label("Power ") groupbox onclickon(program c1pe_power)
+	CHECKBOX 	c1pe_power	_lft 	_xls 	_gb		60, label("Power ") groupbox onclickon(program onOff_power)
 	TEXT  		c1pe_n_de 	_ilft	_ms 	_de		., label("n ") right
     EDIT  		c1pe_n_ed 	_ide	@ 		_edw	., numonly label("n") option(n)
     TEXT  		c1pe_n_tx 	_iedw	@ 		_tx	   	., label("Sample Size")
 
+	// c2pe controls
+	GROUPBOX	c2pe_gb1	_lft  	_ini	_gb    	170
+	TEXT  		c2pe_p0_de 	_ilft	_ss 	_de		., label("p0 ") right
+    EDIT  		c2pe_p0_ed  _ide	@ 		_edw   	., numonly label("p0") option(p0)
+    TEXT  		c2pe_p0_tx  _iedw	@ 		_tx	   	., label("Proportion(%) of events in reference")
+	TEXT  		c2pe_p1_de	_ilft	_ms 	_de		., label("p1 ") right
+    EDIT  		c2pe_p1_ed 	_ide	@ 		_edw   	., numonly label("p1") option(p1)
+    TEXT  		c2pe_p1_tx 	_iedw	@ 		_tx	   	., label("Proportion(%) of events in experimental")
+	TEXT  		c2pe_d_de 	_ilft	_ms 	_de		., label("delta ") right
+    EDIT  		c2pe_d_ed 	_ide	@ 		_edw   	., numonly label("delta") option(delta)
+    TEXT  		c2pe_d_tx 	_iedw	@ 		_tx	   	., label("Equivalence limit")
+	TEXT  		c2pe_r_de 	_ilft	_ms 	_de		., label("r ") right
+    EDIT  		c2pe_r_ed 	_ide	@ 		_edw   	., numonly label("r") option(r) default(1)
+    TEXT  		c2pe_r_tx 	_iedw	@ 		_tx	   	., label("Ratio n0/n1")
+	TEXT  		c2pe_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		c2pe_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		c2pe_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	GROUPBOX 	c2pe_gb2  	_lft 	_xls 	_gb 	55, label("Test ")
+	RADIO 		c2pe_equ	_ilft   _ss  	120   	., first label("Equivalence") onclickon(program test) option("")
+	RADIO 		c2pe_non	+130  	@   	120   	., middle label("Non-Inferiority") onclickon(program test) option(noninf)
+	RADIO 		c2pe_sup	+130   	@   	120   	., last label("Superiority") onclickon(program test) option(super)
+	CHECKBOX 	c2pe_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		c2pe_b_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		c2pe_b_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		c2pe_b_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	c2pe_power	_lft 	_xls 	_gb		80, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		c2pe_n0_de 	_ilft	_ms 	_de		., label("n0 ") right
+    EDIT  		c2pe_n0_ed 	_ide	@ 		_edw	., numonly label("n0") option(n0)
+    TEXT  		c2pe_n0_tx 	_iedw	@ 		_tx	   	., label("Sample Size (Reference treatment)")
+	TEXT  		c2pe_n1_de 	_ilft	_ms 	_de		., label("n1 ") right
+    EDIT  		c2pe_n1_ed 	_ide	@ 		_edw	., numonly label("n1") option(n1)
+    TEXT  		c2pe_n1_tx 	_iedw	@ 		_tx	   	., label("Sample Size (Experimental treatment)")
+
+	// copp controls
+	GROUPBOX	copp_gb1	_lft  	_ini	_gb    	195
+	TEXT  		copp_or_de 	_ilft	_ss 	_de		., label("or ") right
+    EDIT  		copp_or_ed  _ide	@ 		_edw   	., numonly label("or") option(or)
+    TEXT  		copp_or_tx  _iedw	@ 		_tx	   	., label("Expected Response/Exposure Odds Ratio")
+	TEXT  		copp_pd_de	_ilft	_ms 	_de		., label("{ pd ") right
+    EDIT  		copp_pd_ed 	_ide	@ 		_edw   	., numonly label("pd") option(pd)
+    TEXT  		copp_pd_tx 	_iedw	@ 		_tx	   	., label("Proportion of Discordant pairs(%)")
+	TEXT  		copp_p0_de 	_ilft	_ms 	_de		., label("or (p0 ") right
+    EDIT  		copp_p0_ed 	_ide	@ 		_edw   	., numonly label("p0") option(p0)
+    TEXT  		copp_p0_tx 	_iedw	@ 		_tx	   	., label("Proportion in the Reference group(%)")
+	TEXT  		copp_ora_de	_ilft	_ms 	_de		., label("and ora) } ") right
+    EDIT  		copp_ora_ed	_ide	@ 		_edw   	., numonly label("ora") option(ora)
+    TEXT  		copp_ora_tx _iedw	@ 		_tx	   	., label("Marginal Odds Ratio")
+	TEXT  		copp_r_de 	_ilft	_ms 	_de		., label("r ") right
+    EDIT  		copp_r_ed 	_ide	@ 		_edw   	., numonly label("r") option(r) default(1)
+    TEXT  		copp_r_tx 	_iedw	@ 		_tx	   	., label("Ratio of Matching (1:r)")
+	TEXT  		copp_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		copp_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		copp_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	CHECKBOX 	copp_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		copp_b_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		copp_b_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		copp_b_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	copp_power	_lft 	_xls 	_gb		60, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		copp_n_de 	_ilft	_ms 	_de		., label("n ") right
+    EDIT  		copp_n_ed 	_ide	@ 		_edw	., numonly label("n") option(n)
+    TEXT  		copp_n_tx 	_iedw	@ 		_tx	   	., label("Sample Size")
+
+	
 	// nst
 	GROUPBOX	gb_nst	 	_lft    _nst   	_gb   	60, label("Name of the study")
 	EDIT		ed_nst	 	_ilft   _ms	 	380   	., option(nst)
@@ -153,147 +239,38 @@ LIST values
 		ncr
 	END
 	
-LIST list_actions
-	BEGIN
-		program co1p
-		program co2p
-		program c1pe
-		program c2pe
-		program copp
-		program co1m
-		program co2m
-		program c2me
-		program cokm
-		program ci1p
-		program ci2p
-		program ci1m
-		program ci2m
-		program co1c
-		program co2c
-		program co2r1
-		program co2r2
-		program co2i
-		program ncr
-	END
+PROGRAM showHide
+BEGIN
+	if ! isLoading {
+		put "nsize__utils showHide , "
+		put "clsname(" dlgName ")"
+		stata hidden
+	}
+END
 	
-PROGRAM co1p
+PROGRAM onOff_size
 BEGIN
-	call main.tx_type.setlabel "co1p"
-	call program co1p_show
-	call main.co1p_size.seton
-	
-	call program co2p_hide
+	if ! isLoading & onOff {
+		put "nsize__utils onOff , "
+		put "clsname(" dlgName ") size"
+		stata hidden
+	}
 END
 
-PROGRAM co1p_show
+PROGRAM onOff_power
 BEGIN
-	call main.co1p_gb1.show
-	call main.co1p_p_de.show
-    call main.co1p_p_ed.show
-    call main.co1p_p_tx.show
-	call main.co1p_p1_de.show
-    call main.co1p_p1_ed.show
-    call main.co1p_p1_tx.show
-	call main.co1p_size.show
-	call main.co1p_b_de.show
-    call main.co1p_b_ed.show
-    call main.co1p_b_tx.show
-	call main.co1p_power.show
-	call main.co1p_n_de.show
-    call main.co1p_n_ed.show
-    call main.co1p_n_tx.show
+	if ! isLoading & onOff {
+		put "nsize__utils onOff , "
+		put "clsname(" dlgName ") power"
+		stata hidden
+	}
 END
 
-PROGRAM co1p_hide
+PROGRAM test
 BEGIN
-	call main.co1p_gb1.hide
-	call main.co1p_p_de.hide
-    call main.co1p_p_ed.hide
-    call main.co1p_p_tx.hide
-	call main.co1p_p1_de.hide
-    call main.co1p_p1_ed.hide
-    call main.co1p_p1_tx.hide
-	call main.co1p_size.hide
-	call main.co1p_b_de.hide
-    call main.co1p_b_ed.hide
-    call main.co1p_b_tx.hide
-	call main.co1p_power.hide
-	call main.co1p_n_de.hide
-    call main.co1p_n_ed.hide
-    call main.co1p_n_tx.hide
-END
-
-PROGRAM co1p_size
-BEGIN
-	call main.co1p_power.setoff
-	call main.co1p_n_ed.disable
-    call main.co1p_b_ed.enable
-END
-
-PROGRAM co1p_power
-BEGIN
-	call main.co1p_size.setoff
-	call main.co1p_n_ed.enable
-    call main.co1p_b_ed.disable
-END
-
-PROGRAM co2p
-BEGIN
-	call main.tx_type.setlabel "co2p"
-	call program co2p_show
-	call main.co2p_size.seton
-	
-	call program co1p_hide
-END
-
-PROGRAM co2p_show
-BEGIN
-	call main.co2p_gb1.show
-	call main.co2p_p0_de.show
-    call main.co2p_p0_ed.show
-    call main.co2p_p0_tx.show
-	call main.co2p_p1_de.show
-    call main.co2p_p1_ed.show
-    call main.co2p_p1_tx.show
-	call main.co2p_size.show
-	call main.co2p_b_de.show
-    call main.co2p_b_ed.show
-    call main.co2p_b_tx.show
-	call main.co2p_power.show
-	call main.co2p_n_de.show
-    call main.co2p_n_ed.show
-    call main.co2p_n_tx.show
-END
-
-PROGRAM co2p_hide
-BEGIN
-	call main.co2p_gb1.hide
-	call main.co2p_p0_de.hide
-    call main.co2p_p0_ed.hide
-    call main.co2p_p0_tx.hide
-	call main.co2p_p1_de.hide
-    call main.co2p_p1_ed.hide
-    call main.co2p_p1_tx.hide
-	call main.co2p_size.hide
-	call main.co2p_b_de.hide
-    call main.co2p_b_ed.hide
-    call main.co2p_b_tx.hide
-	call main.co2p_power.hide
-	call main.co2p_n_de.hide
-    call main.co2p_n_ed.hide
-    call main.co2p_n_tx.hide
-END
-
-PROGRAM co2p_size
-BEGIN
-	call main.co2p_power.setoff
-	call main.co2p_n_ed.disable
-    call main.co2p_b_ed.enable
-END
-
-PROGRAM co2p_power
-BEGIN
-	call main.co2p_size.setoff
-	call main.co2p_n_ed.enable
-    call main.co2p_b_ed.disable
+	if ! isLoading {
+		put "nsize__utils test , "
+		put "clsname(" dlgName ") "
+		stata hidden
+	}
 END

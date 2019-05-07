@@ -10,19 +10,21 @@ SYNCHRONOUS_ONLY
 
 INCLUDE _std_medium
 DEFINE _dlgwd 430
-DEFINE _dlght 510
+DEFINE _dlght 570
 INCLUDE header
 HELP hlp1, view("help nsize")
 RESET res1
 
 DEFINE _ini 60
-DEFINE _nst 445
+DEFINE _nst 500
 DEFINE _de 60
 DEFINE _ide +70
 DEFINE _edw 70
 DEFINE _iedw +80
 DEFINE _tx 240
+DEFINE _iwd 310
 DEFINE _gb 410
+
 
 SCRIPT PREINIT
 BEGIN
@@ -187,6 +189,125 @@ BEGIN
     EDIT  		copp_n_ed 	_ide	@ 		_edw	., numonly label("n") option(n)
     TEXT  		copp_n_tx 	_iedw	@ 		_tx	   	., label("Sample Size")
 
+	// co1m controls
+	GROUPBOX	co1m_gb1	_lft  	_ini	_gb    	90
+	TEXT  		co1m_sd_de 	_ilft	_ss 	_de		., label("sd ") right
+    EDIT  		co1m_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
+    TEXT  		co1m_sd_tx  _iedw	@ 		_tx	   	., label("Common standard deviation")
+	TEXT  		co1m_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		co1m_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		co1m_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	CHECKBOX 	co1m_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		co1m_e1_de 	_ilft	_ms 	_de		., label("effect ") right
+    EDIT  		co1m_e1_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
+    TEXT  		co1m_e1_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size")
+	TEXT  		co1m_b1_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		co1m_b1_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		co1m_b1_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	co1m_power	_lft 	_xls 	_gb		80, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		co1m_e2_de 	_ilft	_ms 	_de		., label("effect ") right
+    EDIT  		co1m_e2_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
+    TEXT  		co1m_e2_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size")
+	TEXT  		co1m_n1_de 	_ilft	_ms 	_de		., label("n ") right
+    EDIT  		co1m_n1_ed 	_ide	@ 		_edw   	., numonly label("n") option(n)
+    TEXT  		co1m_n1_tx 	_iedw	@ 		_tx	   	., label("Sample Size (by group)")
+	CHECKBOX 	co1m_effect	_lft 	_xls 	_gb		80, label("Effect size ") groupbox onclickon(program onOff_effect)
+	TEXT  		co1m_b2_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		co1m_b2_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		co1m_b2_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	TEXT  		co1m_n2_de 	_ilft	_ms 	_de		., label("n ") right
+    EDIT  		co1m_n2_ed 	_ide	@ 		_edw   	., numonly label("n") option(n)
+    TEXT  		co1m_n2_tx 	_iedw	@ 		_tx	   	., label("Sample Size (by group)")
+
+	// co2m controls
+	GROUPBOX	co2m_gb1	_lft  	_ini	_gb    	115
+	TEXT  		co2m_sd_de 	_ilft	_ss 	_de		., label("sd ") right
+    EDIT  		co2m_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
+    TEXT  		co2m_sd_tx  _iedw	@ 		_tx	   	., label("Common standard deviation")
+	TEXT  		co2m_r_de 	_ilft	_ms 	_de		., label("r ") right
+    EDIT  		co2m_r_ed 	_ide	@ 		_edw   	., numonly label("r") option(r) default(1)
+    TEXT  		co2m_r_tx 	_iedw	@ 		_tx	   	., label("Ratio n0/n1")
+	TEXT  		co2m_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		co2m_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		co2m_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	CHECKBOX 	co2m_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		co2m_e1_de 	_ilft	_ms 	_de		., label("effect ") right
+    EDIT  		co2m_e1_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
+    TEXT  		co2m_e1_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size")
+	TEXT  		co2m_b1_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		co2m_b1_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		co2m_b1_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	co2m_power	_lft 	_xls 	_gb		105, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		co2m_e2_de 	_ilft	_ms 	_de		., label("effect ") right
+    EDIT  		co2m_e2_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
+    TEXT  		co2m_e2_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size")
+	TEXT  		co2m_n11_de _ilft	_ms 	_de		., label("n1 ") right
+    EDIT  		co2m_n11_ed _ide	@ 		_edw   	., numonly label("n") option(n1)
+    TEXT  		co2m_n11_tx _iedw	@ 		_tx	   	., label("Sample Size (Group 1)")
+	TEXT  		co2m_n01_de _ilft	_ms 	_de		., label("n0 ") right
+    EDIT  		co2m_n01_ed _ide	@ 		_edw   	., numonly label("n0") option(n1)
+    TEXT  		co2m_n01_tx _iedw	@ 		_tx	   	., label("Sample Size (Group 0)")
+	CHECKBOX 	co2m_effect	_lft 	_xls 	_gb		105, label("Effect size ") groupbox onclickon(program onOff_effect)
+	TEXT  		co2m_b2_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		co2m_b2_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		co2m_b2_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	TEXT  		co2m_n12_de _ilft	_ms 	_de		., label("n1 ") right
+    EDIT  		co2m_n12_ed _ide	@ 		_edw   	., numonly label("n") option(n1)
+    TEXT  		co2m_n12_tx _iedw	@ 		_tx	   	., label("Sample Size (Group 1)")
+	TEXT  		co2m_n02_de _ilft	_ms 	_de		., label("n0 ") right
+    EDIT  		co2m_n02_ed _ide	@ 		_edw   	., numonly label("n0") option(n1)
+    TEXT  		co2m_n02_tx _iedw	@ 		_tx	   	., label("Sample Size (Group 0)")
+
+	// c2me controls
+	GROUPBOX	c2me_gb1	_lft  	_ini	_gb    	90
+	TEXT  		c2me_sd_de 	_ilft	_ss 	_de		., label("sd ") right
+    EDIT  		c2me_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
+    TEXT  		c2me_sd_tx  _iedw	@ 		_tx	   	., label("Common standard deviation")
+	TEXT  		c2me_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		c2me_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		c2me_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	CHECKBOX 	c2me_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		c2me_e1_de 	_ilft	_ms 	_de		., label("eqlim ") right
+    EDIT  		c2me_e1_ed 	_ide	@ 		_edw   	., numonly label("eqlim") option(eqlim)
+    TEXT  		c2me_e1_tx 	_iedw	@ 		_tx	   	., label("Equivalence limits")
+	TEXT  		c2me_b1_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		c2me_b1_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		c2me_b1_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	c2me_power	_lft 	_xls 	_gb		80, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		c2me_e2_de 	_ilft	_ms 	_de		., label("eqlim ") right
+    EDIT  		c2me_e2_ed 	_ide	@ 		_edw   	., numonly label("eqlim") option(eqlim)
+    TEXT  		c2me_e2_tx 	_iedw	@ 		_tx	   	., label("Equivalence limits")
+	TEXT  		c2me_n1_de 	_ilft	_ms 	_de		., label("n ") right
+    EDIT  		c2me_n1_ed 	_ide	@ 		_edw   	., numonly label("n") option(n)
+    TEXT  		c2me_n1_tx 	_iedw	@ 		_tx	   	., label("Sample Size (by group)")
+	CHECKBOX 	c2me_effect	_lft 	_xls 	_gb		80, label("Effect size ") groupbox onclickon(program onOff_effect)
+	TEXT  		c2me_b2_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		c2me_b2_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		c2me_b2_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	TEXT  		c2me_n2_de 	_ilft	_ms 	_de		., label("n ") right
+    EDIT  		c2me_n2_ed 	_ide	@ 		_edw   	., numonly label("n") option(n)
+    TEXT  		c2me_n2_tx 	_iedw	@ 		_tx	   	., label("Sample Size (by group)")
+
+	// cokm controls
+	GROUPBOX	cokm_gb1	_lft  	_ini	_gb    	55
+	TEXT  		cokm_sd_de 	_ilft	_ss 	_de		., label("sd ") right
+    EDIT  		cokm_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
+    TEXT  		cokm_sd_tx  _iedw	@ 		_tx	   	., label("Common standard deviation estimated")
+	CHECKBOX 	cokm_mean	_lft 	_xls 	_gb		60, label("k Simultaneous comparisons: List of hypothetical means ") groupbox onclickon(program onOff_mean)
+	TEXT  		cokm_m_de 	_ilft	_ms 	_de		., label("mean ") right
+    EDIT  		cokm_m_ed 	_ide	@ 		_iwd   	., numonly label("mean") option(mean)
+    TEXT  		cokm_m_tx 	+315	@		2   	., label("")
+	CHECKBOX 	cokm_pair	_lft 	_xls 	_gb		80, label("c Pairwise comparisons ") groupbox onclickon(program onOff_pair)
+	TEXT  		cokm_e_de 	_ilft	_ms 	_de		., label("effect ") right
+    EDIT  		cokm_e_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
+    TEXT  		cokm_e_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size")
+	TEXT  		cokm_c_de 	_ilft	_ms 	_de		., label("c ") right
+    EDIT  		cokm_c_ed 	_ide	@ 		_edw   	., numonly label("c") option(c)
+    TEXT  		cokm_c_tx 	_iedw	@ 		_tx	   	., label("Number of pairwise comparisons")
+	CHECKBOX 	cokm_power	_lft 	_xls 	_gb		60, label("Power: Sample size (by group) ") groupbox onclickon(program onOff_power)
+	TEXT  		cokm_nk_de 	_ilft	_ms 	_de		., label("nk ") right
+    EDIT  		cokm_nk_ed 	_ide	@ 		_iwd   	., numonly label("nk") option(nk)
+    TEXT  		cokm_nk_tx 	+315	@ 		2	   	., label("")
 	
 	// nst
 	GROUPBOX	gb_nst	 	_lft    _nst   	_gb   	60, label("Name of the study")
@@ -262,6 +383,33 @@ BEGIN
 	if ! isLoading & onOff {
 		put "nsize__utils onOff , "
 		put "clsname(" dlgName ") power"
+		stata hidden
+	}
+END
+
+PROGRAM onOff_effect
+BEGIN
+	if ! isLoading & onOff {
+		put "nsize__utils onOff , "
+		put "clsname(" dlgName ") effect"
+		stata hidden
+	}
+END
+
+PROGRAM onOff_mean
+BEGIN
+	if ! isLoading & onOff {
+		put "nsize__utils onOff , "
+		put "clsname(" dlgName ") mean"
+		stata hidden
+	}
+END
+
+PROGRAM onOff_mean
+BEGIN
+	if ! isLoading & onOff {
+		put "nsize__utils onOff , "
+		put "clsname(" dlgName ") pair"
 		stata hidden
 	}
 END

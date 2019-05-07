@@ -15,7 +15,7 @@ program define showHide
 	
 	`dlg'.onOff.setfalse				// set false to block events when seton sample size by default
 	
-	local l co1p co2p c1pe c2pe copp
+	local l co1p co2p c1pe c2pe copp co1m co2m c2me cokm
 	local l: list l - type
 	
 	* show controls for selected type
@@ -27,8 +27,12 @@ program define showHide
 	}
 	
 	* sample size is the default
-	`dlg'.main.`type'_size.seton
-	onOff, clsname(`clsname') size
+	if ("`type'"=="cokm") {
+	}
+	else {
+		`dlg'.main.`type'_size.seton
+		onOff, clsname(`clsname') size
+	}
 	
 	`dlg'.onOff.settrue
 end
@@ -39,6 +43,8 @@ program define s_h
 	
 	if ("`type'"=="co1p" | "`type'"=="co2p" | "`type'"=="copp") local l gb1 size power
 	if ("`type'"=="c1pe" | "`type'"=="c2pe") local l gb1 size power gb2 equ non sup
+	if ("`type'"=="co1m" | "`type'"=="co2m" | "`type'"=="c2me") local l gb1 size power effect
+	if ("`type'"=="cokm") local l gb1 mean pair power
 	foreach j in `l' {
 		`dlg'.main.`type'_`j'.`show'`hide'
 	}
@@ -48,6 +54,9 @@ program define s_h
 	if ("`type'"=="c1pe") local l p0 p1 d a b n
 	if ("`type'"=="c2pe") local l p0 p1 d r a b n0 n1
 	if ("`type'"=="copp") local l or pd p0 ora r a b n
+	if ("`type'"=="co1m" | "`type'"=="c2me") local l sd a e1 e2 b1 b2 n1 n2
+	if ("`type'"=="co2m") local l sd r a e1 b1 e2 n11 n01 b2 n12 n02
+	if ("`type'"=="cokm") local l sd m e c nk
 	foreach j in `l' {
 		`dlg'.main.`type'_`j'_de.`show'`hide'
 		`dlg'.main.`type'_`j'_ed.`show'`hide'
@@ -56,7 +65,7 @@ program define s_h
 end
 
 program define onOff
-	syntax , clsname(string) [power size]
+	syntax , clsname(string) [power size effect mean pair]
 	local dlg .`clsname'
 	local type = "``dlg'.main.co_type.value'"
 
@@ -74,6 +83,22 @@ program define onOff
 			`dlg'.main.`type'_n1_ed.disable
 			`dlg'.main.`type'_b_ed.enable
 		}
+		if ("`type'"=="co1m" ) | ("`type'"=="c2me") | ("`type'"=="co2m") {
+			`dlg'.main.`type'_e1_ed.enable
+			`dlg'.main.`type'_b1_ed.enable
+			`dlg'.main.`type'_power.setoff
+			`dlg'.main.`type'_e2_ed.disable
+			`dlg'.main.`type'_effect.setoff
+			`dlg'.main.`type'_b2_ed.disable
+			
+			if ("`type'"=="co1m" ) | ("`type'"=="c2me") `dlg'.main.`type'_n1_ed.disable
+			if ("`type'"=="co1m" ) | ("`type'"=="c2me") `dlg'.main.`type'_n2_ed.disable
+
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n11_ed.disable
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n01_ed.disable
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n12_ed.disable
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n02_ed.disable
+		}
 	}
 	
 	if ("`power'"!="") {
@@ -88,7 +113,43 @@ program define onOff
 			`dlg'.main.`type'_n1_ed.enable
 			`dlg'.main.`type'_b_ed.disable
 		}
+		if ("`type'"=="co1m") | ("`type'"=="co2m") | ("`type'"=="c2me") {
+			`dlg'.main.`type'_e2_ed.enable
+			`dlg'.main.`type'_size.setoff
+			`dlg'.main.`type'_e1_ed.disable
+			`dlg'.main.`type'_b1_ed.disable
+			`dlg'.main.`type'_effect.setoff
+			`dlg'.main.`type'_b2_ed.disable
+
+			if ("`type'"=="co1m" ) | ("`type'"=="c2me") `dlg'.main.`type'_n1_ed.enable
+			if ("`type'"=="co1m" ) | ("`type'"=="c2me") `dlg'.main.`type'_n2_ed.disable
+			
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n11_ed.enable
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n01_ed.enable
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n12_ed.disable
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n02_ed.disable
+		}
 	}
+	
+	if ("`effect'"!="") {
+		if ("`type'"=="co1m") | ("`type'"=="co2m") | ("`type'"=="c2me") {
+			`dlg'.main.`type'_b2_ed.enable
+			`dlg'.main.`type'_size.setoff
+			`dlg'.main.`type'_e1_ed.disable
+			`dlg'.main.`type'_b1_ed.disable
+			`dlg'.main.`type'_power.setoff
+			`dlg'.main.`type'_e2_ed.disable
+			
+			if ("`type'"=="co1m" ) | ("`type'"=="c2me") `dlg'.main.`type'_n2_ed.enable
+			if ("`type'"=="co1m" ) | ("`type'"=="c2me") `dlg'.main.`type'_n1_ed.disable
+			
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n11_ed.disable
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n01_ed.disable
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n12_ed.enable
+			if ("`type'"=="co2m" ) `dlg'.main.`type'_n02_ed.enable			
+		}
+	}
+	
 end
 
 program define test

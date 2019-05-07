@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.2 11may2018}{...}
+{* *! version 1.1.3 07may2019}{...}
 {viewerdialog dtroc "dialog dtroc"}{...}
 {viewerjumpto "Syntax" "dtroc##syntax"}{...}
 {viewerjumpto "Description" "dtroc##description"}{...}
@@ -30,10 +30,10 @@
 {bf:cc} Case-control{p_end}
 {synopt :{opt ic(#)}}code of {it:illness} group; default is {cmd:ic(1)}{break}
 {it:non-illness} group: codes not equal to {cmd:ic}{p_end}
-{synopt :{opt [no]inc}}{it:illness} increases {it:classvar} variable; default is {cmd:inc}{break}
-If {it:illness} decreases {it:classvar} variable, specify {cmd:noinc}{p_end}
-{synopt :{opt prev(#)}}Prevalence of {it:illness} in the population; by default: sample prevalence{p_end}
-{synopt :{opt cost(#)}}ratio false-negative/positive cost (FNC/FPC); default is{cmd:cost(1)}{p_end}
+{synopt :{opt noinc}}by default, {it:illness} increases {it:classvar} variable;
+if {it:illness} {bf:decreases} {it:classvar} variable, specify {cmd:noinc}{p_end}
+{synopt :{opt prev(#)}}prevalence of {it:illness} in the population; by default: sample prevalence{p_end}
+{synopt :{opt cost(#)}}ratio false-negative/positive cost (FNC/FPC); default is {cmd:cost(1)}{p_end}
 {synopt :{opt detail}}show & save to a file details on sensitivity/specificity for each cutoff point{p_end}
 {synopt :{opth using(filename)}}{it:{help filename}} to store the cutoff points data created by the {cmd:detail} option; by default a dataset named 
 {it:dtroc_cutoff} is saved in the current (working) directory{p_end}
@@ -113,7 +113,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.2 {hline 2} 11 May 2018
+Version 1.1.3 {hline 2} 07 May 2019
 
 
 {marker authors}{...}
@@ -131,7 +131,7 @@ stata@graunt.cat{p_end}
 
 {p 4 6 2}
 Dom{c e'}nech JM. ROC Analysis & Optimal Cutoff Point: User-written command dtroc for Stata [computer program].{break}
-V1.1.2. Barcelona: Graunt21; 2018.{break}
+V1.1.3. Barcelona: Graunt21; 2019.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 
 

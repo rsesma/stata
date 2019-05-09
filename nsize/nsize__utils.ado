@@ -15,7 +15,7 @@ program define showHide
 	
 	`dlg'.onOff.setfalse				// set false to block events when seton sample size by default
 	
-	local l co1p co2p c1pe c2pe copp co1m co2m c2me cokm
+	local l co1p co2p c1pe c2pe copp co1m co2m c2me cokm ci1p ci2p ci1m ci2m co1c co2c co2r co2i ncr
 	local l: list l - type
 	
 	* show controls for selected type
@@ -28,10 +28,20 @@ program define showHide
 	
 	* sample size is the default
 	if ("`type'"=="cokm") {
+		`dlg'.main.`type'_mean.seton
+		onOff, clsname(`clsname') mean
 	}
 	else {
-		`dlg'.main.`type'_size.seton
-		onOff, clsname(`clsname') size
+		if ("`type'"=="co2r") {
+			`dlg'.main.`type'_co.seton
+			co2r, clsname(`clsname') co
+		}
+		else {
+			if ("`type'"!="ncr") {
+				`dlg'.main.`type'_size.seton
+				onOff, clsname(`clsname') size
+			}
+		}
 	}
 	
 	`dlg'.onOff.settrue
@@ -41,10 +51,14 @@ program define s_h
 	syntax , clsname(string) type(string) [show hide]
 	local dlg .`clsname'
 	
-	if ("`type'"=="co1p" | "`type'"=="co2p" | "`type'"=="copp") local l gb1 size power
+	if ("`type'"=="co1p" | "`type'"=="co2p" | "`type'"=="copp" | /*
+	*/ "`type'"=="co1c" | "`type'"=="co2c" | "`type'"=="co2i") local l gb1 size power
 	if ("`type'"=="c1pe" | "`type'"=="c2pe") local l gb1 size power gb2 equ non sup
 	if ("`type'"=="co1m" | "`type'"=="co2m" | "`type'"=="c2me") local l gb1 size power effect
 	if ("`type'"=="cokm") local l gb1 mean pair power
+	if ("`type'"=="ci1p" | "`type'"=="ci2p" | "`type'"=="ci1m" | "`type'"=="ci2m") local l gb1 size preci
+	if ("`type'"=="co2r") local l gb1 co cc gb2 size1 power1 gb3 size2 power2
+	if ("`type'"=="ncr") local l gb1 gb2
 	foreach j in `l' {
 		`dlg'.main.`type'_`j'.`show'`hide'
 	}
@@ -57,6 +71,15 @@ program define s_h
 	if ("`type'"=="co1m" | "`type'"=="c2me") local l sd a e1 e2 b1 b2 n1 n2
 	if ("`type'"=="co2m") local l sd r a e1 b1 e2 n11 n01 b2 n12 n02
 	if ("`type'"=="cokm") local l sd m e c nk
+	if ("`type'"=="ci1p") local l p0 cl n a ns
+	if ("`type'"=="ci2p") local l p0 p1 cl r a n1 n0
+	if ("`type'"=="ci1m") local l sd cl n a ns
+	if ("`type'"=="ci2m") local l sd cl r a n1 n0
+	if ("`type'"=="co1c") local l cr cr1 e a b n1
+	if ("`type'"=="co2c") local l cr0 cr1 e a b n1 n0
+	if ("`type'"=="co2r") local l r0 r1 rr rd or1 rt1 pe b1 n1 n0 pe0 pe1 or2 rt2 a b2 m1 m0
+	if ("`type'"=="co2i") local l i0 i1 ir id d r a b n1 n0
+	if ("`type'"=="ncr") local l vb vw e a b
 	foreach j in `l' {
 		`dlg'.main.`type'_`j'_de.`show'`hide'
 		`dlg'.main.`type'_`j'_ed.`show'`hide'
@@ -65,7 +88,7 @@ program define s_h
 end
 
 program define onOff
-	syntax , clsname(string) [power size effect mean pair]
+	syntax , clsname(string) [power size effect mean pair preci]
 	local dlg .`clsname'
 	local type = "``dlg'.main.co_type.value'"
 
@@ -77,7 +100,7 @@ program define onOff
 			`dlg'.main.`type'_n_ed.disable
 			`dlg'.main.`type'_b_ed.enable
 		}
-		if ("`type'"=="c2pe") {
+		if ("`type'"=="c2pe") | ("`type'"=="co2i") {
 			`dlg'.main.`type'_power.setoff
 			`dlg'.main.`type'_n0_ed.disable
 			`dlg'.main.`type'_n1_ed.disable
@@ -99,6 +122,42 @@ program define onOff
 			if ("`type'"=="co2m" ) `dlg'.main.`type'_n12_ed.disable
 			if ("`type'"=="co2m" ) `dlg'.main.`type'_n02_ed.disable
 		}
+		if ("`type'"=="ci1p") | ("`type'"=="ci1m") {
+			`dlg'.main.`type'_a_ed.enable
+			`dlg'.main.`type'_preci.setoff
+			`dlg'.main.`type'_ns_ed.disable
+			if ("`type'"=="ci1p") {
+				`dlg'.main.`type'_p0_tx.setlabel "Supposed Population Proportion(%)"
+				`dlg'.main.`type'_cl_ed.setdefault "90 95 99"
+				`dlg'.main.`type'_cl_ed.setvalue "90 95 99"
+			}
+		}
+		if ("`type'"=="ci2p") | ("`type'"=="ci2m") {
+			`dlg'.main.`type'_a_ed.enable
+			`dlg'.main.`type'_preci.setoff
+			`dlg'.main.`type'_n1_ed.disable
+			`dlg'.main.`type'_n0_ed.disable
+		}
+		if ("`type'"=="co1c") | ("`type'"=="co2c") {
+			`dlg'.main.`type'_b_ed.enable
+			`dlg'.main.`type'_power.setoff
+			`dlg'.main.`type'_n1_ed.disable
+			if ("`type'"=="co2c") `dlg'.main.`type'_n0_ed.disable
+		}
+		if ("`type'"=="co2r") {
+			if (``dlg'.main.`type'_co.value') {
+				`dlg'.main.`type'_b1_ed.enable
+				`dlg'.main.`type'_power1.setoff
+				`dlg'.main.`type'_n1_ed.disable
+				`dlg'.main.`type'_n0_ed.disable				
+			}
+			if (``dlg'.main.`type'_cc.value') {
+				`dlg'.main.`type'_b2_ed.enable
+				`dlg'.main.`type'_power2.setoff
+				`dlg'.main.`type'_m1_ed.disable
+				`dlg'.main.`type'_m0_ed.disable				
+			}
+		}
 	}
 	
 	if ("`power'"!="") {
@@ -107,7 +166,7 @@ program define onOff
 			`dlg'.main.`type'_n_ed.enable
 			`dlg'.main.`type'_b_ed.disable
 		}
-		if ("`type'"=="c2pe") {
+		if ("`type'"=="c2pe") | ("`type'"=="co2i") {
 			`dlg'.main.`type'_size.setoff
 			`dlg'.main.`type'_n0_ed.enable
 			`dlg'.main.`type'_n1_ed.enable
@@ -129,6 +188,34 @@ program define onOff
 			if ("`type'"=="co2m" ) `dlg'.main.`type'_n12_ed.disable
 			if ("`type'"=="co2m" ) `dlg'.main.`type'_n02_ed.disable
 		}
+		if ("`type'"=="cokm") {
+			`dlg'.main.`type'_nk_ed.enable
+			`dlg'.main.`type'_mean.setoff
+			`dlg'.main.`type'_m_ed.disable
+			`dlg'.main.`type'_pair.setoff
+			`dlg'.main.`type'_e_ed.disable
+			`dlg'.main.`type'_c_ed.disable
+		}
+		if ("`type'"=="co1c") | ("`type'"=="co2c") {	
+			`dlg'.main.`type'_n1_ed.enable
+			if ("`type'"=="co2c") `dlg'.main.`type'_n0_ed.enable
+			`dlg'.main.`type'_size.setoff
+			`dlg'.main.`type'_b_ed.disable
+		}
+		if ("`type'"=="co2r") {
+			if (``dlg'.main.`type'_co.value') {
+				`dlg'.main.`type'_n1_ed.enable
+				`dlg'.main.`type'_n0_ed.enable
+				`dlg'.main.`type'_size1.setoff
+				`dlg'.main.`type'_b1_ed.disable
+			}
+			if (``dlg'.main.`type'_cc.value') {
+				`dlg'.main.`type'_m1_ed.enable
+				`dlg'.main.`type'_m0_ed.enable				
+				`dlg'.main.`type'_size2.setoff
+				`dlg'.main.`type'_b2_ed.disable
+			}
+		}
 	}
 	
 	if ("`effect'"!="") {
@@ -149,6 +236,47 @@ program define onOff
 			if ("`type'"=="co2m" ) `dlg'.main.`type'_n02_ed.enable			
 		}
 	}
+
+	if ("`mean'"!="") {
+		if ("`type'"=="cokm") {
+			`dlg'.main.`type'_m_ed.enable
+			`dlg'.main.`type'_pair.setoff
+			`dlg'.main.`type'_e_ed.disable
+			`dlg'.main.`type'_c_ed.disable
+			`dlg'.main.`type'_power.setoff
+			`dlg'.main.`type'_nk_ed.disable
+		}
+	}
+
+	if ("`pair'"!="") {
+		if ("`type'"=="cokm") {
+			`dlg'.main.`type'_e_ed.enable
+			`dlg'.main.`type'_c_ed.enable
+			`dlg'.main.`type'_mean.setoff
+			`dlg'.main.`type'_m_ed.disable
+			`dlg'.main.`type'_power.setoff
+			`dlg'.main.`type'_nk_ed.disable
+		}
+	}
+
+	if ("`preci'"!="") {
+		if ("`type'"=="ci1p") | ("`type'"=="ci1m") {
+			`dlg'.main.`type'_ns_ed.enable
+			`dlg'.main.`type'_size.setoff
+			`dlg'.main.`type'_a_ed.disable
+			if ("`type'"=="ci1p") {
+				`dlg'.main.`type'_p0_tx.setlabel "List of Supposed Population Proportion(%)"
+				`dlg'.main.`type'_cl_ed.setdefault "95"
+				`dlg'.main.`type'_cl_ed.setvalue "95"
+			}
+		}
+		if ("`type'"=="ci2p") | ("`type'"=="ci2m") {
+			`dlg'.main.`type'_n1_ed.enable
+			`dlg'.main.`type'_n0_ed.enable
+			`dlg'.main.`type'_size.setoff
+			`dlg'.main.`type'_a_ed.disable
+		}
+	}
 	
 end
 
@@ -163,6 +291,55 @@ program define test
 	if (``dlg'.main.`type'_sup.value') local c "Superiority limit"
 	
 	`dlg'.main.`type'_d_tx.setlabel "`c'"
+end
+
+program define co2r
+	syntax , clsname(string) [co cc]
+	local dlg .`clsname'
+	local type co2r
+	
+	`dlg'.co2rOnOff.setfalse
+	
+	if ("`co'"!="") {
+		local ls1 gb2 size1 power1 
+		local lh1 gb3 size2 power2
+		local ls2 r0 r1 rr rd or1 rt1 pe b1 n1 n0
+		local lh2 pe0 pe1 or2 rt2 a b2 m1 m0
+	}
+	if ("`cc'"!="") {
+		local ls1 gb3 size2 power2
+		local lh1 gb2 size1 power1 
+		local ls2 pe0 pe1 or2 rt2 a b2 m1 m0
+		local lh2 r0 r1 rr rd or1 rt1 pe b1 n1 n0
+	}
+	foreach j in `ls1' {
+		`dlg'.main.`type'_`j'.show
+	}
+	foreach j in `lh1' {
+		`dlg'.main.`type'_`j'.hide
+	}
+	
+	foreach j in `ls2' {
+		`dlg'.main.`type'_`j'_de.show
+		`dlg'.main.`type'_`j'_ed.show
+		`dlg'.main.`type'_`j'_tx.show
+	}
+	foreach j in `lh2' {
+		`dlg'.main.`type'_`j'_de.hide
+		`dlg'.main.`type'_`j'_ed.hide
+		`dlg'.main.`type'_`j'_tx.hide
+	}
+
+	if ("`co'"!="") {
+		`dlg'.main.`type'_size1.seton
+	}
+	if ("`co'"!="") {
+		`dlg'.main.`type'_size2.seton
+	}
+	onOff, clsname(`clsname') size
+
+	`dlg'.co2rOnOff.settrue
+	
 end
 
 

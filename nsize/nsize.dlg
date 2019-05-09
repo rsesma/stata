@@ -36,6 +36,9 @@ BEGIN
 	create BOOLEAN onOff
 	.onOff.settrue
 	
+	create BOOLEAN co2rOnOff
+	.co2rOnOff.settrue
+	
 	create STRING cmd
 	create STRING dlgName
 	dlgName.setvalue class _dlg_rsrcname
@@ -293,21 +296,280 @@ BEGIN
 	TEXT  		cokm_sd_de 	_ilft	_ss 	_de		., label("sd ") right
     EDIT  		cokm_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
     TEXT  		cokm_sd_tx  _iedw	@ 		_tx	   	., label("Common standard deviation estimated")
-	CHECKBOX 	cokm_mean	_lft 	_xls 	_gb		60, label("k Simultaneous comparisons: List of hypothetical means ") groupbox onclickon(program onOff_mean)
-	TEXT  		cokm_m_de 	_ilft	_ms 	_de		., label("mean ") right
-    EDIT  		cokm_m_ed 	_ide	@ 		_iwd   	., numonly label("mean") option(mean)
-    TEXT  		cokm_m_tx 	+315	@		2   	., label("")
-	CHECKBOX 	cokm_pair	_lft 	_xls 	_gb		80, label("c Pairwise comparisons ") groupbox onclickon(program onOff_pair)
+	CHECKBOX 	cokm_mean	_lft 	_xls 	_gb		80, label("k Simultaneous comparisons ") groupbox onclickon(program onOff_mean)
+	TEXT  		cokm_m_tx 	_ilft	_ss 	_tx		., label("List of hypothetical means:")
+	TEXT  		cokm_m_de 	_ilft	_ss 	_de		., label("means ") right
+    EDIT  		cokm_m_ed 	_ide	@ 		_iwd   	., numonly label("mean") option(means)
+	CHECKBOX 	cokm_pair	_lft 	_xxls 	_gb		80, label("c Pairwise comparisons ") groupbox onclickon(program onOff_pair)
 	TEXT  		cokm_e_de 	_ilft	_ms 	_de		., label("effect ") right
     EDIT  		cokm_e_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
     TEXT  		cokm_e_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size")
 	TEXT  		cokm_c_de 	_ilft	_ms 	_de		., label("c ") right
     EDIT  		cokm_c_ed 	_ide	@ 		_edw   	., numonly label("c") option(c)
     TEXT  		cokm_c_tx 	_iedw	@ 		_tx	   	., label("Number of pairwise comparisons")
-	CHECKBOX 	cokm_power	_lft 	_xls 	_gb		60, label("Power: Sample size (by group) ") groupbox onclickon(program onOff_power)
-	TEXT  		cokm_nk_de 	_ilft	_ms 	_de		., label("nk ") right
+	CHECKBOX 	cokm_power	_lft 	_xls 	_gb		80, label("Power ") groupbox onclickon(program onOff_power)
+    TEXT  		cokm_nk_tx 	_ilft	_ss		_tx	   	., label("List of Sample size (by group):")
+	TEXT  		cokm_nk_de 	_ilft	_ss 	_de		., label("nk ") right
     EDIT  		cokm_nk_ed 	_ide	@ 		_iwd   	., numonly label("nk") option(nk)
-    TEXT  		cokm_nk_tx 	+315	@ 		2	   	., label("")
+	
+	// ci1p controls
+	GROUPBOX	ci1p_gb1	_lft  	_ini	_gb    	100
+	TEXT  		ci1p_p0_de 	_ilft	_ss 	_de		., label("p0 ") right
+    EDIT  		ci1p_p0_ed  _ide	@ 		_edw   	., numonly label("p0") option(p0)
+    TEXT  		ci1p_p0_tx  _iedw	@ 		_tx	   	., label("Supposed Population Proportion(%)")
+	TEXT  		ci1p_cl_de 	_ilft	_ms 	_de		., label("cl ") right
+    EDIT  		ci1p_cl_ed  _ide	@ 		_edw   	., numonly label("cl") option(cl) default("90 95 99")
+    TEXT  		ci1p_cl_tx  _iedw	@ 		_tx	   	., label("Confidence level(%)")
+	TEXT  		ci1p_n_de 	_ilft	_ms 	_de		., label("n ") right
+    EDIT  		ci1p_n_ed  	_ide	@ 		_edw   	., numonly label("n") option(n)
+    TEXT  		ci1p_n_tx  	_iedw	@ 		_tx	   	., label("Population Size")
+	CHECKBOX 	ci1p_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		ci1p_a_tx 	_ilft	_ss 	_tx		., label("List of CI absolute precision values(%):")
+	TEXT  		ci1p_a_de 	_ilft	_ms 	_de		., label("apre ") right
+    EDIT  		ci1p_a_ed 	_ide	@ 		_iwd   	., numonly label("apre") option(apre)
+	CHECKBOX 	ci1p_preci	_lft 	_xls 	_gb		60, label("Precision of CI ") groupbox onclickon(program onOff_preci)
+	TEXT  		ci1p_ns_de 	_ilft	_ms 	_de		., label("ns ") right
+    EDIT  		ci1p_ns_ed 	_ide	@ 		_edw   	., numonly label("ns") option(ns)
+    TEXT  		ci1p_ns_tx 	_iedw	@ 		_tx	   	., label("List of Sample Sizes")
+	
+	// ci2p controls
+	GROUPBOX	ci2p_gb1	_lft  	_ini	_gb    	130
+	TEXT  		ci2p_p0_de 	_ilft	_ss 	_de		., label("p0 ") right
+    EDIT  		ci2p_p0_ed  _ide	@ 		_edw   	., numonly label("p0") option(p0)
+    TEXT  		ci2p_p0_tx  _iedw	@ 		_tx	   	., label("Supposed proportion in Pop.0(%)")
+	TEXT  		ci2p_p1_de 	_ilft	_ms 	_de		., label("p1 ") right
+    EDIT  		ci2p_p1_ed  _ide	@ 		_edw   	., numonly label("p1") option(p1)
+    TEXT  		ci2p_p1_tx  _iedw	@ 		_tx	   	., label("Supposed proportion in Pop.1(%)")
+	TEXT  		ci2p_cl_de 	_ilft	_ms 	_de		., label("cl ") right
+    EDIT  		ci2p_cl_ed  _ide	@ 		_edw   	., numonly label("cl") option(cl) default("90 95 97.5 99")
+    TEXT  		ci2p_cl_tx  _iedw	@ 		_tx	   	., label("Confidence level(%)")
+	TEXT  		ci2p_r_de 	_ilft	_ms 	_de		., label("r ") right
+    EDIT  		ci2p_r_ed  	_ide	@ 		_edw   	., numonly label("r") option(r) default("1")
+    TEXT  		ci2p_r_tx  	_iedw	@ 		_tx	   	., label("Ratio n0/n1")
+	CHECKBOX 	ci2p_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		ci2p_a_tx 	_ilft	_ss 	_tx		., label("List of CI absolute precision values(%):")
+	TEXT  		ci2p_a_de 	_ilft	_ms 	_de		., label("apre ") right
+    EDIT  		ci2p_a_ed 	_ide	@ 		_iwd   	., numonly label("apre") option(apre)
+	CHECKBOX 	ci2p_preci	_lft 	_xls 	_gb		80, label("Precision of CI ") groupbox onclickon(program onOff_preci)
+	TEXT  		ci2p_n1_de 	_ilft	_ms 	_de		., label("n1 ") right
+    EDIT  		ci2p_n1_ed 	_ide	@ 		_edw   	., numonly label("n1") option(n1)
+    TEXT  		ci2p_n1_tx 	_iedw	@ 		_tx	   	., label("Sample Size (Group 1)")
+	TEXT  		ci2p_n0_de 	_ilft	_ms 	_de		., label("n0 ") right
+    EDIT  		ci2p_n0_ed 	_ide	@ 		_edw   	., numonly label("n0") option(n0)
+    TEXT  		ci2p_n0_tx 	_iedw	@ 		_tx	   	., label("Sample Size (Group 0)")
+
+	// ci1m controls
+	GROUPBOX	ci1m_gb1	_lft  	_ini	_gb    	100
+	TEXT  		ci1m_sd_de 	_ilft	_ss 	_de		., label("sd ") right
+    EDIT  		ci1m_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
+    TEXT  		ci1m_sd_tx  _iedw	@ 		_tx	   	., label("Supposed Standard Deviation")
+	TEXT  		ci1m_cl_de 	_ilft	_ms 	_de		., label("cl ") right
+    EDIT  		ci1m_cl_ed  _ide	@ 		_edw   	., numonly label("cl") option(cl) default("90 95 99")
+    TEXT  		ci1m_cl_tx  _iedw	@ 		_tx	   	., label("Confidence level(%)")
+	TEXT  		ci1m_n_de 	_ilft	_ms 	_de		., label("n ") right
+    EDIT  		ci1m_n_ed  	_ide	@ 		_edw   	., numonly label("n") option(n)
+    TEXT  		ci1m_n_tx  	_iedw	@ 		_tx	   	., label("Population Size")
+	CHECKBOX 	ci1m_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		ci1m_a_tx 	_ilft	_ss 	_tx		., label("List of CI absolute precision values:")
+	TEXT  		ci1m_a_de 	_ilft	_ms 	_de		., label("apre ") right
+    EDIT  		ci1m_a_ed 	_ide	@ 		_iwd   	., numonly label("apre") option(apre)
+	CHECKBOX 	ci1m_preci	_lft 	_xls 	_gb		60, label("Precision of CI ") groupbox onclickon(program onOff_preci)
+	TEXT  		ci1m_ns_de 	_ilft	_ms 	_de		., label("ns ") right
+    EDIT  		ci1m_ns_ed 	_ide	@ 		_edw   	., numonly label("ns") option(ns)
+    TEXT  		ci1m_ns_tx 	_iedw	@ 		_tx	   	., label("Sample Size")
+	
+	// ci2m controls
+	GROUPBOX	ci2m_gb1	_lft  	_ini	_gb    	100
+	TEXT  		ci2m_sd_de 	_ilft	_ss 	_de		., label("sd ") right
+    EDIT  		ci2m_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
+    TEXT  		ci2m_sd_tx  _iedw	@ 		_tx	   	., label("Supposed Standard Deviation")
+	TEXT  		ci2m_cl_de 	_ilft	_ms 	_de		., label("cl ") right
+    EDIT  		ci2m_cl_ed  _ide	@ 		_edw   	., numonly label("cl") option(cl) default("90 95 97.5 99")
+    TEXT  		ci2m_cl_tx  _iedw	@ 		_tx	   	., label("Confidence level(%)")
+	TEXT  		ci2m_r_de 	_ilft	_ms 	_de		., label("r ") right
+    EDIT  		ci2m_r_ed  	_ide	@ 		_edw   	., numonly label("r") option(r) default("1")
+    TEXT  		ci2m_r_tx  	_iedw	@ 		_tx	   	., label("Ratio n0/n1")
+	CHECKBOX 	ci2m_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		ci2m_a_tx 	_ilft	_ss 	_tx		., label("List of CI absolute precision values:")
+	TEXT  		ci2m_a_de 	_ilft	_ms 	_de		., label("apre ") right
+    EDIT  		ci2m_a_ed 	_ide	@ 		_iwd   	., numonly label("apre") option(apre)
+	CHECKBOX 	ci2m_preci	_lft 	_xls 	_gb		80, label("Precision of CI ") groupbox onclickon(program onOff_preci)
+	TEXT  		ci2m_n1_de 	_ilft	_ms 	_de		., label("n1 ") right
+    EDIT  		ci2m_n1_ed 	_ide	@ 		_edw   	., numonly label("n1") option(n1)
+    TEXT  		ci2m_n1_tx 	_iedw	@ 		_tx	   	., label("Sample Size (Group 1)")
+	TEXT  		ci2m_n0_de 	_ilft	_ms 	_de		., label("n0 ") right
+    EDIT  		ci2m_n0_ed 	_ide	@ 		_edw   	., numonly label("n0") option(n0)
+    TEXT  		ci2m_n0_tx 	_iedw	@ 		_tx	   	., label("Sample Size (Group 0)")
+
+	// co1c controls
+	GROUPBOX	co1c_gb1	_lft  	_ini	_gb    	140
+	TEXT  		co1c_cr_de 	_ilft	_ss 	_de		., label("cr ") right
+    EDIT  		co1c_cr_ed  _ide	@ 		_edw   	., numonly label("cr") option(cr)
+    TEXT  		co1c_cr_tx  _iedw	@ 		_tx	   	., label("Correlation in a reference population")
+	TEXT  		co1c_cr1_de	_ilft	_ms 	_de		., label("{ cr1 ") right
+    EDIT  		co1c_cr1_ed _ide	@ 		_edw   	., numonly label("cr1") option(cr1)
+    TEXT  		co1c_cr1_tx _iedw	@ 		_tx	   	., label("Correlation in a sample")
+	TEXT  		co1c_e_de 	_ilft	_ms 	_de		., label("or effect } ") right
+    EDIT  		co1c_e_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
+    TEXT  		co1c_e_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size(%)")
+	TEXT  		co1c_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		co1c_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		co1c_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	CHECKBOX 	co1c_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		co1c_b_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		co1c_b_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		co1c_b_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	co1c_power	_lft 	_xls 	_gb		60, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		co1c_n1_de 	_ilft	_ms 	_de		., label("n1 ") right
+    EDIT  		co1c_n1_ed 	_ide	@ 		_edw	., numonly label("n1") option(n1)
+    TEXT  		co1c_n1_tx 	_iedw	@ 		_tx	   	., label("Size of sample 1")
+
+	// co2c controls
+	GROUPBOX	co2c_gb1	_lft  	_ini	_gb    	140
+	TEXT  		co2c_cr0_de	_ilft	_ss 	_de		., label("cr0 ") right
+    EDIT  		co2c_cr0_ed _ide	@ 		_edw   	., numonly label("cr0") option(cr0)
+    TEXT  		co2c_cr0_tx _iedw	@ 		_tx	   	., label("Correlation in a sample 0")
+	TEXT  		co2c_cr1_de	_ilft	_ms 	_de		., label("{ cr1 ") right
+    EDIT  		co2c_cr1_ed _ide	@ 		_edw   	., numonly label("cr1") option(cr1)
+    TEXT  		co2c_cr1_tx _iedw	@ 		_tx	   	., label("Correlation in a sample 1")
+	TEXT  		co2c_e_de 	_ilft	_ms 	_de		., label("or effect } ") right
+    EDIT  		co2c_e_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
+    TEXT  		co2c_e_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size(%)")
+	TEXT  		co2c_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		co2c_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		co2c_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	CHECKBOX 	co2c_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		co2c_b_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		co2c_b_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		co2c_b_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	co2c_power	_lft 	_xls 	_gb		80, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		co2c_n1_de 	_ilft	_ms 	_de		., label("n1 ") right
+    EDIT  		co2c_n1_ed 	_ide	@ 		_edw	., numonly label("n1") option(n1)
+    TEXT  		co2c_n1_tx 	_iedw	@ 		_tx	   	., label("Size of sample 1")
+	TEXT  		co2c_n0_de 	_ilft	_ms 	_de		., label("n0 ") right
+    EDIT  		co2c_n0_ed 	_ide	@ 		_edw	., numonly label("n0") option(n0)
+    TEXT  		co2c_n0_tx 	_iedw	@ 		_tx	   	., label("Size of sample 0")
+
+	// co2r controls
+	GROUPBOX 	co2r_gb1  	_lft 	_ini 	_gb 	55, label("")
+	RADIO 		co2r_co		_ilft   _ss  	200   	., first label("Cohort Risk studies") onclickon(program co2r_co)
+	RADIO 		co2r_cc		+210   	@   	175   	., last label("Case-Control studies") onclickon(program co2r_cc)
+	// cohort
+	GROUPBOX	co2r_gb2	_lft  	120		_gb    	205
+	TEXT  		co2r_r0_de	_ilft	_ss 	_de		., label("r0 ") right
+    EDIT  		co2r_r0_ed 	_ide	@ 		_edw   	., numonly label("r0") option(r0)
+    TEXT  		co2r_r0_tx 	_iedw	@ 		_tx	   	., label("Event risk in UnExposed(%)")
+	TEXT  		co2r_r1_de	_ilft	_ms 	_de		., label("{ r1 ") right
+    EDIT  		co2r_r1_ed 	_ide	@ 		_edw   	., numonly label("r1") option(r1)
+    TEXT  		co2r_r1_tx 	_iedw	@ 		_tx	   	., label("Event risk in Exposed(%)")
+	TEXT  		co2r_rr_de 	_ilft	_ms 	_de		., label("or rr ") right
+    EDIT  		co2r_rr_ed 	_ide	@ 		_edw   	., numonly label("rr") option(rr)
+    TEXT  		co2r_rr_tx 	_iedw	@ 		_tx	   	., label("Expected Risk Ratio")
+	TEXT  		co2r_rd_de 	_ilft	_ms 	_de		., label("or rd ") right
+    EDIT  		co2r_rd_ed 	_ide	@ 		_edw   	., numonly label("rd") option(rd)
+    TEXT  		co2r_rd_tx 	_iedw	@ 		_tx	   	., label("Expected Risk Difference(%)")
+	TEXT  		co2r_or1_de _ilft	_ms 	_de		., label("or or } ") right
+    EDIT  		co2r_or1_ed _ide	@ 		_edw   	., numonly label("or") option(or)
+    TEXT  		co2r_or1_tx _iedw	@ 		_tx	   	., label("Expected Odds Ratio")
+	TEXT  		co2r_rt1_de _ilft	_ms 	_de		., label("{ r ") right
+    EDIT  		co2r_rt1_ed _ide	@ 		_edw   	., numonly label("r") option(r) default(1)
+    TEXT  		co2r_rt1_tx _iedw	@ 		_tx	   	., label("Ratio n0/n1")
+	TEXT  		co2r_pe_de 	_ilft	_ms 	_de		., label("or pe } ") right
+    EDIT  		co2r_pe_ed 	_ide	@ 		_edw   	., numonly label("pe") option(pe)
+    TEXT  		co2r_pe_tx 	_iedw	@ 		_tx	   	., label("Cohort exposure prevalence(%)")
+	CHECKBOX 	co2r_size1	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		co2r_b1_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		co2r_b1_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		co2r_b1_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	co2r_power1	_lft 	_xls 	_gb		80, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		co2r_n1_de 	_ilft	_ms 	_de		., label("n1 ") right
+    EDIT  		co2r_n1_ed 	_ide	@ 		_edw	., numonly label("n1") option(n1)
+    TEXT  		co2r_n1_tx 	_iedw	@ 		_tx	   	., label("Size of sample 1")
+	TEXT  		co2r_n0_de 	_ilft	_ms 	_de		., label("n0 ") right
+    EDIT  		co2r_n0_ed 	_ide	@ 		_edw	., numonly label("n0") option(n0)
+    TEXT  		co2r_n0_tx 	_iedw	@ 		_tx	   	., label("Size of sample 0")
+	// case-control
+	GROUPBOX	co2r_gb3	_lft  	120		_gb    	165
+	TEXT  		co2r_pe0_de	_ilft	_ss 	_de		., label("pe0 ") right
+    EDIT  		co2r_pe0_ed _ide	@ 		_edw   	., numonly label("pe0") option(pe0)
+    TEXT  		co2r_pe0_tx _iedw	@ 		_tx	   	., label("Proportion of exposed in NonCases(%)")
+	TEXT  		co2r_pe1_de	_ilft	_ms 	_de		., label("{ pe1 ") right
+    EDIT  		co2r_pe1_ed _ide	@ 		_edw   	., numonly label("pe1") option(pe1)
+    TEXT  		co2r_pe1_tx _iedw	@ 		_tx	   	., label("Proportion of exposed in Cases(%)")
+	TEXT  		co2r_or2_de _ilft	_ms 	_de		., label("or or } ") right
+    EDIT  		co2r_or2_ed _ide	@ 		_edw   	., numonly label("or") option(or)
+    TEXT  		co2r_or2_tx _iedw	@ 		_tx	   	., label("Expected Odds Ratio")
+	TEXT  		co2r_rt2_de _ilft	_ms 	_de		., label("r ") right
+    EDIT  		co2r_rt2_ed _ide	@ 		_edw   	., numonly label("r") option(r) default(1)
+    TEXT  		co2r_rt2_tx _iedw	@ 		_tx	   	., label("Ratio m0/m1")
+	TEXT  		co2r_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		co2r_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		co2r_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	CHECKBOX 	co2r_size2	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		co2r_b2_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		co2r_b2_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		co2r_b2_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	co2r_power2	_lft 	_xls 	_gb		80, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		co2r_m1_de 	_ilft	_ms 	_de		., label("m1 ") right
+    EDIT  		co2r_m1_ed 	_ide	@ 		_edw	., numonly label("m1") option(m1)
+    TEXT  		co2r_m1_tx 	_iedw	@ 		_tx	   	., label("Size of sample 1")
+	TEXT  		co2r_m0_de 	_ilft	_ms 	_de		., label("m0 ") right
+    EDIT  		co2r_m0_ed 	_ide	@ 		_edw	., numonly label("m0") option(m0)
+    TEXT  		co2r_m0_tx 	_iedw	@ 		_tx	   	., label("Size of sample 0")
+	
+	// co2i controls
+	GROUPBOX	co2i_gb1	_lft  	_ini	_gb    	220
+	TEXT  		co2i_i0_de	_ilft	_ss 	_de		., label("i0 ") right
+    EDIT  		co2i_i0_ed 	_ide	@ 		_edw   	., numonly label("i0") option(i0)
+    TEXT  		co2i_i0_tx 	_iedw	@ 		_tx	   	., label("Event rate in UnExposed")
+	TEXT  		co2i_i1_de	_ilft	_ms 	_de		., label("{ i1 ") right
+    EDIT  		co2i_i1_ed 	_ide	@ 		_edw   	., numonly label("i1") option(i1)
+    TEXT  		co2i_i1_tx 	_iedw	@ 		_tx	   	., label("Event rate in Exposed")
+	TEXT  		co2i_ir_de 	_ilft	_ms 	_de		., label("or ir ") right
+    EDIT  		co2i_ir_ed 	_ide	@ 		_edw   	., numonly label("ir") option(ir)
+    TEXT  		co2i_ir_tx 	_iedw	@ 		_tx	   	., label("Expected Rate Ratio")
+	TEXT  		co2i_id_de 	_ilft	_ms 	_de		., label("or id } ") right
+    EDIT  		co2i_id_ed 	_ide	@ 		_edw   	., numonly label("id") option(id)
+    TEXT  		co2i_id_tx 	_iedw	@ 		_tx	   	., label("Expected Rate Difference")
+	TEXT  		co2i_d_de 	_ilft	_ms 	_de		., label("d ") right
+    EDIT  		co2i_d_ed 	_ide	@ 		_edw   	., numonly label("d") option(d)
+    TEXT  		co2i_d_tx 	_iedw	@ 		_tx	   	., label("Mean duration of Follow up")
+	TEXT  		co2i_r_de 	_ilft	_ms 	_de		., label("r ") right
+    EDIT  		co2i_r_ed 	_ide	@ 		_edw   	., numonly label("r") option(r) default(1)
+    TEXT  		co2i_r_tx 	_iedw	@ 		_tx	   	., label("Ratio n0/n1")
+	TEXT  		co2i_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		co2i_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		co2i_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	CHECKBOX 	co2i_size	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
+	TEXT  		co2i_b_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		co2i_b_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		co2i_b_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
+	CHECKBOX 	co2i_power	_lft 	_xls 	_gb		80, label("Power ") groupbox onclickon(program onOff_power)
+	TEXT  		co2i_n1_de 	_ilft	_ms 	_de		., label("n1 ") right
+    EDIT  		co2i_n1_ed 	_ide	@ 		_edw	., numonly label("n1") option(n1)
+    TEXT  		co2i_n1_tx 	_iedw	@ 		_tx	   	., label("Size of sample 1")
+	TEXT  		co2i_n0_de 	_ilft	_ms 	_de		., label("n0 ") right
+    EDIT  		co2i_n0_ed 	_ide	@ 		_edw	., numonly label("n0") option(n0)
+    TEXT  		co2i_n0_tx 	_iedw	@ 		_tx	   	., label("Size of sample 0")
+
+	// ncr controls
+	GROUPBOX	ncr_gb1		_lft  	_ini	_gb    	145
+	TEXT  		ncr_vb_de	_ilft	_ss 	_de		., label("vb ") right
+    EDIT  		ncr_vb_ed 	_ide	@ 		_edw   	., numonly label("vb") option(vb)
+    TEXT  		ncr_vb_tx 	_iedw	@ 		_tx	   	., label("Supposed Between Group Variance")
+	TEXT  		ncr_vw_de	_ilft	_ms 	_de		., label("vw ") right
+    EDIT  		ncr_vw_ed 	_ide	@ 		_edw   	., numonly label("vw") option(vw)
+    TEXT  		ncr_vw_tx 	_iedw	@ 		_tx	   	., label("Supposed Within Group Variance")
+	TEXT  		ncr_e_de 	_ilft	_ms 	_de		., label("effect ") right
+    EDIT  		ncr_e_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
+    TEXT  		ncr_e_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size in proportion")
+	TEXT  		ncr_a_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		ncr_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		ncr_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	GROUPBOX	ncr_gb2		_lft  	_xls	_gb    	55, label("Sample Size ")
+	TEXT  		ncr_b_de 	_ilft	_ms 	_de		., label("beta ") right
+    EDIT  		ncr_b_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
+    TEXT  		ncr_b_tx 	_iedw	@ 		_tx	   	., label("Beta risk(%)")
 	
 	// nst
 	GROUPBOX	gb_nst	 	_lft    _nst   	_gb   	60, label("Name of the study")
@@ -331,8 +593,7 @@ LIST descrip
 		Estimation of the difference between 2 means
 		Comparison of one correlation to a reference
 		Comparison of two correlations
-		Comparison of two risks - Cohort risk studies
-		Comparison of two risks - Case-Control studies
+		Comparison of two risks
 		Comparison of two rates
 		Number of communities (Risk): Intervention trials
 	END
@@ -354,8 +615,7 @@ LIST values
 		ci2m
 		co1c
 		co2c
-		co2r1
-		co2r2
+		co2r
 		co2i
 		ncr
 	END
@@ -371,7 +631,7 @@ END
 	
 PROGRAM onOff_size
 BEGIN
-	if ! isLoading & onOff {
+	if ! isLoading & onOff & co2rOnOff {
 		put "nsize__utils onOff , "
 		put "clsname(" dlgName ") size"
 		stata hidden
@@ -380,7 +640,7 @@ END
 
 PROGRAM onOff_power
 BEGIN
-	if ! isLoading & onOff {
+	if ! isLoading & onOff & co2rOnOff {
 		put "nsize__utils onOff , "
 		put "clsname(" dlgName ") power"
 		stata hidden
@@ -405,11 +665,38 @@ BEGIN
 	}
 END
 
-PROGRAM onOff_mean
+PROGRAM onOff_pair
 BEGIN
 	if ! isLoading & onOff {
 		put "nsize__utils onOff , "
 		put "clsname(" dlgName ") pair"
+		stata hidden
+	}
+END
+
+PROGRAM onOff_preci
+BEGIN
+	if ! isLoading & onOff {
+		put "nsize__utils onOff , "
+		put "clsname(" dlgName ") preci"
+		stata hidden
+	}
+END
+
+PROGRAM co2r_co
+BEGIN
+	if ! isLoading & onOff & co2rOnOff {
+		put "nsize__utils co2r , "
+		put "clsname(" dlgName ") co"
+		stata hidden
+	}
+END
+
+PROGRAM co2r_cc
+BEGIN
+	if ! isLoading & onOff & co2rOnOff {
+		put "nsize__utils co2r , "
+		put "clsname(" dlgName ") cc"
 		stata hidden
 	}
 END
@@ -421,4 +708,27 @@ BEGIN
 		put "clsname(" dlgName ") "
 		stata hidden
 	}
+END
+
+
+PROGRAM command
+BEGIN
+	put "nsize " main.co_type
+	
+	beginoptions
+		if main.co_type.iseq("co1p") {
+			optionarg main.co1p_p_ed
+			optionarg main.co1p_p1_ed
+			optionarg main.co1p_ef_ed
+			optionarg /hidedefault main.co1p_a_ed
+			if (main.co1p_size) {
+				optionarg /hidedefault main.co1p_b_ed
+			}
+			if (main.co1p_power) {
+				optionarg main.co1p_n_ed
+			}
+		}
+		
+		optionarg main.ed_nst
+	endoptions
 END

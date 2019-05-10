@@ -190,7 +190,7 @@ BEGIN
 	CHECKBOX 	copp_power	_lft 	_xls 	_gb		60, label("Power ") groupbox onclickon(program onOff_power)
 	TEXT  		copp_n_de 	_ilft	_ms 	_de		., label("n ") right
     EDIT  		copp_n_ed 	_ide	@ 		_edw	., numonly label("n") option(n)
-    TEXT  		copp_n_tx 	_iedw	@ 		_tx	   	., label("Sample Size")
+    TEXT  		copp_n_tx 	_iedw	@ 		_tx	   	., label("Sample Size (Total number of cases)")
 
 	// co1m controls
 	GROUPBOX	co1m_gb1	_lft  	_ini	_gb    	90
@@ -726,6 +726,64 @@ BEGIN
 			}
 			if (main.co1p_power) {
 				optionarg main.co1p_n_ed
+			}
+		}
+		
+		if main.co_type.iseq("co2p") {
+			optionarg main.co2p_p0_ed
+			optionarg main.co2p_p1_ed
+			optionarg main.co2p_ef_ed
+			optionarg /hidedefault main.co2p_a_ed
+			if (main.co2p_size) {
+				optionarg /hidedefault main.co2p_b_ed
+			}
+			if (main.co2p_power) {
+				optionarg main.co2p_n_ed
+			}
+		}
+		
+		if main.co_type.iseq("c1pe") {
+			optionarg main.c1pe_p0_ed
+			optionarg main.c1pe_p1_ed
+			optionarg main.c1pe_d_ed
+			option radio(main c1pe_non c1pe_sup)
+			optionarg /hidedefault main.c1pe_a_ed
+			if (main.c1pe_size) {
+				optionarg /hidedefault main.c1pe_b_ed
+			}
+			if (main.c1pe_power) {
+				optionarg main.c1pe_n_ed
+			}
+		}
+		
+		if main.co_type.iseq("c2pe") {
+			optionarg main.c2pe_p0_ed
+			optionarg main.c2pe_p1_ed
+			optionarg main.c2pe_d_ed
+			option radio(main c2pe_non c2pe_sup)
+			optionarg /hidedefault main.c2pe_r_ed
+			optionarg /hidedefault main.c2pe_a_ed
+			if (main.c2pe_size) {
+				optionarg /hidedefault main.c2pe_b_ed
+			}
+			if (main.c2pe_power) {
+				optionarg main.c2pe_n0_ed
+				optionarg main.c2pe_n1_ed
+			}
+		}
+		
+		if main.co_type.iseq("copp") {
+			optionarg main.copp_or_ed
+			optionarg main.copp_pd_ed
+			optionarg main.copp_p0_ed
+			optionarg main.copp_ora_ed
+			optionarg /hidedefault main.copp_r_ed
+			optionarg /hidedefault main.copp_a_ed
+			if (main.copp_size) {
+				optionarg /hidedefault main.copp_b_ed
+			}
+			if (main.copp_power) {
+				optionarg main.copp_n_ed
 			}
 		}
 		

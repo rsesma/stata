@@ -55,7 +55,7 @@ program define s_h
 	*/ "`type'"=="co1c" | "`type'"=="co2c" | "`type'"=="co2i") local l gb1 size power
 	if ("`type'"=="c1pe" | "`type'"=="c2pe") local l gb1 size power gb2 equ non sup
 	if ("`type'"=="co1m" | "`type'"=="co2m" | "`type'"=="c2me") local l gb1 size power effect
-	if ("`type'"=="cokm") local l gb1 mean pair power
+	if ("`type'"=="cokm") local l gb1 mean pair power1 power2
 	if ("`type'"=="ci1p" | "`type'"=="ci2p" | "`type'"=="ci1m" | "`type'"=="ci2m") local l gb1 size preci
 	if ("`type'"=="co2r") local l gb1 co cc gb2 size1 power1 gb3 size2 power2
 	if ("`type'"=="ncr") local l gb1 gb2
@@ -70,7 +70,7 @@ program define s_h
 	if ("`type'"=="copp") local l or pd p0 ora r a b n
 	if ("`type'"=="co1m" | "`type'"=="c2me") local l sd a e1 e2 b1 b2 n1 n2
 	if ("`type'"=="co2m") local l sd r a e1 b1 e2 n11 n01 b2 n12 n02
-	if ("`type'"=="cokm") local l sd m e c nk
+	if ("`type'"=="cokm") local l sd m e c nk1 nk2
 	if ("`type'"=="ci1p") local l p0 cl n a ns
 	if ("`type'"=="ci2p") local l p0 p1 cl r a n1 n0
 	if ("`type'"=="ci1m") local l sd cl n a ns
@@ -127,7 +127,7 @@ program define onOff
 			`dlg'.main.`type'_preci.setoff
 			`dlg'.main.`type'_ns_ed.disable
 			if ("`type'"=="ci1p") {
-				`dlg'.main.`type'_p0_tx.setlabel "Supposed Population Proportion(%)"
+				`dlg'.main.`type'_p0_tx.setlabel "Supposed Population Proportion(%):"
 				`dlg'.main.`type'_cl_ed.setdefault "90 95 99"
 				`dlg'.main.`type'_cl_ed.setvalue "90 95 99"
 			}
@@ -188,14 +188,6 @@ program define onOff
 			if ("`type'"=="co2m" ) `dlg'.main.`type'_n12_ed.disable
 			if ("`type'"=="co2m" ) `dlg'.main.`type'_n02_ed.disable
 		}
-		if ("`type'"=="cokm") {
-			`dlg'.main.`type'_nk_ed.enable
-			`dlg'.main.`type'_mean.setoff
-			`dlg'.main.`type'_m_ed.disable
-			`dlg'.main.`type'_pair.setoff
-			`dlg'.main.`type'_e_ed.disable
-			`dlg'.main.`type'_c_ed.disable
-		}
 		if ("`type'"=="co1c") | ("`type'"=="co2c") {	
 			`dlg'.main.`type'_n1_ed.enable
 			if ("`type'"=="co2c") `dlg'.main.`type'_n0_ed.enable
@@ -240,11 +232,14 @@ program define onOff
 	if ("`mean'"!="") {
 		if ("`type'"=="cokm") {
 			`dlg'.main.`type'_m_ed.enable
+			`dlg'.main.`type'_power1.setoff
+			`dlg'.main.`type'_power1.enable
 			`dlg'.main.`type'_pair.setoff
 			`dlg'.main.`type'_e_ed.disable
 			`dlg'.main.`type'_c_ed.disable
-			`dlg'.main.`type'_power.setoff
-			`dlg'.main.`type'_nk_ed.disable
+			`dlg'.main.`type'_power2.setoff
+			`dlg'.main.`type'_power2.disable
+			`dlg'.main.`type'_nk2_ed.disable
 		}
 	}
 
@@ -252,20 +247,23 @@ program define onOff
 		if ("`type'"=="cokm") {
 			`dlg'.main.`type'_e_ed.enable
 			`dlg'.main.`type'_c_ed.enable
+			`dlg'.main.`type'_power2.setoff
+			`dlg'.main.`type'_power2.enable
 			`dlg'.main.`type'_mean.setoff
 			`dlg'.main.`type'_m_ed.disable
-			`dlg'.main.`type'_power.setoff
-			`dlg'.main.`type'_nk_ed.disable
+			`dlg'.main.`type'_power1.setoff
+			`dlg'.main.`type'_power1.disable
+			`dlg'.main.`type'_nk1_ed.disable
 		}
 	}
-
+	
 	if ("`preci'"!="") {
 		if ("`type'"=="ci1p") | ("`type'"=="ci1m") {
 			`dlg'.main.`type'_ns_ed.enable
 			`dlg'.main.`type'_size.setoff
 			`dlg'.main.`type'_a_ed.disable
 			if ("`type'"=="ci1p") {
-				`dlg'.main.`type'_p0_tx.setlabel "List of Supposed Population Proportion(%)"
+				`dlg'.main.`type'_p0_tx.setlabel "List of Supposed Population Proportion(%):"
 				`dlg'.main.`type'_cl_ed.setdefault "95"
 				`dlg'.main.`type'_cl_ed.setvalue "95"
 			}

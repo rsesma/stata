@@ -39,7 +39,6 @@ BEGIN
 	create BOOLEAN co2rOnOff
 	.co2rOnOff.settrue
 	
-	create STRING cmd
 	create STRING dlgName
 	dlgName.setvalue class _dlg_rsrcname
 END
@@ -226,7 +225,7 @@ BEGIN
 	GROUPBOX	co2m_gb1	_lft  	_ini	_gb    	115
 	TEXT  		co2m_sd_de 	_ilft	_ss 	_de		., label("sd ") right
     EDIT  		co2m_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
-    TEXT  		co2m_sd_tx  _iedw	@ 		_tx	   	., label("Common standard deviation")
+    TEXT  		co2m_sd_tx  _iedw	@ 		_tx	   	., label("Common standard deviation of Groups 0 && 1")
 	TEXT  		co2m_r_de 	_ilft	_ms 	_de		., label("r ") right
     EDIT  		co2m_r_ed 	_ide	@ 		_edw   	., numonly label("r") option(r) default(1)
     TEXT  		co2m_r_tx 	_iedw	@ 		_tx	   	., label("Ratio n0/n1")
@@ -248,7 +247,7 @@ BEGIN
     EDIT  		co2m_n11_ed _ide	@ 		_edw   	., numonly label("n") option(n1)
     TEXT  		co2m_n11_tx _iedw	@ 		_tx	   	., label("Sample Size (Group 1)")
 	TEXT  		co2m_n01_de _ilft	_ms 	_de		., label("n0 ") right
-    EDIT  		co2m_n01_ed _ide	@ 		_edw   	., numonly label("n0") option(n1)
+    EDIT  		co2m_n01_ed _ide	@ 		_edw   	., numonly label("n0") option(n0)
     TEXT  		co2m_n01_tx _iedw	@ 		_tx	   	., label("Sample Size (Group 0)")
 	CHECKBOX 	co2m_effect	_lft 	_xls 	_gb		105, label("Effect size ") groupbox onclickon(program onOff_effect)
 	TEXT  		co2m_b2_de 	_ilft	_ms 	_de		., label("beta ") right
@@ -258,7 +257,7 @@ BEGIN
     EDIT  		co2m_n12_ed _ide	@ 		_edw   	., numonly label("n") option(n1)
     TEXT  		co2m_n12_tx _iedw	@ 		_tx	   	., label("Sample Size (Group 1)")
 	TEXT  		co2m_n02_de _ilft	_ms 	_de		., label("n0 ") right
-    EDIT  		co2m_n02_ed _ide	@ 		_edw   	., numonly label("n0") option(n1)
+    EDIT  		co2m_n02_ed _ide	@ 		_edw   	., numonly label("n0") option(n0)
     TEXT  		co2m_n02_tx _iedw	@ 		_tx	   	., label("Sample Size (Group 0)")
 
 	// c2me controls
@@ -296,27 +295,32 @@ BEGIN
 	TEXT  		cokm_sd_de 	_ilft	_ss 	_de		., label("sd ") right
     EDIT  		cokm_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
     TEXT  		cokm_sd_tx  _iedw	@ 		_tx	   	., label("Common standard deviation estimated")
-	CHECKBOX 	cokm_mean	_lft 	_xls 	_gb		80, label("k Simultaneous comparisons ") groupbox onclickon(program onOff_mean)
+	CHECKBOX 	cokm_mean	_lft 	_xls 	_gb		150, label("k Simultaneous comparisons ") groupbox onclickon(program onOff_mean)
 	TEXT  		cokm_m_tx 	_ilft	_ss 	_tx		., label("List of hypothetical means:")
 	TEXT  		cokm_m_de 	_ilft	_ss 	_de		., label("means ") right
-    EDIT  		cokm_m_ed 	_ide	@ 		_iwd   	., numonly label("mean") option(means)
-	CHECKBOX 	cokm_pair	_lft 	_xxls 	_gb		80, label("c Pairwise comparisons ") groupbox onclickon(program onOff_pair)
+    EDIT  		cokm_m_ed 	_ide	@ 		_iwd   	., label("mean") option(means)
+	CHECKBOX 	cokm_power1	_ilft 	_ls 	_tx		., label("Power ") onclickon(main.cokm_nk1_ed.enable) onclickoff(main.cokm_nk1_ed.disable)
+    TEXT  		cokm_nk1_tx _ilft	_ss		_tx	   	., label("List of Sample size (by group):")
+	TEXT  		cokm_nk1_de _ilft	_ss 	_de		., label("nk ") right
+    EDIT  		cokm_nk1_ed _ide	@ 		_iwd   	., label("nk") option(nk)
+	CHECKBOX 	cokm_pair	_lft 	_xxls 	_gb		155, label("c Pairwise comparisons ") groupbox onclickon(program onOff_pair)
 	TEXT  		cokm_e_de 	_ilft	_ms 	_de		., label("effect ") right
     EDIT  		cokm_e_ed 	_ide	@ 		_edw   	., numonly label("effect") option(effect)
     TEXT  		cokm_e_tx 	_iedw	@ 		_tx	   	., label("Minimum expected effect size")
 	TEXT  		cokm_c_de 	_ilft	_ms 	_de		., label("c ") right
     EDIT  		cokm_c_ed 	_ide	@ 		_edw   	., numonly label("c") option(c)
     TEXT  		cokm_c_tx 	_iedw	@ 		_tx	   	., label("Number of pairwise comparisons")
-	CHECKBOX 	cokm_power	_lft 	_xls 	_gb		80, label("Power ") groupbox onclickon(program onOff_power)
-    TEXT  		cokm_nk_tx 	_ilft	_ss		_tx	   	., label("List of Sample size (by group):")
-	TEXT  		cokm_nk_de 	_ilft	_ss 	_de		., label("nk ") right
-    EDIT  		cokm_nk_ed 	_ide	@ 		_iwd   	., numonly label("nk") option(nk)
+	CHECKBOX 	cokm_power2	_ilft 	_ls 	_tx		., label("Power ") onclickon(main.cokm_nk2_ed.enable) onclickoff(main.cokm_nk2_ed.disable)
+    TEXT  		cokm_nk2_tx _ilft	_ss		_tx	   	., label("Sample size (by group):")
+	TEXT  		cokm_nk2_de _ilft	_ss 	_de		., label("nk ") right
+    EDIT  		cokm_nk2_ed _ide	@ 		_iwd   	., label("nk") option(nk)
+
 	
 	// ci1p controls
-	GROUPBOX	ci1p_gb1	_lft  	_ini	_gb    	100
-	TEXT  		ci1p_p0_de 	_ilft	_ss 	_de		., label("p0 ") right
-    EDIT  		ci1p_p0_ed  _ide	@ 		_edw   	., numonly label("p0") option(p0)
-    TEXT  		ci1p_p0_tx  _iedw	@ 		_tx	   	., label("Supposed Population Proportion(%)")
+	GROUPBOX	ci1p_gb1	_lft  	_ini	_gb    	130
+    TEXT  		ci1p_p0_tx  _ilft	_ss 	_tx	   	., label("Supposed Population Proportion(%):")
+	TEXT  		ci1p_p0_de 	_ilft	_ms 	_de		., label("p0 ") right
+    EDIT  		ci1p_p0_ed  _ide	@ 		_iwd   	., label("p0") option(p0)
 	TEXT  		ci1p_cl_de 	_ilft	_ms 	_de		., label("cl ") right
     EDIT  		ci1p_cl_ed  _ide	@ 		_edw   	., numonly label("cl") option(cl) default("90 95 99")
     TEXT  		ci1p_cl_tx  _iedw	@ 		_tx	   	., label("Confidence level(%)")
@@ -326,11 +330,11 @@ BEGIN
 	CHECKBOX 	ci1p_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
 	TEXT  		ci1p_a_tx 	_ilft	_ss 	_tx		., label("List of CI absolute precision values(%):")
 	TEXT  		ci1p_a_de 	_ilft	_ms 	_de		., label("apre ") right
-    EDIT  		ci1p_a_ed 	_ide	@ 		_iwd   	., numonly label("apre") option(apre)
-	CHECKBOX 	ci1p_preci	_lft 	_xls 	_gb		60, label("Precision of CI ") groupbox onclickon(program onOff_preci)
+    EDIT  		ci1p_a_ed 	_ide	@ 		_iwd   	., label("apre") option(apre)
+	CHECKBOX 	ci1p_preci	_lft 	_xls 	_gb		80, label("Precision of CI ") groupbox onclickon(program onOff_preci)
+    TEXT  		ci1p_ns_tx 	_ilft	_ss		_tx	   	., label("List of Sample Sizes:")
 	TEXT  		ci1p_ns_de 	_ilft	_ms 	_de		., label("ns ") right
-    EDIT  		ci1p_ns_ed 	_ide	@ 		_edw   	., numonly label("ns") option(ns)
-    TEXT  		ci1p_ns_tx 	_iedw	@ 		_tx	   	., label("List of Sample Sizes")
+    EDIT  		ci1p_ns_ed 	_ide	@ 		_iwd   	., label("ns") option(ns)
 	
 	// ci2p controls
 	GROUPBOX	ci2p_gb1	_lft  	_ini	_gb    	130
@@ -341,15 +345,15 @@ BEGIN
     EDIT  		ci2p_p1_ed  _ide	@ 		_edw   	., numonly label("p1") option(p1)
     TEXT  		ci2p_p1_tx  _iedw	@ 		_tx	   	., label("Supposed proportion in Pop.1(%)")
 	TEXT  		ci2p_cl_de 	_ilft	_ms 	_de		., label("cl ") right
-    EDIT  		ci2p_cl_ed  _ide	@ 		_edw   	., numonly label("cl") option(cl) default("90 95 97.5 99")
-    TEXT  		ci2p_cl_tx  _iedw	@ 		_tx	   	., label("Confidence level(%)")
+    EDIT  		ci2p_cl_ed  _ide	@ 		80   	., numonly label("cl") option(cl) default("90 95 97.5 99")
+    TEXT  		ci2p_cl_tx  +90		@ 		_tx	   	., label("Confidence level(%)")
 	TEXT  		ci2p_r_de 	_ilft	_ms 	_de		., label("r ") right
     EDIT  		ci2p_r_ed  	_ide	@ 		_edw   	., numonly label("r") option(r) default("1")
     TEXT  		ci2p_r_tx  	_iedw	@ 		_tx	   	., label("Ratio n0/n1")
 	CHECKBOX 	ci2p_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
 	TEXT  		ci2p_a_tx 	_ilft	_ss 	_tx		., label("List of CI absolute precision values(%):")
 	TEXT  		ci2p_a_de 	_ilft	_ms 	_de		., label("apre ") right
-    EDIT  		ci2p_a_ed 	_ide	@ 		_iwd   	., numonly label("apre") option(apre)
+    EDIT  		ci2p_a_ed 	_ide	@ 		_iwd   	., label("apre") option(apre)
 	CHECKBOX 	ci2p_preci	_lft 	_xls 	_gb		80, label("Precision of CI ") groupbox onclickon(program onOff_preci)
 	TEXT  		ci2p_n1_de 	_ilft	_ms 	_de		., label("n1 ") right
     EDIT  		ci2p_n1_ed 	_ide	@ 		_edw   	., numonly label("n1") option(n1)
@@ -372,7 +376,7 @@ BEGIN
 	CHECKBOX 	ci1m_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
 	TEXT  		ci1m_a_tx 	_ilft	_ss 	_tx		., label("List of CI absolute precision values:")
 	TEXT  		ci1m_a_de 	_ilft	_ms 	_de		., label("apre ") right
-    EDIT  		ci1m_a_ed 	_ide	@ 		_iwd   	., numonly label("apre") option(apre)
+    EDIT  		ci1m_a_ed 	_ide	@ 		_iwd   	., label("apre") option(apre)
 	CHECKBOX 	ci1m_preci	_lft 	_xls 	_gb		60, label("Precision of CI ") groupbox onclickon(program onOff_preci)
 	TEXT  		ci1m_ns_de 	_ilft	_ms 	_de		., label("ns ") right
     EDIT  		ci1m_ns_ed 	_ide	@ 		_edw   	., numonly label("ns") option(ns)
@@ -784,6 +788,115 @@ BEGIN
 			}
 			if (main.copp_power) {
 				optionarg main.copp_n_ed
+			}
+		}
+		
+		if main.co_type.iseq("co1m") {
+			optionarg main.co1m_sd_ed
+			optionarg /hidedefault main.co1m_a_ed
+			if (main.co1m_size) {
+				optionarg main.co1m_e1_ed
+				optionarg /hidedefault main.co1m_b1_ed
+			}
+			if (main.co1m_power) {
+				optionarg main.co1m_e2_ed
+				optionarg main.co1m_n1_ed
+			}
+			if (main.co1m_effect) {
+				optionarg /hidedefault main.co1m_b2_ed
+				optionarg main.co1m_n2_ed
+			}
+		}
+		
+		if main.co_type.iseq("co2m") {
+			optionarg main.co2m_sd_ed
+			optionarg /hidedefault main.co2m_r_ed
+			optionarg /hidedefault main.co2m_a_ed
+			if (main.co2m_size) {
+				optionarg main.co2m_e1_ed
+				optionarg /hidedefault main.co2m_b1_ed
+			}
+			if (main.co2m_power) {
+				optionarg main.co2m_e2_ed
+				optionarg main.co2m_n11_ed
+				optionarg main.co2m_n01_ed
+			}
+			if (main.co2m_effect) {
+				optionarg /hidedefault main.co2m_b2_ed
+				optionarg main.co2m_n12_ed
+				optionarg main.co2m_n02_ed
+			}
+		}
+		
+		if main.co_type.iseq("c2me") {
+			optionarg main.c2me_sd_ed
+			optionarg /hidedefault main.c2me_a_ed
+			if (main.c2me_size) {
+				optionarg main.c2me_e1_ed
+				optionarg /hidedefault main.c2me_b1_ed
+			}
+			if (main.c2me_power) {
+				optionarg main.c2me_e2_ed
+				optionarg main.c2me_n1_ed
+			}
+			if (main.c2me_effect) {
+				optionarg /hidedefault main.c2me_b2_ed
+				optionarg main.c2me_n2_ed
+			}
+		}
+		
+		if main.co_type.iseq("cokm") {
+			optionarg main.cokm_sd_ed
+			if (main.cokm_mean) {
+				optionarg main.cokm_m_ed
+				if (main.cokm_power1) {
+					optionarg main.cokm_nk1_ed
+				}
+			}
+			if (main.cokm_pair) {
+				optionarg main.cokm_e_ed
+				optionarg main.cokm_c_ed
+				if (main.cokm_power2) {
+					optionarg main.cokm_nk2_ed
+				}
+			}
+		}
+		
+		if main.co_type.iseq("ci1p") {
+			optionarg main.ci1p_p0_ed
+			optionarg /hidedefault main.ci1p_cl_ed
+			optionarg main.ci1p_n_ed
+			if (main.ci1p_size) {
+				optionarg main.ci1p_a_ed
+			}
+			if (main.ci1p_preci) {
+				optionarg main.ci1p_ns_ed
+			}
+		}
+		
+		if main.co_type.iseq("ci2p") {
+			optionarg main.ci2p_p0_ed
+			optionarg main.ci2p_p1_ed
+			optionarg /hidedefault main.ci2p_r_ed
+			optionarg /hidedefault main.ci2p_cl_ed
+			if (main.ci2p_size) {
+				optionarg main.ci2p_a_ed
+			}
+			if (main.ci2p_preci) {
+				optionarg main.ci2p_n1_ed
+				optionarg main.ci2p_n0_ed
+			}
+		}
+		
+		if main.co_type.iseq("ci1m") {
+			optionarg main.ci1m_sd_ed
+			optionarg /hidedefault main.ci1m_cl_ed
+			optionarg main.ci1m_n_ed
+			if (main.ci1m_size) {
+				optionarg main.ci1m_a_ed
+			}
+			if (main.ci1m_preci) {
+				optionarg main.ci1m_ns_ed
 			}
 		}
 		

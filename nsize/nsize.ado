@@ -1,4 +1,4 @@
-*! version 1.2.9.dlg  ?may2019 JM. Domenech, R. Sesma
+*! version 1.2.9  14may2019 JM. Domenech, R. Sesma
 /*
 SAMPLE SIZE & POWER
 **PROPORTIONS

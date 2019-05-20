@@ -1,7 +1,7 @@
 /*
   nsize.dlg
 
-*! VERSION 1.2.9  ?may2019
+*! VERSION 1.2.9  14may2019
 
 */
 
@@ -388,15 +388,15 @@ BEGIN
     EDIT  		ci2m_sd_ed  _ide	@ 		_edw   	., numonly label("sd") option(sd)
     TEXT  		ci2m_sd_tx  _iedw	@ 		_tx	   	., label("Supposed Standard Deviation")
 	TEXT  		ci2m_cl_de 	_ilft	_ms 	_de		., label("cl ") right
-    EDIT  		ci2m_cl_ed  _ide	@ 		_edw   	., numonly label("cl") option(cl) default("90 95 97.5 99")
-    TEXT  		ci2m_cl_tx  _iedw	@ 		_tx	   	., label("Confidence level(%)")
+    EDIT  		ci2m_cl_ed  _ide	@ 		80   	., label("cl") option(cl) default("90 95 97.5 99")
+    TEXT  		ci2m_cl_tx  +90		@ 		_tx	   	., label("Confidence level(%)")
 	TEXT  		ci2m_r_de 	_ilft	_ms 	_de		., label("r ") right
     EDIT  		ci2m_r_ed  	_ide	@ 		_edw   	., numonly label("r") option(r) default("1")
     TEXT  		ci2m_r_tx  	_iedw	@ 		_tx	   	., label("Ratio n0/n1")
 	CHECKBOX 	ci2m_size	_lft 	_xls 	_gb		80, label("Sample Size ") groupbox onclickon(program onOff_size)
 	TEXT  		ci2m_a_tx 	_ilft	_ss 	_tx		., label("List of CI absolute precision values:")
 	TEXT  		ci2m_a_de 	_ilft	_ms 	_de		., label("apre ") right
-    EDIT  		ci2m_a_ed 	_ide	@ 		_iwd   	., numonly label("apre") option(apre)
+    EDIT  		ci2m_a_ed 	_ide	@ 		_iwd   	., label("apre") option(apre)
 	CHECKBOX 	ci2m_preci	_lft 	_xls 	_gb		80, label("Precision of CI ") groupbox onclickon(program onOff_preci)
 	TEXT  		ci2m_n1_de 	_ilft	_ms 	_de		., label("n1 ") right
     EDIT  		ci2m_n1_ed 	_ide	@ 		_edw   	., numonly label("n1") option(n1)
@@ -455,11 +455,11 @@ BEGIN
     TEXT  		co2c_n0_tx 	_iedw	@ 		_tx	   	., label("Size of sample 0")
 
 	// co2r controls
-	GROUPBOX 	co2r_gb1  	_lft 	_ini 	_gb 	55, label("")
+	GROUPBOX 	co2r_gb1  	_lft 	_ini 	_gb 	50, label("")
 	RADIO 		co2r_co		_ilft   _ss  	200   	., first label("Cohort Risk studies") onclickon(program co2r_co)
 	RADIO 		co2r_cc		+210   	@   	175   	., last label("Case-Control studies") onclickon(program co2r_cc)
 	// cohort
-	GROUPBOX	co2r_gb2	_lft  	120		_gb    	205
+	GROUPBOX	co2r_gb2	_lft  	110		_gb    	230
 	TEXT  		co2r_r0_de	_ilft	_ss 	_de		., label("r0 ") right
     EDIT  		co2r_r0_ed 	_ide	@ 		_edw   	., numonly label("r0") option(r0)
     TEXT  		co2r_r0_tx 	_iedw	@ 		_tx	   	., label("Event risk in UnExposed(%)")
@@ -481,6 +481,9 @@ BEGIN
 	TEXT  		co2r_pe_de 	_ilft	_ms 	_de		., label("or pe } ") right
     EDIT  		co2r_pe_ed 	_ide	@ 		_edw   	., numonly label("pe") option(pe)
     TEXT  		co2r_pe_tx 	_iedw	@ 		_tx	   	., label("Cohort exposure prevalence(%)")
+	TEXT  		co2r_a1_de 	_ilft	_ls 	_de		., label("alpha ") right
+    EDIT  		co2r_a1_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		co2r_a1_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")	
 	CHECKBOX 	co2r_size1	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
 	TEXT  		co2r_b1_de 	_ilft	_ms 	_de		., label("beta ") right
     EDIT  		co2r_b1_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
@@ -493,7 +496,7 @@ BEGIN
     EDIT  		co2r_n0_ed 	_ide	@ 		_edw	., numonly label("n0") option(n0)
     TEXT  		co2r_n0_tx 	_iedw	@ 		_tx	   	., label("Size of sample 0")
 	// case-control
-	GROUPBOX	co2r_gb3	_lft  	120		_gb    	165
+	GROUPBOX	co2r_gb3	_lft  	110		_gb    	165
 	TEXT  		co2r_pe0_de	_ilft	_ss 	_de		., label("pe0 ") right
     EDIT  		co2r_pe0_ed _ide	@ 		_edw   	., numonly label("pe0") option(pe0)
     TEXT  		co2r_pe0_tx _iedw	@ 		_tx	   	., label("Proportion of exposed in NonCases(%)")
@@ -506,9 +509,9 @@ BEGIN
 	TEXT  		co2r_rt2_de _ilft	_ms 	_de		., label("r ") right
     EDIT  		co2r_rt2_ed _ide	@ 		_edw   	., numonly label("r") option(r) default(1)
     TEXT  		co2r_rt2_tx _iedw	@ 		_tx	   	., label("Ratio m0/m1")
-	TEXT  		co2r_a_de 	_ilft	_xls 	_de		., label("alpha ") right
-    EDIT  		co2r_a_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
-    TEXT  		co2r_a_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
+	TEXT  		co2r_a2_de 	_ilft	_xls 	_de		., label("alpha ") right
+    EDIT  		co2r_a2_ed 	_ide	@ 		_edw   	., numonly label("alpha") option(alpha) default(5)
+    TEXT  		co2r_a2_tx 	_iedw	@ 		_tx	   	., label("Alpha risk(%)")
 	CHECKBOX 	co2r_size2	_lft 	_xls 	_gb		60, label("Sample Size ") groupbox onclickon(program onOff_size)
 	TEXT  		co2r_b2_de 	_ilft	_ms 	_de		., label("beta ") right
     EDIT  		co2r_b2_ed 	_ide	@ 		_edw   	., numonly label("beta") option(beta) default("20 15 10")
@@ -898,6 +901,105 @@ BEGIN
 			if (main.ci1m_preci) {
 				optionarg main.ci1m_ns_ed
 			}
+		}
+		
+		if main.co_type.iseq("ci2m") {
+			optionarg main.ci2m_sd_ed
+			optionarg /hidedefault main.ci2m_r_ed
+			optionarg /hidedefault main.ci2m_cl_ed
+			if (main.ci2m_size) {
+				optionarg main.ci2m_a_ed
+			}
+			if (main.ci2m_preci) {
+				optionarg main.ci2m_n1_ed
+				optionarg main.ci2m_n0_ed
+			}
+		}
+		
+		if main.co_type.iseq("co1c") {
+			optionarg main.co1c_cr_ed
+			optionarg main.co1c_cr1_ed
+			optionarg main.co1c_e_ed
+			optionarg /hidedefault main.co1c_a_ed
+			if (main.co1c_size) {
+				optionarg /hidedefault main.co1c_b_ed
+			}
+			if (main.co1c_power) {
+				optionarg main.co1c_n1_ed
+			}
+		}
+		
+		if main.co_type.iseq("co2c") {
+			optionarg main.co2c_cr0_ed
+			optionarg main.co2c_cr1_ed
+			optionarg main.co2c_e_ed
+			optionarg /hidedefault main.co2c_a_ed
+			if (main.co2c_size) {
+				optionarg /hidedefault main.co2c_b_ed
+			}
+			if (main.co2c_power) {
+				optionarg main.co2c_n1_ed
+				optionarg main.co2c_n0_ed
+			}
+		}
+
+		if main.co_type.iseq("co2r") {
+			if main.co2r_co {
+				optionarg main.co2r_r0_ed
+				optionarg main.co2r_r1_ed
+				optionarg main.co2r_rr_ed
+				optionarg main.co2r_rd_ed
+				optionarg main.co2r_or1_ed
+				optionarg /hidedefault main.co2r_rt1_ed
+				optionarg main.co2r_pe_ed
+				optionarg /hidedefault main.co2r_a1_ed
+				if (main.co2r_size1) {
+					optionarg /hidedefault main.co2r_b1_ed
+				}
+				if (main.co2r_power1) {
+					optionarg main.co2r_n1_ed
+					optionarg main.co2r_n0_ed
+				}
+			}
+			if main.co2r_cc {
+				optionarg main.co2r_pe0_ed
+				optionarg main.co2r_pe1_ed
+				optionarg main.co2r_or2_ed
+				optionarg /hidedefault main.co2r_rt2_ed
+				optionarg /hidedefault main.co2r_a2_ed
+				if (main.co2r_size2) {
+					optionarg /hidedefault main.co2r_b2_ed
+				}
+				if (main.co2r_power2) {
+					optionarg main.co2r_m1_ed
+					optionarg main.co2r_m0_ed
+				}
+			}
+		}
+
+		if main.co_type.iseq("co2i") {
+			optionarg main.co2i_i0_ed
+			optionarg main.co2i_i1_ed
+			optionarg main.co2i_ir_ed
+			optionarg main.co2i_id_ed
+			optionarg main.co2i_d_ed
+			optionarg /hidedefault main.co2i_r_ed
+			optionarg /hidedefault main.co2i_a_ed
+			if (main.co2i_size) {
+				optionarg /hidedefault main.co2i_b_ed
+			}
+			if (main.co2i_power) {
+				optionarg main.co2i_n1_ed
+				optionarg main.co2i_n0_ed
+			}
+		}
+		
+		if main.co_type.iseq("ncr") {
+			optionarg main.ncr_vb_ed
+			optionarg main.ncr_vw_ed
+			optionarg main.ncr_e_ed
+			optionarg /hidedefault main.ncr_a_ed
+			optionarg /hidedefault main.ncr_b_ed
 		}
 		
 		optionarg main.ed_nst

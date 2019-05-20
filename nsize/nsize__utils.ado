@@ -1,4 +1,4 @@
-*! version 1.2.9.dlg  ?may2019
+*! version 1.2.9  14may2019
 program nsize__utils
 	version 12.0
 	gettoken subcmd 0 : 0
@@ -77,7 +77,7 @@ program define s_h
 	if ("`type'"=="ci2m") local l sd cl r a n1 n0
 	if ("`type'"=="co1c") local l cr cr1 e a b n1
 	if ("`type'"=="co2c") local l cr0 cr1 e a b n1 n0
-	if ("`type'"=="co2r") local l r0 r1 rr rd or1 rt1 pe b1 n1 n0 pe0 pe1 or2 rt2 a b2 m1 m0
+	if ("`type'"=="co2r") local l r0 r1 rr rd or1 rt1 pe a1 b1 n1 n0 pe0 pe1 or2 rt2 a2 b2 m1 m0
 	if ("`type'"=="co2i") local l i0 i1 ir id d r a b n1 n0
 	if ("`type'"=="ncr") local l vb vw e a b
 	foreach j in `l' {
@@ -301,14 +301,14 @@ program define co2r
 	if ("`co'"!="") {
 		local ls1 gb2 size1 power1 
 		local lh1 gb3 size2 power2
-		local ls2 r0 r1 rr rd or1 rt1 pe b1 n1 n0
-		local lh2 pe0 pe1 or2 rt2 a b2 m1 m0
+		local ls2 r0 r1 rr rd or1 rt1 pe a1 b1 n1 n0
+		local lh2 pe0 pe1 or2 rt2 a2 b2 m1 m0
 	}
 	if ("`cc'"!="") {
 		local ls1 gb3 size2 power2
 		local lh1 gb2 size1 power1 
-		local ls2 pe0 pe1 or2 rt2 a b2 m1 m0
-		local lh2 r0 r1 rr rd or1 rt1 pe b1 n1 n0
+		local ls2 pe0 pe1 or2 rt2 a2 b2 m1 m0
+		local lh2 r0 r1 rr rd or1 rt1 pe a1 b1 n1 n0
 	}
 	foreach j in `ls1' {
 		`dlg'.main.`type'_`j'.show

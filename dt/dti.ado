@@ -1,4 +1,4 @@
-*! version 1.1.4  04feb2019 JM. Domenech, R. Sesma
+*! version 1.1.5  03jun2019 JM. Domenech, R. Sesma
 /*
 dti: Diagnostics Tests (immediate command)
 For cross-sectional and case-control studies 4 elements are provided: a1 a0 b1 b0
@@ -310,7 +310,7 @@ program define dti, rclass
 		print_pct `se_pct'
 		di as txt "{ralign 22:Likelihood Ratio +} = " as res %7.0g `lrp'
 
-		di as txt "{ralign 14:Sensibility} = " _c
+		di as txt "{ralign 14:Specificity} = " _c
 		print_pct `sp_pct'
 		if (`lrp'>=1 & `lrn'<1) di as txt "{ralign 22:-} = " as res %7.0g `lrn'
 		else di as txt "{ralign 22:inverse +} = " as res %7.0g 1/`lrp'

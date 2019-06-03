@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.4 04feb2019}{...}
+{* *! version 1.1.5 03jun2019}{...}
 {viewerdialog dt "dialog dt"}{...}
 {viewerdialog dti "dialog dti"}{...}
 {viewerjumpto "Syntax" "dt##syntax"}{...}
@@ -216,7 +216,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.4 {hline 2} 4 February 2019
+Version 1.1.5 {hline 2} 3 June 2019
 
 
 {marker authors}{...}
@@ -234,7 +234,7 @@ stata@graunt.cat{p_end}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Diagnostic tests: User-written command dt for Stata [computer program].{break}
-V1.1.4. Barcelona: Graunt21; 2019.{break}
+V1.1.5. Barcelona: Graunt21; 2019.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 
 

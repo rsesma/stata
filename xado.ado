@@ -1,4 +1,4 @@
-*! version 1.0.2  04nov2018 R. Sesma
+*! version 1.0.3  26jul2019 R. Sesma
 
 /*
 Update user-defined commands
@@ -13,9 +13,13 @@ program define xado
 	local letter = substr("`command'",1,1)
 
 	*get default dir values
-	if ("`codedir'"=="") local codedir = "/Users/r/github/stata"
-	if ("`adodir'"=="") local adodir = "/Users/r/Library/Application Support/Stata/ado/plus"
-	local extradir = "/Users/r/Library/Application Support/Stata/ado/plus/_"
+	if ("`codedir'"=="") {
+		if ("`c(os)'"=="Windows") local c "C:/Users/`c(username)'"
+		if ("`c(os)'"=="MacOSX") local c "/Users/`c(username)'"
+		local codedir = "`c'/git/stata/"
+	}
+	if ("`adodir'"=="") local adodir "`c(sysdir_plus)'"
+	local extradir = "`adodir'_"
 
 	*build origin and destination path
 	mata: st_local("orig",pathjoin(st_local("codedir"),st_local("command")))

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.4  08apr2019}{...}
+{* *! version 1.1.5 26jul2019}{...}
 {viewerdialog statmis "dialog statmis"}{...}
 {viewerjumpto "Syntax" "statmis##syntax"}{...}
 {viewerjumpto "Description" "statmis##description"}{...}
@@ -95,7 +95,7 @@ Unless {cmd:noreport} option is especified, the command stores the following sca
 {title:Version}
 
 {p 4}
-Version 1.1.4 {hline 2} 08 April 2019
+Version 1.1.5 {hline 2} 26 July 2019
 
 
 {marker authors}{...}
@@ -113,5 +113,5 @@ stata@graunt.cat
 
 {p 4 6 2}
 Dom{c e'}nech JM. Statistics of missing values: User-written command statmis for Stata [computer program].{break}
-V1.1.4. Barcelona: Graunt21; 2018.{break}
+V1.1.5. Barcelona: Graunt21; 2019.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}

@@ -1,4 +1,4 @@
-*! version 1.1.4 08apr2019 JM. Domenech, R. Sesma
+*! version 1.1.5 26jul2019 JM. Domenech, R. Sesma
 
 /*
 statmis: missing statistics
@@ -36,19 +36,28 @@ program define statmis, rclass
 			exit 198
 		}
 		
-		ds `vlist', not(type str#)
-		local vnum = r(varlist)		// list of numeric variables
-		ds `vlist', has(type str#)
-		local vstr = r(varlist)		// list of string variables
-		if ("`r(varlist)'"=="") local vstr
-		ds `vlist', has(format %td*)
-		local vdaily = r(varlist)	// list of daily variables
-		ds `vlist', has(format %tc*)
-		local vclock = r(varlist)	// list of clock variables
+		ds `vlist', not(type str#)			// list of numeric variables
+		local vnum = "`r(varlist)'"
 		
-		recode `vnum' (.z=0), prefix(__Miss_)
-		egen `nmis' = rowmiss(__Miss_* `vstr') if `touse'
-		drop __Miss_*
+		ds `vlist', has(type str#)			// list of string variables
+		local vstr = "`r(varlist)'"
+		
+		ds `vlist', has(format %td*)		// list of daily variables
+		local vdaily = "`r(varlist)'"
+		
+		ds `vlist', has(format %tc*)		// list of clock variables
+		local vclock = "`r(varlist)'"
+		
+		// generate nmis variable with number of missing per observation
+		local rlist
+		if ("`vnum'"!="") {
+			foreach v of varlist `vnum' {
+				tempname vr
+				recode `v' (.z=0), generate(`vr')			// to exclude .z values (NA) from the count, recode .z to 0
+				local rlist `rlist' `vr'
+			}
+		}
+		egen `nmis' = rowmiss(`rlist' `vstr') if `touse'
 	}
 
 	preserve

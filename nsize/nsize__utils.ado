@@ -1,4 +1,4 @@
-*! version 1.2.9  14may2019
+*! version 1.3.0  10sep2019
 program nsize__utils
 	version 12.0
 	gettoken subcmd 0 : 0
@@ -462,6 +462,12 @@ program define get_nsize, rclass
 		if ("`type'" == "co1m" | "`type'" == "c2me") {
 			local i = cond("`type'"=="co1m",1,2)
 			local n = ceil(`i'*(`sd'^2)*(`za'+`zb')^2/(`effect')^2)
+			
+			* (v1.3.0) obtain results using Student's T, using invnormal n as df
+			local ta = invttail((`i'*`n')-`i',(100-`alpha')/100)
+			local tb = invttail((`i'*`n')-`i',(100-`beta')/100)
+			local n = ceil(`i'*(`sd'^2)*(`ta'+`tb')^2/(`effect')^2)
+			
 			return scalar n = `n'
 			return scalar warn = (`n'<30)
 		}
@@ -470,6 +476,17 @@ program define get_nsize, rclass
 			if (mod(`r',1)==0) local n0 = ceil(`n1')*`r'
 			else local n0 = ceil(`n1'*`r')
 			local n1 = ceil(`n1')
+			local n = `n1'+`n0'
+			
+			* (v1.3.0) obtain results using Student's T, using invnormal n as df
+			local ta = invttail(`n'-2,(100-`alpha')/100)
+			local tb = invttail(`n'-2,(100-`beta')/100)
+			local n1 = (`r'+1)*(`sd'^2)*(`ta'+`tb')^2/(`r'*(`effect')^2)
+			if (mod(`r',1)==0) local n0 = ceil(`n1')*`r'
+			else local n0 = ceil(`n1'*`r')
+			local n1 = ceil(`n1')
+			
+			* stored results
 			return scalar n1 = `n1'
 			return scalar n0 = `n0'
 			return scalar n = `n1'+`n0'

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.2.9  14may2019}{...}
+{* *! version 1.3.0  10sep2019}{...}
 {viewerdialog nsize "dialog nsize"}{...}
 {viewerjumpto "Syntax" "nsize##syntax"}{...}
 {viewerjumpto "Description" "nsize##description"}{...}
@@ -952,7 +952,7 @@ The command stores the following scalars or matrices in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.2.9 {hline 2} 14 May 2019
+Version 1.3.0 {hline 2} 10 September 2019
 
 
 {marker authors}{...}
@@ -971,7 +971,7 @@ stata@graunt.cat{p_end}
 {p 4 6 2}
 Dom{c e'}nech JM. Sample Size and Power: Comparisons and estimations for independent proportions, means,{break}
 correlations, risks and rates: User-written command nsize for Stata [computer program].{break}
-V1.2.9. Barcelona: Graunt21; 2019.{break}
+V1.3.0. Barcelona: Graunt21; 2019.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 
 

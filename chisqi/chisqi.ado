@@ -1,4 +1,4 @@
-*! version 1.1.0  16sep2019 JM. Domenech, R. Sesma
+*! version 1.1.1  17sep2019 JM. Domenech, R. Sesma
 /*
 chisqi: chi square comparisons
 It receives n numlists, the first being the categorical distribution, 
@@ -31,43 +31,45 @@ program define chisqi, rclass
 	
 	if (`error') print_error "data invalid -- all the numlists must have the same number of elements"
 	
-	*Category labels
-	if ("`labels'"!="") {
-		local len : word count `labels'
-		if (`len'!=`ncat') print_error "wrong number of elements in labels"
-	}
-	foreach i of numlist 1/`ncat' {
-		if ("`labels'"!="") local lbl`i' : word `i' of `labels'
-		else local lbl`i' = "`i'"
-		local lbl`i' = substr("`lbl`i''",1,10)		// labels up to 10 chars
-	}
-
 	*Print header
 	di as res _n "Goodness of fit Chi-squared test"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
-	di as txt _n _col(19) "Theoretical  {ralign 8:Cases}  {ralign 8:Cases}  {ralign 8:Cases}  {ralign 8:Pearson}"
-	di as txt "Sample  Categories  {ralign 9:distrib.}  {ralign 8:Observed}  {ralign 8:Expected}  {ralign 8:Residual}  {ralign 8:Chi2}"
+	di as txt _n _col(20) "Theoretical{ralign 10:Cases}{ralign 10:Cases}{ralign 10:Cases}{ralign 10:Pearson}"
+	di as txt "Sample  Categories{ralign 12:distrib.}{ralign 10:Observed}{ralign 10:Expected}{ralign 10:Residual}{ralign 10:Chi2}"
 	*Print results for each sample
 	foreach i of numlist 1/`nsamples' {
 		matrix `S' = `R'_`i'
-		di as txt %5.0f `i' _c
+		local chi2_`i' = `S'[1,6]
+		local p_`i' = `S'[1,7]
+		local n_`i' = `S'[1,5]
+		
+		di as txt %6.0f `i' _c
 		foreach j of numlist 1/`ncat' {
-			di as txt _col(9) "{ralign 10:`lbl`j''}   " _c
+			* labels: if defined, up to 10 chars
+			if ("`labels'"!="") local lbl : word `j' of `labels'
+			else local lbl = "`j'"
+			local lbl = substr("`lbl'",1,10)					// labels up to 10 chars
+			di as txt "{col 9}{ralign 10:`lbl'}" _c
+			
+			* values
 			foreach k of numlist 1/4 {
 				local v = `S'[`j',`k']
-				local fmt = cond(`k'>2,"%8.1f","%8.0g")
-				if (`k'==1) print_pct `v', col(25)
-				else di as res `fmt' `v' "  " _c
-				if (`k'==1) di " " _c
+				if (`k'==1) {
+					local v = `v' * 100
+					local fmt = cond(`v'<1,"%6.0g",cond(`v'<10,"%6.3f","%6.2f"))
+					di as res _col(24) `fmt' `v' as txt "%  " _c
+				}
+				else {
+					local fmt = cond(`k'>2,"%8.1f","%8.0g")
+					di as res `fmt' `v' "  " _c
+				}
+				if (`k'==4 & `j'<`ncat') di
 			}
-			local chi2_`i' = `S'[1,6]
-			if (`j'<`ncat') di
-			else di as res %8.0g `chi2_`i''
 		}
-		local p_`i' = `S'[1,7]
-		di as txt _col(14) "Total" _col(27) as res "100" as txt "% " /*
-		*/ as res %8.0g `S'[1,5] _col(62) as txt "p= " as res %5.3f `p_`i''
-		di
+		* Total & chi2 & p
+		di as res _col(63) %8.0g `chi2_`i''
+		di as txt _col(14) "Total" _col(27) as res "100" as txt "%  " /*
+		*/ as res %8.0g `n_`i'' _col(63) as txt "p= " as res %5.3f `p_`i'' _n
 		
 		* stored results
 		if (`nsamples'>1) {
@@ -80,8 +82,8 @@ program define chisqi, rclass
 	di as txt cond(`warning'==1,"WARNING: Expected frequencies < 5","") _c
 	if (`nsamples'>1) {
 		* if there are more than 1 sample, print OVERALL results
-		di as txt _col(52) "OVERALL:" _col(62) as res %8.0g `chi2_over'
-		di as txt _col(62) "p= " as res %5.3f `p_over' _c
+		di as txt _col(53) "OVERALL:" _col(63) as res %8.0g `chi2_over'
+		di as txt _col(63) "p= " as res %5.3f `p_over' _c
 	}
 	di
 
@@ -95,15 +97,6 @@ program define print_error
 	args message
 	display in red "`message'" 
 	exit 198
-end
-
-program define print_pct
-	syntax anything, [col(numlist max=1) nopercent]
-	local p = `anything' * 100
-	local fmt = cond(abs(`p')<10,cond(abs(`p')<1,"%5.0g","%5.2f"),"%5.1f")
-	if ("`col'"=="") di as res `fmt' `p' _c
-	else di as res _col(`col') `fmt' `p' _c
-	if ("`percent'"=="") di as txt "%" _c
 end
 
 

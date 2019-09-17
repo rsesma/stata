@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.0 16sep2019}{...}
+{* *! version 1.1.1 17sep2019}{...}
 {viewerdialog chisqi "dialog chisqi"}{...}
 {viewerjumpto "Syntax" "chisqi##syntax"}{...}
 {viewerjumpto "Description" "chisqi##description"}{...}
@@ -78,7 +78,7 @@ The command stores the following scalars in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.0 {hline 2} 16 September 2019
+Version 1.1.1 {hline 2} 17 September 2019
 
 
 {marker authors}{...}
@@ -96,7 +96,7 @@ stata@graunt.cat{p_end}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Goodness of fit Chi-squared test: User-written command chisqi for Stata [computer program].{break}
-V1.1.0. Barcelona: Graunt21; 2019.{break}
+V1.1.1. Barcelona: Graunt21; 2019.{break}
 Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
 
 

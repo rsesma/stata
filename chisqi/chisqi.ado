@@ -68,8 +68,9 @@ program define chisqi, rclass
 		}
 		* Total & chi2 & p
 		di as res _col(63) %8.0g `chi2_`i''
-		di as txt _col(14) "Total" _col(27) as res "100" as txt "%  " /*
-		*/ as res %8.0g `n_`i'' _col(63) as txt "p= " as res %5.3f `p_`i'' _n
+		di as txt _col(14) "Total" _col(27) as res "100" as txt "%" /*
+		*/ _col(33) as res %8.0f `n_`i'' _col(43) %8.0f `n_`i'' /*
+		*/ _col(63) as txt "p= " as res %5.3f `p_`i'' _n
 		
 		* stored results
 		if (`nsamples'>1) {

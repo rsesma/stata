@@ -1,4 +1,4 @@
-*! version 1.1.5  03jun2019 JM. Domenech, R. Sesma
+*! version 1.1.6  30sep2019 JM. Domenech, R. Sesma
 /*
 dti: Diagnostics Tests (immediate command)
 For cross-sectional and case-control studies 4 elements are provided: a1 a0 b1 b0

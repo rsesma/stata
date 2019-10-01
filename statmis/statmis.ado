@@ -1,4 +1,4 @@
-*! version 1.1.5 26jul2019 JM. Domenech, R. Sesma
+*! version 1.1.6 30sep2019 JM. Domenech, R. Sesma
 
 /*
 statmis: missing statistics

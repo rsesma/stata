@@ -1,4 +1,4 @@
-*! version 1.1.2  17jan2019 JM. Domenech, R. Sesma
+*! version 1.1.3  30sep2019 JM. Domenech, R. Sesma
 
 program define cohenkapi, rclass
 	version 12

@@ -1,4 +1,4 @@
-*! version 1.2.5  23oct2018 JM. Domenech, R. Sesma
+*! version 1.2.6  30sep2019 JM. Domenech, R. Sesma
 /*
 rtrendi: Trend Test - inmediate command
 */
@@ -33,6 +33,8 @@ program define rtrendi, rclass
 	if ("`wilson'"!="") local ci_method 1	//Wilson method
 	if ("`exact'"!="") local ci_method 2	//Exact method
 	if ("`wald'"!="") local ci_method 3		//Wald method
+	if ("`data'"=="pt" & "`wilson'"!="") print_error "wilson option not compatible with person-time data"
+	if ("`data'"=="pt" & "`wald'"!="") print_error "wald option not compatible with person-time data"
 	if ("`level'"=="") local level 95
 
 	*Reference category

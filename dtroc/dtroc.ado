@@ -1,4 +1,4 @@
-*! version 1.1.3  07may2019 JM. Domenech, R. Sesma
+*! version 1.1.4  30sep2019 JM. Domenech, R. Sesma
 /*
 dtroc: ROC analysis
 */

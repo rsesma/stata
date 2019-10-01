@@ -1,4 +1,4 @@
-*! version 1.0.5  05oct2016 JM. Domenech, R. Sesma
+*! version 1.0.6  30sep2019 JM. Domenech, R. Sesma
 /*
 scct: Stochastic curtailment (immediate command)
 */

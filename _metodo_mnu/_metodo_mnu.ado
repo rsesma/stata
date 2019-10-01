@@ -1,4 +1,4 @@
-*! version 1.0.0  25jun2018 JM Domenech, R. Sesma
+*! version 1.0.1  30sep2019 JM Domenech, R. Sesma
 
 /*
 Create menu User > Metodo for the user-written commands 

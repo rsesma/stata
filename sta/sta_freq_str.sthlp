@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.1 11may2018}{...}
+{* *! version 1.1.2 30sep2019}{...}
 {viewerdialog sta "dialog sta"}{...}
 {viewerdialog stai "dialog stai"}{...}
 {viewerjumpto "Syntax" "sta_freq_str##syntax"}{...}
@@ -81,14 +81,14 @@ UnExposed{space 3}Cases {c |} {bf:a01} {c |} .. {c |} {bf:a0i} {c |} .. {c |} {b
 {title:Examples}
 
 {it:Cohort}
-{p 4 4}{stata "use http://www.graunt.cat/stata/RaceDeathStage.dta":. use http://www.graunt.cat/stata/RaceDeathStage.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/RaceDeathStage.dta":. use http://metodo.uab.cat/stata/RaceDeathStage.dta}{p_end}
 {p 4 4}{cmd:. sta Death Race, data(freq) st(co) by(Stage) method(mh)}{p_end}
 
 {p 4 4}{cmd:. stai 84 727 710 9055 \ 322 2277 553 5193, data(freq) st(co) method(mh)}{p_end}
 {p 4 4}{cmd:. stai 84 727 0 9055 \ 322 2277 553 5193, data(freq) st(co) method(mh) zero(c)}{p_end}
 
 {it:Case-Control}
-{p 4 4}{stata "use http://www.graunt.cat/stata/TubeBlanketSeason.dta":. use http://www.graunt.cat/stata/TubeBlanketSeason.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/TubeBlanketSeason.dta":. use http://metodo.uab.cat/stata/TubeBlanketSeason.dta}{p_end}
 {p 4 4}{cmd:. sta NeuralTubeDef Blanket, data(freq) st(cc) by(Season) method(iv)}{p_end}
 
 {p 4 4}{cmd:. stai 10 104 15 97 \ 11 99 9 103, data(freq) st(cc) method(iv)}{p_end}

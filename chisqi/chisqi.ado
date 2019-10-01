@@ -1,4 +1,4 @@
-*! version 1.1.1  17sep2019 JM. Domenech, R. Sesma
+*! version 1.1.2  30sep2019 JM. Domenech, R. Sesma
 /*
 chisqi: chi square comparisons
 It receives n numlists, the first being the categorical distribution, 

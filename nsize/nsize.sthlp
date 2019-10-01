@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.3.0  10sep2019}{...}
+{* *! version 1.3.1  30sep2019}{...}
 {viewerdialog nsize "dialog nsize"}{...}
 {viewerjumpto "Syntax" "nsize##syntax"}{...}
 {viewerjumpto "Description" "nsize##description"}{...}
@@ -63,14 +63,14 @@ This command does not work with data of the current dataset. Current dataset is 
 You can click {dialog nsize:here} to pop up a {dialog nsize:dialog} or type {inp: db nsize}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://metodo.uab.cat/stata} for install. 
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate nsize, update} to update the {bf:nsize} command.{break}
 Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker options}{...}
@@ -952,7 +952,7 @@ The command stores the following scalars or matrices in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.3.0 {hline 2} 10 September 2019
+Version 1.3.1 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -963,7 +963,7 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{p_end}
+stata@metodo.uab.cat{p_end}
 
 
 {title:Vancouver reference}
@@ -971,8 +971,8 @@ stata@graunt.cat{p_end}
 {p 4 6 2}
 Dom{c e'}nech JM. Sample Size and Power: Comparisons and estimations for independent proportions, means,{break}
 correlations, risks and rates: User-written command nsize for Stata [computer program].{break}
-V1.3.0. Barcelona: Graunt21; 2019.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.3.1. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

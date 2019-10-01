@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.1 11may2018}{...}
+{* *! version 1.1.2 30sep2019}{...}
 {viewerdialog sta "dialog sta"}{...}
 {viewerdialog stai "dialog stai"}{...}
 {viewerjumpto "Syntax" "sta_freq##syntax"}{...}
@@ -92,31 +92,31 @@ NonCases {c |} {space 2}{bf:b0}  {space 2} {c |} {space 2}{bf:b1}  {space 2} {c 
 {title:Examples}
 
 {it:Cross-Sectional}
-{p 4 4}{stata "use http://www.graunt.cat/stata/ObesArt.dta":. use http://www.graunt.cat/stata/ObesArt.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/ObesArt.dta":. use http://metodo.uab.cat/stata/ObesArt.dta}{p_end}
 {p 4 4}{cmd:. sta Art Obes, data(freq) st(cs) wilson nst(Study name)}{p_end}
 
 {p 4 4}{cmd:. stai 9 1 1191 999, data(freq) st(cs) wilson}{p_end}
 {p 4 4}{cmd:. stai 9.4 1 1190.6 999, data(freq) st(cs)}{p_end}
 
 {it:Cohort}
-{p 4 4}{stata "use http://www.graunt.cat/stata/SmokePreterm.dta":. use http://www.graunt.cat/stata/SmokePreterm.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/SmokePreterm.dta":. use http://metodo.uab.cat/stata/SmokePreterm.dta}{p_end}
 {p 4 4}{cmd:. sta Preterm Smoke, data(freq) st(co) wilson}{p_end}
 {p 4 4}{cmd:. sta Preterm Smoke, data(freq) st(co) wilson pe(0.4) detail}{p_end}
 
 {p 4 4}{cmd:. stai 100 90 100 990, data(freq) st(co) exact}{p_end}
 
 {it:Experimental}
-{p 4 4}{stata "use http://www.graunt.cat/stata/TreatHeal.dta":. use http://www.graunt.cat/stata/TreatHeal.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/TreatHeal.dta":. use http://metodo.uab.cat/stata/TreatHeal.dta}{p_end}
 {p 4 4}{cmd:. sta Heal Treat, data(freq) st(ex) wilson}{p_end}
 
 {p 4 4}{cmd:. stai 100 90 100 990, data(freq) st(ex) nnt(1)}{p_end}
 {p 4 4}{cmd:. stai 100 0 100 1080, data(freq) st(ex) zero(c)}{p_end}
 
 {it:Case-Control}
-{p 4 4}{stata "use http://www.graunt.cat/stata/SmokeCancer.dta":. use http://www.graunt.cat/stata/SmokeCancer.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/SmokeCancer.dta":. use http://metodo.uab.cat/stata/SmokeCancer.dta}{p_end}
 {p 4 4}{cmd:. sta Cancer Smoke, data(freq) st(cc) wilson}{p_end}
 
-{p 4 4}{stata "use http://www.graunt.cat/stata/ContrCancer.dta":. use http://www.graunt.cat/stata/ContrCancer.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/ContrCancer.dta":. use http://metodo.uab.cat/stata/ContrCancer.dta}{p_end}
 {p 4 4}{cmd:. sta Cancer Contr, data(freq) st(cc) wilson}{p_end}
 {p 4 4}{cmd:. sta Cancer Contr, data(freq) st(cc) wilson r(0.0003) detail rare}{p_end}
 

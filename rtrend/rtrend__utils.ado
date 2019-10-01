@@ -1,4 +1,4 @@
-*! version 1.2.5  23oct2018
+*! version 1.2.6  30sep2019
 program rtrend__utils
 	version 12.0
 	gettoken subcmd 0 : 0

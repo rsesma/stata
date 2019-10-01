@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.1 11may2018}{...}
+{* *! version 1.1.2 30sep2019}{...}
 {viewerdialog sta "dialog sta"}{...}
 {viewerdialog stai "dialog stai"}{...}
 {viewerjumpto "Syntax" "sta_paired##syntax"}{...}
@@ -61,7 +61,7 @@ Y{space 4}(+) {c |}{space 2} {bf:a10} {space 2}{c |}{space 2} {bf:a11} {space 2}
 {marker examples}{...}
 {title:Examples}
 
-{p 4 4}{stata "use http://www.graunt.cat/stata/ParacetAspirin.dta":. use http://www.graunt.cat/stata/ParacetAspirin.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/ParacetAspirin.dta":. use http://metodo.uab.cat/stata/ParacetAspirin.dta}{p_end}
 {p 4 4}{cmd:. sta Paracetamol Aspirin, data(paired)}{p_end}
 {p 4 4}{cmd:. sta Paracetamol Aspirin, data(paired) relatsymm}{p_end}
 

@@ -1,4 +1,4 @@
-*! version 1.1.1  23jun2017 JM. Domenech, R. Sesma
+*! version 1.1.2  30sep2019 JM. Domenech, R. Sesma
 /*
 cir: Confidence interval for Pearson/Spearman's correlation 
 */

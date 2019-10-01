@@ -1,5 +1,5 @@
 v 3
-d ci2p  Confidence Intervals for Measures of Association (2x2 table, unpaired & paired data).
+d ci2p.  Confidence Intervals for Measures of Association (2x2 table, unpaired & paired data).
 d This command is obsolete. Install new command sta.
 d
 d (c)JM. Domenech
@@ -9,7 +9,7 @@ d
 d Distribution-Date:  24apr2017
 d Version 1.2.5 (24apr2017)
 d
-d E-mail: stata@graunt.cat
+d E-mail: stata@metodo.uab.cat
 f ci2p.ado
 f ci2p.sthlp
 f ci2pi.ado

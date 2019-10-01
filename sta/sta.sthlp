@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.1 11may2018}{...}
+{* *! version 1.1.2 30sep2019}{...}
 {title:Association measures}
 {viewerdialog sta "dialog sta"}{...}
 {viewerdialog stai "dialog stai"}{...}
@@ -40,7 +40,7 @@ You can click {dialog sta:here} to pop up a {dialog sta:dialog} or type {inp: db
 immediate command, you can click {dialog stai:here} to pop up a {dialog stai:dialog} or type {inp: db stai}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://metodo.uab.cat/stata} for install. 
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate sta, update} to update the {bf:sta} command.{break}
@@ -50,14 +50,14 @@ Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 This command uses the {help csi} and {help cci} Stata commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker version}{...}
 {title:Version}
 
 {p 4}
-Version 1.1.1 {hline 2} 11 May 2018
+Version 1.1.2 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -68,7 +68,7 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{p_end}
+stata@metodo.uab.cat{p_end}
 
 
 {title:Vancouver reference}
@@ -76,8 +76,8 @@ stata@graunt.cat{p_end}
 {p 4 6 2}
 Dom{c e'}nech JM. Association Measures (frequency, person-time & paired data):{break}
 User-written command sta for Stata [computer program]{break}
-V1.1.1. Barcelona: Graunt21; 2018.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.1.2. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

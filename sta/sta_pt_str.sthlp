@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.1 11may2018}{...}
+{* *! version 1.1.2 30sep2019}{...}
 {viewerdialog sta "dialog sta"}{...}
 {viewerdialog stai "dialog stai"}{...}
 {viewerjumpto "Syntax" "sta_pt_str##syntax"}{...}
@@ -69,7 +69,7 @@ UnExposed{space 3}Cases {c |} {bf:a01} {c |} .. {c |} {bf:a0i} {c |} .. {c |} {b
 {marker examples}{...}
 {title:Examples}
 
-{p 4 4}{stata "use http://www.graunt.cat/stata/LungFruitSmoking.dta":. use http://www.graunt.cat/stata/LungFruitSmoking.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/LungFruitSmoking.dta":. use http://metodo.uab.cat/stata/LungFruitSmoking.dta}{p_end}
 {p 4 4}{cmd:. sta Lung Fruit Time, data(pt) by(Smoking) method(mh)}{p_end}
 {p 4 4}{cmd:. stai 2 18 5144 124474 \ 6 26 3984 28539, data(pt) method(mh)}{p_end}
 

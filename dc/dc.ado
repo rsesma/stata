@@ -1,4 +1,4 @@
-*! version 1.0.9  19oct2017 JM. Domenech, R. Sesma
+*! version 1.1.0  30sep2019 JM. Domenech, R. Sesma
 /*
 Data Checking
 */

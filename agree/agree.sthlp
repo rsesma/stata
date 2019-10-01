@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.7 24dec2018}{...}
+{* *! version 1.1.8 30sep2019}{...}
 {viewerdialog agree "dialog agree"}{...}
 {viewerjumpto "Syntax" "agree##syntax"}{...}
 {viewerjumpto "Description" "agree##description"}{...}
@@ -52,7 +52,7 @@ with method X (reference) and method Y.
 You can click {dialog agree:here} to pop up a {dialog agree:dialog} or type {inp: db agree}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install.
+Execute {cmd: net from http://metodo.uab.cat/stata} for install.
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate agree, update} to update the {bf:agree} command.{break}
@@ -62,13 +62,13 @@ Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 This command uses the {help tabstat}, {help summarize}, {help swilk}, {help sktest} and {help spearman} Stata commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
 {title:Examples}
 
-{p 4 4}{stata "use http://www.graunt.cat/stata/agree_data.dta":. use http://www.graunt.cat/stata/agree_data.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/agree_data.dta":. use http://metodo.uab.cat/stata/agree_data.dta}{p_end}
 {p 4 4}{cmd:. agree Instrumental Manual}{p_end}
 {p 4 4}{cmd:. agree Instrumental Manual, ba pct line nst(Study name)}{p_end}
 {p 4 4}{cmd:. agree Instrumental Manual, pb ci list id(Especimen)}{p_end}
@@ -127,7 +127,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.7 {hline 2} 24 December 2018
+Version 1.1.8 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -138,15 +138,15 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{break}
+stata@metodo.uab.cat{break}
 
 
 {title:Vancouver reference}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Passing-Bablok & Bland-Altman methods: User-written command agree for Stata [computer program].{break}
-V1.1.7s. Barcelona: Graunt21; 2018.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.1.8. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

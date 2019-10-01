@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.9 19oct2017}{...}
+{* *! version 1.1.0 30sep2019}{...}
 {viewerdialog dc "dialog dc"}{...}
 {vieweralsosee "dcreport" "help dcreport"}{...}
 {viewerjumpto "Syntax" "dc##syntax"}{...}
@@ -84,35 +84,33 @@ and write the logical expression that identifies the error; the expression must 
 You can click {dialog dc:here} to pop up a {dialog dc:dialog} or type {inp: db dc}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://metodo.uab.cat/stata} for install. 
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate dc, update} to update the {bf:dc} command.{break}
 Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
 {title:Examples}
-{p 4 4}{cmd:. dc Caso, init}{p_end}
-{p 4 4}{cmd:. dc Caso, isid}{p_end}
-{p 4 4}{cmd:. dc Caso, reset}{p_end}
-{p 4 4}{cmd:. dc Peso, vl(45/120) nd(1) id(Caso)}{p_end}
-{p 4 4}{cmd:. dc H1 H2 H3, vl(0 1 2) id(Caso)}{p_end}
-{p 4 4}{cmd:. dc Sex, vl(F M) id(Caso)}{p_end}
-{p 4 4}{cmd:. dc CIE, table(C:\...\CIE9.dta) vk(cie9) id(Caso)}{p_end}
-{p 4 4}{cmd:. dc FR, di(01/04/2006) df(15/04/2006) nomissing id(Caso)}{p_end}
-{p 4 4}{cmd:. dc FN, dd(FR-FN) ddl(18) ddu(90) ddunit(years) id(Caso)}{p_end}
-{p 4 4}{cmd:. dc PAS, vl(100/200) id(Caso) code1(10) expr1(PAD>=PAS & PAD<.)}{p_end}
+{p 4 4}{cmd:. dc Id, isid}{p_end}
+{p 4 4}{cmd:. dc Peso, vl(45/120) nd(1) id(Id)}{p_end}
+{p 4 4}{cmd:. dc H1 H2 H3, vl(0 1 2) id(Id)}{p_end}
+{p 4 4}{cmd:. dc Sex, vl(F M) id(Id)}{p_end}
+{p 4 4}{cmd:. dc CIE, table(C:\...\CIE9.dta) vk(cie9) id(Id)}{p_end}
+{p 4 4}{cmd:. dc FR, di(01/04/2006) df(15/04/2006) nomissing id(Id)}{p_end}
+{p 4 4}{cmd:. dc FN, dd(FR-FN) ddl(18) ddu(90) ddunit(years) id(Id)}{p_end}
+{p 4 4}{cmd:. dc PAS, vl(100/200) id(Id) code1(10) expr1(PAD>=PAS & PAD<.)}{p_end}
 
 
 {marker version}{...}
 {title:Version}
 
 {p 4}
-Version 1.0.9 {hline 2} 19 October 2017
+Version 1.1.0 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -123,15 +121,15 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat
+stata@metodo.uab.cat
 
 
 {title:Vancouver reference}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Data Check: User-written command dc for Stata [computer program].{break}
-V1.0.9. Barcelona: Graunt21; 2017.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.1.0. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

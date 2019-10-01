@@ -1,4 +1,4 @@
-*! version 1.2.5  13feb2019 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.2.6  30sep2019 JM. Domenech, JB.Navarro, R. Sesma
 
 program allsets
 	version 12

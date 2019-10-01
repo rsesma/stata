@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.2.5 13feb2019}{...}
+{* *! version 1.2.6 30sep2019}{...}
 {viewerdialog allsets "dialog allsets"}{...}
 {vieweralsosee "[R] regress" "help regress"}{...}
 {vieweralsosee "[R] logit" "help logit"}{...}
@@ -91,7 +91,7 @@ directory. Option {cmd: using} allows to use another path for results dataset. E
 You can click {dialog allsets:here} to pop up a {dialog allsets:dialog} or type {inp: db allsets}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install.
+Execute {cmd: net from http://metodo.uab.cat/stata} for install.
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate allsets, update} to update the {bf:allsets} command.{break}
@@ -103,29 +103,29 @@ and {help _rmcoll} Stata commands. It also uses the {stata "net describe somersd
 user defined program.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
 {title:Examples}
 
 Linear regression
-{p 4 4}{stata "use http://www.graunt.cat/stata/allsets_linear.dta":. use http://www.graunt.cat/stata/allsets_linear.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/allsets_linear.dta":. use http://metodo.uab.cat/stata/allsets_linear.dta}{p_end}
 {p 4 4}{cmd:. allsets Y X1 X2 B i.C, linear}{p_end}
 {p 4 4}{cmd:. allsets Y X1 X2 B i.C, linear fixed(X1)}{p_end}
 {p 4 4}{cmd:. allsets Y X1 X2 B i.C, linear maxvar(1)}{p_end}
 {p 4 4}{cmd:. allsets Y X1 X2 B i.C c.X1#c.X2 c.X1#c.B, linear using(results_linear.dta)}{p_end}
 
 Logistic regression
-{p 4 4}{stata "use http://www.graunt.cat/stata/allsets_logistic.dta":. use http://www.graunt.cat/stata/allsets_logistic.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/allsets_logistic.dta":. use http://metodo.uab.cat/stata/allsets_logistic.dta}{p_end}
 {p 4 4}{cmd:. allsets Y X1 X2 X3 i.C, logistic using(results_log.dta) noreplace}{p_end}
 
 Cox regression
-{p 4 4}{stata "use http://www.graunt.cat/stata/allsets_cox.dta":. use http://www.graunt.cat/stata/allsets_cox.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/allsets_cox.dta":. use http://metodo.uab.cat/stata/allsets_cox.dta}{p_end}
 {p 4 4}{cmd:. stset TR, failure(Estado==1)}{p_end}
 {p 4 4}{cmd:. allsets X2 X3 i.C, cox using(allsets_cox.dta)}{p_end}
 {it:Time dependent covariates}
-{p 4 4}{stata "use http://www.graunt.cat/stata/allsets_cox_vdt.dta":. use http://www.graunt.cat/stata/allsets_cox_vdt.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/allsets_cox_vdt.dta":. use http://metodo.uab.cat/stata/allsets_cox_vdt.dta}{p_end}
 {p 4 4}{cmd:. stset Stop, id(Caso) failure(Estado==1) time0(Start)}{p_end}
 {p 4 4}{cmd:. allsets X1 X2 X3 i.C c.X1#c.X2, cox}{p_end}
 
@@ -134,7 +134,7 @@ Cox regression
 {title:Version}
 
 {p 4}
-Version 1.2.5 {hline 2} 13 February 2019
+Version 1.2.6 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -145,15 +145,15 @@ JM.Dom{c e'}nech & JB.Navarro{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{break}
+stata@metodo.uab.cat{break}
 
 
 {title:Vancouver reference}
 
 {p 4 6 2}
 Dom{c e'}nech JM, Navarro JB. Find the best subset for Linear, Logistic and Cox Regression: User-written command allsets for Stata [computer program].{break}
-V1.2.5. Barcelona: Graunt21; 2019{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.2.6. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

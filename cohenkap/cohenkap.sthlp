@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.2 17jan2019}{...}
+{* *! version 1.1.3 30sep2019}{...}
 {viewerdialog cohenkap "dialog cohenkap"}{...}
 {viewerdialog cohenkapi "dialog cohenkapi"}{...}
 {vieweralsosee "[R] kappa" "help kappa"}{...}
@@ -73,20 +73,20 @@ You can click {dialog cohenkap:here} to pop up a {dialog cohenkap:dialog} or typ
 immediate command, you can click {dialog cohenkapi:here} to pop up a {dialog cohenkapi:dialog} or type {inp: db conhenkapi}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install.
+Execute {cmd: net from http://metodo.uab.cat/stata} for install.
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate cohenkap, update} to update the {bf:cohenkap} command.{break}
 Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
 {title:Examples}
 
-{p 4 4}{stata "use http://www.graunt.cat/stata/kappa_data.dta":. use http://www.graunt.cat/stata/kappa_data.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/kappa_data.dta":. use http://metodo.uab.cat/stata/kappa_data.dta}{p_end}
 
 {p 4 4}{cmd:. cohenkap Rating2 Rating1, ordered}{p_end}
 {p 4 4}{cmd:. cohenkapi 15 4 2 0 \ 5 16 4 1 \ 3 6 18 6 \ 1 2 3 14, ordered}{p_end}
@@ -175,7 +175,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.2 {hline 2} 17 January 2019
+Version 1.1.3 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -186,15 +186,15 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{p_end}
+stata@metodo.uab.cat{p_end}
 
 
 {title:Vancouver reference}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Weighted kappa: User-written command cohenkap for Stata [computer program].{break}
-V1.1.2. Barcelona: Graunt21; 2019.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.1.3. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

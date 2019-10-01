@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.1  23jun2017}{...}
+{* *! version 1.1.2  30sep2019}{...}
 {viewerdialog cir "dialog cir"}{...}
 {viewerdialog ciri "dialog ciri"}{...}
 {vieweralsosee "[R] correlate" "help correlate"}{...}
@@ -63,7 +63,7 @@ You can click {dialog cir:here} to pop up a {dialog cir:dialog} or type {inp: db
 immediate command, you can click {dialog ciri:here} to pop up a {dialog ciri:dialog} or type {inp: db ciri}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://metodo.uab.cat/stata} for install. 
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate cir, update} to update the {bf:cir} command.{break}
@@ -73,13 +73,13 @@ Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 This command uses the {help correlate} and {help spearman} Stata commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
 {title:Examples}
 
-{p 4 4}{stata "use http://www.graunt.cat/stata/CreaHemo.dta":. use http://www.graunt.cat/stata/CreaHemo.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/CreaHemo.dta":. use http://metodo.uab.cat/stata/CreaHemo.dta}{p_end}
 {p 4 4}{cmd:. cir Creatin Hemoglo, pearson}{p_end}
 {p 4 4}{cmd:. cir Creatin Hemoglo, spearman rho(-0.7)}{p_end}
 {p 4 4}{cmd:. cir Creatin Hemoglo, pearson by(Tratamiento) level(90)}{p_end}
@@ -134,7 +134,7 @@ The command stores the following scalars in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.1 {hline 2} 23 June 2017
+Version 1.1.2 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -145,15 +145,15 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{break}
+stata@metodo.uab.cat{break}
 
 
 {title:Vancouver reference}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Confidence Interval for Pearson and Spearman Correlation: User-written command cir for Stata [computer program].{break}
-V1.1.1. Barcelona: Graunt21; 2017.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.1.2. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

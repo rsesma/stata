@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.5 26jul2019}{...}
+{* *! version 1.1.6 30sep2019}{...}
 {viewerdialog statmis "dialog statmis"}{...}
 {viewerjumpto "Syntax" "statmis##syntax"}{...}
 {viewerjumpto "Description" "statmis##description"}{...}
@@ -53,7 +53,7 @@ By default all the variables in the dataset are used.
 You can click {dialog statmis:here} to pop up a {dialog statmis:dialog} or type {inp: db statmis}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://metodo.uab.cat/stata} for install. 
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate statmis, update} to update the {bf:statmis} command.{break}
@@ -63,12 +63,12 @@ Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 This command uses the {help summarize} and {help tabulate} Stata commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
 {title:Examples}
-{p 4 4}{stata "use http://www.graunt.cat/stata/Salud.dta":. use http://www.graunt.cat/stata/Salud.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/Salud.dta":. use http://metodo.uab.cat/stata/Salud.dta}{p_end}
 {p 4 4}{cmd:. statmis}{p_end}
 {p 4 4}{cmd:. statmis Sexo HabitFum PTc IMC Edad HTA}{p_end}
 {p 4 4}{cmd:. statmis HabitFum EdadF Tab CIE, noreport generate(miss)}{p_end}
@@ -95,7 +95,7 @@ Unless {cmd:noreport} option is especified, the command stores the following sca
 {title:Version}
 
 {p 4}
-Version 1.1.5 {hline 2} 26 July 2019
+Version 1.1.6 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -106,12 +106,12 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat
+stata@metodo.uab.cat
 
 
 {title:Vancouver reference}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Statistics of missing values: User-written command statmis for Stata [computer program].{break}
-V1.1.5. Barcelona: Graunt21; 2019.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.1.6. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}

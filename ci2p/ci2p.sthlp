@@ -6,7 +6,7 @@
 {title:Title}
 
 {phang}
-{bf:ci2p} {hline 2} This command is {bf:obsolete}. To install new command {bf:sta} execute: {stata "net from http://www.graunt.cat/stata"}
+{bf:ci2p} {hline 2} This command is {bf:obsolete}. To install new command {bf:sta} execute: {stata "net from http://metodo.uab.cat/stata"}
 
 
 {marker version}{...}
@@ -24,4 +24,4 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{p_end}
+stata@metodo.uab.cat{p_end}

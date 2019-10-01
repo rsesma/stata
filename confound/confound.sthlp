@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.4 01apr2019}{...}
+{* *! version 1.1.5 30sep2019}{...}
 {viewerdialog confound "dialog confound"}{...}
 {vieweralsosee "[R] regress" "help regress"}{...}
 {vieweralsosee "[R] logit" "help logit"}{...}
@@ -76,7 +76,7 @@ directory. Existing datasets are replaced by default.
 You can click {dialog confound:here} to pop up a {dialog confound:dialog} or type {inp: db confound}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install.
+Execute {cmd: net from http://metodo.uab.cat/stata} for install.
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate confound, update} to update the {bf:confound} command.{break}
@@ -86,25 +86,25 @@ Execute {cmd: confound, update} to update {bf:all} the user-written commands.
 This command uses the {help regress}, {help logit}, {help logistic estat gof}, {help stcox} and {help _rmcoll} Stata commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
 {title:Examples}
 
 Linear regression
-{p 4 4}{stata "use http://www.graunt.cat/stata/Datatest_confound_MR.dta":. use http://www.graunt.cat/stata/Datatest_confound_MR.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/Datatest_confound_MR.dta":. use http://metodo.uab.cat/stata/Datatest_confound_MR.dta}{p_end}
 {p 4 4}{cmd:. confound y x1 z1 z2 z3 i.z4, linear}{p_end}
 {p 4 4}{cmd:. confound y i.x2 z1 z3, linear}{p_end}
 {p 4 4}{cmd:. confound y x1 z1 z2 z3 c.x1#c.z2, linear values(p5 p50 p95 60 75) using(results_lr_cont.dta)}{p_end}
 {p 4 4}{cmd:. confound y x1 z2 z3 i.z4r c.x1#i.z4r, linear}{p_end}
 
 Logistic regression
-{p 4 4}{stata "use http://www.graunt.cat/stata/Datatest_confound_LR.dta":. use http://www.graunt.cat/stata/Datatest_confound_LR.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/Datatest_confound_LR.dta":. use http://metodo.uab.cat/stata/Datatest_confound_LR.dta}{p_end}
 {p 4 4}{cmd:. confound y x1 z1 z2 z3 c.x1#c.z3, logistic values(p5 p50 p95 90 104)}{p_end}
 
 Cox regression
-{p 4 4}{stata "use http://www.graunt.cat/stata/Datatest_confound_Cox.dta":. use http://www.graunt.cat/stata/Datatest_confound_Cox.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/Datatest_confound_Cox.dta":. use http://metodo.uab.cat/stata/Datatest_confound_Cox.dta}{p_end}
 {p 4 4}{cmd:. stset tr, failure(estado==1)}{p_end}
 {p 4 4}{cmd:. confound x1 z1 z2 z3 i.z4 c.x1#c.z2, cox}{p_end}
 
@@ -113,7 +113,7 @@ Cox regression
 {title:Version}
 
 {p 4}
-Version 1.1.4 {hline 2} 01 April 2019
+Version 1.1.5 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -124,7 +124,7 @@ JM.Dom{c e'}nech & JB.Navarro{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{p_end}
+stata@metodo.uab.cat{p_end}
 
 
 {title:Vancouver reference}
@@ -132,8 +132,8 @@ stata@graunt.cat{p_end}
 {p 4 6 2}
 Dom{c e'}nech JM, Navarro JB. Find the best subset for Linear, Logistic and Cox Regression:{break}
 User-written command confound for Stata [computer program].{break}
-V1.1.4. Barcelona: Graunt21; 2019.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.1.5. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

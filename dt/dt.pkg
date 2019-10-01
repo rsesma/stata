@@ -1,15 +1,15 @@
 v 3
-d dt  Diagnostic tests.
+d dt.  Diagnostic tests.
 d After installation, see help dt.
 d
 d (c)JM. Domenech
 d Programmer: R. Sesma
 d Laboratori d'Estadistica Aplicada, Universitat Autonoma de Barcelona.
 d
-d Distribution-Date: 03jun2019
-d Version 1.1.5 (03jun2019)
+d Distribution-Date: 30sep2019
+d Version 1.1.6 (30sep2019)
 d
-d E-mail: stata@graunt.cat
+d E-mail: stata@metodo.uab.cat
 f dt.ado
 f dt.sthlp
 f dt.dlg

@@ -6,10 +6,10 @@ d (c)JM. Domenech
 d Programmer: R. Sesma
 d Laboratori d'Estadistica Aplicada, Universitat Autonoma de Barcelona.
 d
-d Distribution-Date:  13jun2017
-d Version 1.0.7 (13jun2017)
+d Distribution-Date: 30sep2019
+d Version 1.0.8 (30sep2019)
 d
-d E-mail: stata@graunt.cat
+d E-mail: stata@metodo.uab.cat
 f pwkwallis.ado
 f pwkwallis.sthlp
 f pwkwallis.dlg

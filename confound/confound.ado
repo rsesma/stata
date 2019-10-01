@@ -1,4 +1,4 @@
-*! version 1.1.4  01apr2019 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.1.5  30sep2019 JM. Domenech, JB.Navarro, R. Sesma
 
 program confound
 	version 12

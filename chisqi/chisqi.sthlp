@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.1 17sep2019}{...}
+{* *! version 1.1.2 30sep2019}{...}
 {viewerdialog chisqi "dialog chisqi"}{...}
 {viewerjumpto "Syntax" "chisqi##syntax"}{...}
 {viewerjumpto "Description" "chisqi##description"}{...}
@@ -38,14 +38,14 @@ The {bf:labels} option receives a list of labels to label each category in the o
 The {bf:nst} option receives the name of the study to label the output.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://metodo.uab.cat/stata} for install. 
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate chisqi, update} to update the {bf:chisqi} command.{break}
 Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
@@ -78,7 +78,7 @@ The command stores the following scalars in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.1 {hline 2} 17 September 2019
+Version 1.1.2 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -89,15 +89,15 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{p_end}
+stata@metodo.uab.cat{p_end}
 
 
 {title:Vancouver reference}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Goodness of fit Chi-squared test: User-written command chisqi for Stata [computer program].{break}
-V1.1.1. Barcelona: Graunt21; 2019.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.1.2. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

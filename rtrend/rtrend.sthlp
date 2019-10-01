@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.2.5 23oct2018}{...}
+{* *! version 1.2.6 30sep2019}{...}
 {viewerdialog rtrend "dialog rtrend"}{...}
 {viewerdialog rtrendi "dialog rtrendi"}{...}
 {viewerjumpto "Syntax" "rtrend##syntax"}{...}
@@ -146,39 +146,39 @@ You can click {dialog rtrend:here} to pop up a {dialog rtrend:dialog} or type {i
 immediate command, you can click {dialog rtrendi:here} to pop up a {dialog rtrendi:dialog} or type {inp: db rtrendi}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://metodo.uab.cat/stata} for install. 
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate rtrend, update} to update the {bf:rtrend} command.{break}
 Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
 {title:Examples}
 
 {p 2 4}{it:Frequency}{break}
-{stata "use http://www.graunt.cat/stata/SmokeApgar.dta":. use http://www.graunt.cat/stata/SmokeApgar.dta}{break}
+{stata "use http://metodo.uab.cat/stata/SmokeApgar.dta":. use http://metodo.uab.cat/stata/SmokeApgar.dta}{break}
 {cmd:. rtrend Apgar Smoke, data(freq) metric(0 5 15 30) st(cs) wilson zero(n) nst(Study name)}{break}
 {cmd:. rtrendi 0 5 15 30 \ 48 6 17 17 \ 520 108 183 105, data(freq) st(co rr) rc(f)}{break}
 {cmd:. rtrendi 0 5 15 30 \ 48 6 17 17 \ 520 108 183 105, data(freq) st(cs or) rc(l)}{break}
 {cmd:. rtrendi 0 1 2 3 \ 7 565 445 340 \ 61 706 408 182, st(cc) rc(f)}{p_end}
 
 {p 2 4}{it:Frequency - stratified analysis}{break}
-{stata "use http://www.graunt.cat/stata/SmokeApgarAge.dta":. use http://www.graunt.cat/stata/SmokeApgarAge.dta}{break}
+{stata "use http://metodo.uab.cat/stata/SmokeApgarAge.dta":. use http://metodo.uab.cat/stata/SmokeApgarAge.dta}{break}
 {cmd:. rtrend Apgar Smoke, data(freq) metric(1 2 3 4) rc(f) by(Age) st(co rr) wilson zero(n)}{break}
 {cmd:. rtrendi 1 2 3 4 \ 42 2 9 10 \ 6 4 8 7 \ 330 12 36 31 \ 190 96 147 74, data(freq) rc(f) st(co rr) wilson zero(n)}{break}
 
 {p 2 4}{it:Person-time}{break}
-{stata "use http://www.graunt.cat/stata/SmokeBladder.dta":. use http://www.graunt.cat/stata/SmokeBladder.dta}{break}
+{stata "use http://metodo.uab.cat/stata/SmokeBladder.dta":. use http://metodo.uab.cat/stata/SmokeBladder.dta}{break}
 {cmd:. rtrend Bladder Smoke Time, data(pt) rc(f)}{break}
 {cmd:. rtrendi 0 1 2 3.5 \ 82 0 150 141 \ 31966 49672 44112 37545, data(pt) rc(l)}{break}
 {cmd:. rtrendi 0 1 2 3.5 \ 82 140 150 141 \ 31966.7 49672 44112.5 37545.9, data(pt) rc(l)}{p_end}
 
 {p 2 4}{it:Person-time - stratified analysis}{break}
-{stata "use http://www.graunt.cat/stata/ArsenicRespiratoryYear.dta":. use http://www.graunt.cat/stata/ArsenicRespiratoryYear.dta}{break}
+{stata "use http://metodo.uab.cat/stata/ArsenicRespiratoryYear.dta":. use http://metodo.uab.cat/stata/ArsenicRespiratoryYear.dta}{break}
 {cmd:. rtrend Respiratory Arsenic Time, data(pt) by(Year) rc(f)}{break}
 {cmd:. rtrendi 1 2 3 4 \ 51 17 13 34 \ 100 38 15 8 \ 19017 2683 2600 3871 \ 74667 13693 5940 2510, data(pt) rc(f)}{p_end}
 
@@ -227,7 +227,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.2.5 {hline 2} 23 October 2018
+Version 1.2.6 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -238,15 +238,15 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{break}
+stata@metodo.uab.cat{break}
 
 
 {title:Vancouver reference}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Trend Test: User-written command rtrend for Stata [computer program].{break}
-V1.2.5. Barcelona: Graunt21; 2018.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.2.6. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

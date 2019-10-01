@@ -1,4 +1,4 @@
-*! version 1.4.4 27apr2019 JM. Domenech, R. Sesma
+*! version 1.4.5 30sep2019 JM. Domenech, R. Sesma
 
 /*
 META-ANALYSIS: OR,RR,RD,IR,ID,B,MD,R COMBINED

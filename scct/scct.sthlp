@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.5 05oct2016}{...}
+{* *! version 1.0.6 30sep2019}{...}
 {viewerdialog scct "dialog scct"}{...}
 {viewerjumpto "Syntax" "scct##syntax"}{...}
 {viewerjumpto "Description" "scct##description"}{...}
@@ -44,14 +44,14 @@ The {bf:nst} option receives the name of the study to label the output.
 You can click {dialog sccti:here} to pop up a {dialog sccti:dialog} or type {inp: db scct}.
 
 {p 4 4}
-Execute {cmd: net from http://www.graunt.cat/stata} for install. 
+Execute {cmd: net from http://metodo.uab.cat/stata} for install. 
 
 {p 4 4}
 It is important to keep the commands updated. Execute {cmd: adoupdate scct, update} to update the {bf:scct} command.{break}
 Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 
 {p 4 4}
-If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@graunt.cat.
+If you find any bugs or want to suggest any improvements, please send an e-mail to: stata@metodo.uab.cat.
 
 
 {marker examples}{...}
@@ -65,7 +65,7 @@ If you find any bugs or want to suggest any improvements, please send an e-mail 
 {title:Version}
 
 {p 4}
-Version 1.0.5 {hline 2} 05 October 2016
+Version 1.0.6 {hline 2} 30 September 2019
 
 
 {marker authors}{...}
@@ -76,15 +76,15 @@ JM.Dom{c e'}nech{break}
 Programmer: R.Sesma{break}
 Laboratori d'Estad{c i'}stica Aplicada{break}
 Universitat Aut{c o'g}noma de Barcelona{break}
-stata@graunt.cat{p_end}
+stata@metodo.uab.cat{p_end}
 
 
 {title:Vancouver reference}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Stochastic Curtailment, Clinical trials: User-written command scct for Stata [computer program].{break}
-V1.0.5. Barcelona: Graunt21; 2016.{break}
-Available executing from Stata: net from http://www.graunt.cat/stata{p_end}
+V1.0.6. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}

@@ -1,4 +1,4 @@
-*! version 1.0.7 13jun2017 JM. Domenech, R. Sesma
+*! version 1.0.8 30sep2019 JM. Domenech, R. Sesma
 
 /*
 Kruskal-Wallis equality-of-populations rank test and non-parametric pairwise comparisons across the levels of factor variables

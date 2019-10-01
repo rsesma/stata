@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.1 11may2018}{...}
+{* *! version 1.1.2 30sep2019}{...}
 {viewerdialog sta "dialog sta"}{...}
 {viewerdialog stai "dialog stai"}{...}
 {viewerjumpto "Syntax" "sta_pt##syntax"}{...}
@@ -62,7 +62,7 @@ Person-time {c |} {space 2}{bf:t0} {space 2} {c |} {space 2}{bf:t1}  {space 2} {
 {marker examples}{...}
 {title:Examples}
 
-{p 4 4}{stata "use http://www.graunt.cat/stata/BladderSmoking.dta":. use http://www.graunt.cat/stata/BladderSmoking.dta}{p_end}
+{p 4 4}{stata "use http://metodo.uab.cat/stata/BladderSmoking.dta":. use http://metodo.uab.cat/stata/BladderSmoking.dta}{p_end}
 {p 4 4}{cmd:. sta Bladder Smoking Time, data(pt) detail}{p_end}
 {p 4 4}{cmd:. stai 23 25 44607 141634, data(pt) detail}{p_end}
 

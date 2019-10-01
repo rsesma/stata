@@ -1,4 +1,4 @@
-*! version 1.1.7  24dec2018 JM. Domenech, R. Sesma
+*! version 1.1.8  30sep2019 JM. Domenech, R. Sesma
 
 /*
 Agreement: Passing-Bablok & Bland-Altman methods

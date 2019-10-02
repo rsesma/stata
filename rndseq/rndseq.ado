@@ -265,7 +265,7 @@ program define rndseq
 	
 	*Print seed, drug and protocol
 	di
-	if ("`seed'"=="") di as txt "Random number seed= {bf:RANDOM}"
+	if ("`seed'"=="") di as txt "Random number seed= {bf:DEFAULT}"
 	else di as txt "Random number seed= {bf:`seed'}"
 	di
 	di as txt "Random codes for Drug: {bf:`drug'}"

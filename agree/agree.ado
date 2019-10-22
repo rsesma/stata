@@ -1,4 +1,4 @@
-*! version 1.1.8  30sep2019 JM. Domenech, R. Sesma
+*! version 1.1.9  21oct2019 JM. Domenech, R. Sesma
 
 /*
 Agreement: Passing-Bablok & Bland-Altman methods
@@ -7,7 +7,8 @@ Agreement: Passing-Bablok & Bland-Altman methods
 program agree, byable(recall) sortpreserve rclass
 	version 12
 	syntax varlist(min=2 max=2 numeric) [if] [in], /*
-	*/	[pb ba Level(numlist max=1 >=50 <100) pct line list id(varname numeric) ci nst(string)]
+	*/	[pb ba Level(numlist max=1 >=50 <100) pct line list /*
+	*/	 id(varname numeric) ci title(string) nst(string)]
 
 	tempvar yx xy yx2 yxpct diff ai ai_lo ai_up sort d r cusumi sort idv s
 	tempname D S N R A bias sd t z lo up se bias_se
@@ -21,7 +22,7 @@ program agree, byable(recall) sortpreserve rclass
 	if ("`list'"=="" & "`id'"!="") print_error "id() option is only necessary for list option"
 	if ("`pb'"!="" & "`pct'"!="") print_error "pct option not allowed for Passing-Bablok method"
 	if ("`pb'"!="" & "`line'"!="") print_error "ci option not allowed for Passing-Bablok method"
-
+	
 	// x, y variables
 	tokenize `varlist'
 	local x `2'
@@ -130,10 +131,10 @@ program agree, byable(recall) sortpreserve rclass
 			scalar `lo' = `bias' - `z'*`sd'
 			scalar `up' = `bias' + `z'*`sd'
 			scalar `se' = `sd'*sqrt(3/r(N_1))
-			local title = cond(`i'==1,"Diff. (Y-X):   Bias","100*(Y-X)/[(X+Y)/2]")
+			local c = cond(`i'==1,"Diff. (Y-X):   Bias","100*(Y-X)/[(X+Y)/2]")
 
 			di as txt "Parameter             Estimate  Std. Dev.   Std. Err.  [`level'% Conf. Interval]"
-			di as txt "`title'  " as res %9.0g `bias' "  " % 9.0g `sd' "   " %9.0g `bias_se' _c
+			di as txt "`c'  " as res %9.0g `bias' "  " % 9.0g `sd' "   " %9.0g `bias_se' _c
 			di as res _col(57) %9.0g `bias' - `t'*`bias_se' " " %9.0g `bias' + `t'*`bias_se'
 			di as txt _col(11) "Lower LoA  " as res %9.0g `lo' _col(45) %9.0g `se' _c
 			di as res _col(57) %9.0g `lo' - `t'*`se' " " %9.0g `lo' + `t'*`se'
@@ -175,16 +176,18 @@ program agree, byable(recall) sortpreserve rclass
 			* graphic: Bland-Altman
 			local vx = cond(`i'==1,"`yx'","`diff'")
 			local name = cond(`i'==1,"abs","pct")
-			local title = cond(`i'==1,"Difference (Y-X)","100*(Y-X)/Average")
+			local c = cond(`i'==1,"Difference (Y-X)","100*(Y-X)/Average")
 			local reg = cond("`line'"=="","","(lfit `vx' `yx2')")
+			local ba_title = cond("`title'"=="","Bland-Altman Agreement","`title'")
 			graph twoway (scatter `vx' `yx2', mfcolor(none) msize(medlarge) mcolor(black)) `reg'	/*
 			*/	(function y = `bias', range(`x') lcolor(black) lpattern(solid))			/*
 			*/	(function y = `up', range(`x') lcolor(black) lpattern(dash))	/*
 			*/	(function y = `lo', range(`x') lcolor(black) lpattern(dash)) 			/*
 			*/	(function y = 0, range(`x') lcolor(black) lpattern(dash_dot)) if `touse', 			/*
-			*/	legend(off) ytitle("`title'", size(medium) margin(vsmall)) /*
-			*/  xtitle("Average (X+Y)/2", size(medium) margin(small))	/*
-			*/	title("Bland-Altman Agreement `ntitle'", size(medium) color(black) margin(medium))  /*
+			*/	legend(off) ytitle("`c'", margin(small)) /*
+			*/  xtitle("Average (X+Y)/2", margin(small))	/*
+			*/	title("`ba_title' `ntitle'", margin(vsmall))  /*
+			*/  subtitle("`nst'", margin(small))   /*
 			*/  name("ba_`name'`ngraph'", replace)
 		}
 
@@ -325,11 +328,13 @@ program agree, byable(recall) sortpreserve rclass
 	        local cilo "(function y = `a_lo' +  `b_lo' * x, range(`x') lcolor(black) lpattern(dash))"
 	        local ciup "(function y = `a_up' +  `b_up' * x, range(`x') lcolor(black) lpattern(dash))"
 	    }
+		local pb_title = cond("`title'"=="","Passing Bablok Regression line","`title'")
 	    graph twoway (scatter `y' `x', mfcolor(none) msize(medlarge) mcolor(black)) `cilo' `ciup'	/*
 	    */	(function y = `a' +  `b' * x, range(`x') lcolor(black) lpattern(solid)) if `touse',		/*
-	    */	legend(off) ytitle("`y'", size(medium) margin(vsmall))		/*
-	    */	xtitle("`x'", size(medium) margin(small))		/*
-	    */	title("Passing Bablok Regression line `ntitle'", size(medium) color(black) margin(medium)) /*
+	    */	legend(off) ytitle("`y'", margin(small))		/*
+	    */	xtitle("`x'", margin(small))		/*
+	    */	title("`pb_title' `ntitle'", margin(vsmall))  /*
+		*/  subtitle("`nst'", margin(small))   /*
 	    */	name("pb`ngraph'", replace)
 
 		* list input data

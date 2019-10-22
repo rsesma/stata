@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.8 30sep2019}{...}
+{* *! version 1.1.9 21oct2019}{...}
 {viewerdialog agree "dialog agree"}{...}
 {viewerjumpto "Syntax" "agree##syntax"}{...}
 {viewerjumpto "Description" "agree##description"}{...}
@@ -28,13 +28,14 @@
 {synopt :{opt ba}}calculate Bland-Altman comparison of two measurements methods; the {bf:default}{p_end}
 {synopt :{opt pb}}calculate Passing-Bablok estimation of regression line{p_end}
 {synopt :{opt l:evel(#)}}confidence level (%); default is {bf:level(95)}{p_end}
-{synopt :{opt nst(string)}}name of the study (label){p_end}
+{synopt :{opt title(string)}}title for the graphics{p_end}
+{synopt :{opt nst(string)}}name of the study (label); if provided, it is also used as the subtitle for the graphics{p_end}
 {syntab:{it:Bland-Altman method}}
 {synopt :{opt pct}}compute percentage values and graphic{p_end}
 {synopt :{opt line}}show regression line on Bland-Altman graphics{p_end}
 {syntab:{it:Passing-Bablok method}}
 {synopt :{opt ci}}show confidence intervals on Passing-Bablok graphic{p_end}
-{synopt :{opt list}}list input data; the report include X-Y changes (Passing-Bablok only){p_end}
+{synopt :{opt list}}list input data; the report include X-Y changes{p_end}
 {synopt :{opt id(varname)}}name of variable with identifier of cases for the list;  default is {bf:{help _n:_n}}{p_end}
 {synoptline}
 {phang}
@@ -127,7 +128,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.8 {hline 2} 30 September 2019
+Version 1.1.9 {hline 2} 21 October 2019
 
 
 {marker authors}{...}
@@ -145,7 +146,7 @@ stata@metodo.uab.cat{break}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Passing-Bablok & Bland-Altman methods: User-written command agree for Stata [computer program].{break}
-V1.1.8. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+V1.1.9. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 

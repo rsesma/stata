@@ -1,7 +1,7 @@
 /*
   agree.dlg
 
-*! VERSION 1.1.8  30sep2019
+*! VERSION 1.1.9  21oct2019
 
 */
 
@@ -27,13 +27,16 @@ BEGIN
     RADIO		rb_pb	_lft	_ss	    _rb_wd	., label("Passing-Bablok estimation of regression line") /*
     */                                              onclickon(program sel_pb) last option(pb)
 
-	TEXT  		tx_y 	_lft	_ls	_vlx	., label("Y variable:") left
+	TEXT  		tx_y 	_lft	_ms		_vlx	., label("Y variable:") left
 	TEXT  		tx_x 	_vinc 	@   	_vlx	., label("X variable:") left
 	VARNAME		vary	_lft   	_ss		_vlx 	., label("Y variable")
 	VARNAME		varx	_vinc	@		_vlx 	., label("X variable")
 
-	GROUPBOX	gb_nst	_lft  	_y_nst	_gb_wd	65, label("Name of the study")
-	EDIT		ed_nst	_ilft   _ms	 	_rb_wd	., option(nst)
+	TEXT  		tx_tit 	_lft	_xls	_vlx	., label("Title of graphics:") left
+	EDIT		ed_tit	_lft    _ss	 	_gb_wd	., option(title)
+	
+	TEXT		gb_nst	_lft  	_ms		_rb_wd	., label("Name of the study / Subtitle of graphics:")
+	EDIT		ed_nst	_lft    _ss	 	_gb_wd	., option(nst)
 END
 
 INCLUDE byifin
@@ -103,6 +106,7 @@ BEGIN
 
 		INCLUDE _level_opt_pr
 
+		optionarg main.ed_tit
 		optionarg main.ed_nst
 	endoptions
 END

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.2.6 30sep2019}{...}
+{* *! version 1.2.7 30dec2019}{...}
 {viewerdialog rtrend "dialog rtrend"}{...}
 {viewerdialog rtrendi "dialog rtrendi"}{...}
 {viewerjumpto "Syntax" "rtrend##syntax"}{...}
@@ -227,7 +227,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.2.6 {hline 2} 30 September 2019
+Version 1.2.7 {hline 2} 30 December 2019
 
 
 {marker authors}{...}
@@ -245,7 +245,7 @@ stata@metodo.uab.cat{break}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Trend Test: User-written command rtrend for Stata [computer program].{break}
-V1.2.6. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+V1.2.7. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 

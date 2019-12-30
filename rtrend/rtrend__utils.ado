@@ -1,4 +1,4 @@
-*! version 1.2.6  30sep2019
+*! version 1.2.7  30dec2019
 program rtrend__utils
 	version 12.0
 	gettoken subcmd 0 : 0
@@ -143,14 +143,14 @@ program define print_results, rclass
 					local cols= colsof(`r')-2
 					if (`i'==`len') local cols 6
 					if (`i'==`len') di as txt "{hline 6}{c +}{hline `n1'}"
-					if (`i'==`len') di as txt "TOTAL {c |} " _c
-					if (`i'<`len') di as res %5.0g `r'[`i',1] " {c |} " _c
+					if (`i'==`len') di as txt "TOTAL {c |}" _c
+					if (`i'<`len') di as res %5.0g `r'[`i',1] " {c |}" _c
 
 					foreach j of numlist 2/`cols' {
 						local v = `r'[`i',`j']
 						if (!missing(`v')) {
-							if (`stat'==1) local fmt = cond(`j'==2,"%5.0g",cond(`j'==3,"%7.0g",cond(`j'<7,"%8.0g","%9.0g")))
-							if (`stat'==2) local fmt = cond(`j'==2,"%5.0g",cond(`j'<7,"%8.0g","%9.0g"))
+							if (`stat'==1) local fmt = cond(`j'==2,"%6.0g",cond(`j'==3,"%7.0g",cond(`j'<7,"%8.0g","%9.0g")))
+							if (`stat'==2) local fmt = cond(`j'==2,"%6.0g",cond(`j'<7,"%8.0g","%9.0g"))
 							di as res `fmt' `v' _c
 							if ((`stat'==1 & inlist(`j',4,7)) | (`stat'==2 & inlist(`j',5,6,7))) di cond(`r'[`i',`zero_pos']==0," ","*") _c
 							else di as txt " " _c

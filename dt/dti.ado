@@ -1,4 +1,4 @@
-*! version 1.1.6  30sep2019 JM. Domenech, R. Sesma
+*! version 1.1.7  02jan2020 JM. Domenech, R. Sesma
 /*
 dti: Diagnostics Tests (immediate command)
 For cross-sectional and case-control studies 4 elements are provided: a1 a0 b1 b0
@@ -263,7 +263,7 @@ program define dti, rclass
 
 		if ("`p'"!="") {
 			di
-			di as txt "  Pre-test   {c |}{rcenter 45:Post-test Probability of disease*}"
+			di as txt "  Pre-test   {c |}{rcenter 45:Predictive values of disease*}"
 			di as txt " Probability {c |}{rcenter 45:(`level'% Asympt. Confidence Interval)}"
 			di as txt " of disease  {c |}{rcenter 22:Positive}{c |}{rcenter 22:Negative}"
 			di as txt "{hline 13}{c +}{hline 22}{c +}{hline 22}"

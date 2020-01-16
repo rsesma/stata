@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.6 30sep2019}{...}
+{* *! version 1.1.7 02jan2020}{...}
 {viewerdialog dt "dialog dt"}{...}
 {viewerdialog dti "dialog dti"}{...}
 {viewerjumpto "Syntax" "dt##syntax"}{...}
@@ -209,14 +209,14 @@ The command stores the following in {cmd:r()}:
 {synopt:{cmd:r(lrn)}}likelihood ratio -{p_end}
 
 {p 4 4}Matrices{p_end}
-{synopt:{cmd:r(P)}}Post-test Probability statistics if option {cmd:p} provided{p_end}
+{synopt:{cmd:r(P)}}Predictive values of disease if option {cmd:p} provided{p_end}
 
 
 {marker version}{...}
 {title:Version}
 
 {p 4}
-Version 1.1.6 {hline 2} 30 September 2019
+Version 1.1.7 {hline 2} 02 January 2020
 
 
 {marker authors}{...}
@@ -234,7 +234,7 @@ stata@metodo.uab.cat{p_end}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Diagnostic tests: User-written command dt for Stata [computer program].{break}
-V1.1.6. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+V1.1.7. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2020.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 

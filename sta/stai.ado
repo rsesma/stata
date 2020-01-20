@@ -1,4 +1,4 @@
-*! version 1.1.2  30sep2019 JM. Domenech, R. Sesma
+*! version 1.1.3  20jan2020 JM. Domenech, R. Sesma
 /*
 Association Measures - immediate data
 */

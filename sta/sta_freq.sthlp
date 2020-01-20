@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.2 30sep2019}{...}
+{* *! version 1.1.3 20jan2020}{...}
 {viewerdialog sta "dialog sta"}{...}
 {viewerdialog stai "dialog stai"}{...}
 {viewerjumpto "Syntax" "sta_freq##syntax"}{...}
@@ -47,7 +47,7 @@ The recommended correction is {bf:reciprocal}{p_end}
 {synopt :{opt pe(#)}}proportion of exposed in the population{p_end}
 {synopt :{opt r(#)}}proportion of cases in the population; {bf: case-control} type only{p_end}
 {synopt :{opt rare}}rare disease; {bf: case-control} type only{p_end}
-{synopt :{opt nnt(#)}}compute number needed to treat. By default the code of good outcome is 1, but 0 is also allowed; {bf:experimental} type only{p_end}
+{synopt :{opt nnt(#)}}compute number needed to treat. The code is 1 for a benefit outcome (default) and 0 for a harmful outcome; {bf:experimental} type only{p_end}
 {synopt :{opt nst(string)}}name of the study (label){p_end}
 {synoptline}
 

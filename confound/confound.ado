@@ -1,4 +1,4 @@
-*! version 1.1.5  30sep2019 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.1.6  27jan2020 JM. Domenech, JB.Navarro, R. Sesma
 
 program confound
 	version 12
@@ -296,8 +296,8 @@ program confound
 
 		*Compute CI and Range difference
 		if ("`type'"=="linear") {
-			gen double lbCI = B - abs(invttail(N-df,(`level'+100)/200)*SE)
-			gen double ubCI = B + abs(invttail(N-df,(`level'+100)/200)*SE)
+			gen double lbCI = B - abs(invttail(N-df-1,(`level'+100)/200)*SE)
+			gen double ubCI = B + abs(invttail(N-df-1,(`level'+100)/200)*SE)
 		}
 		if ("`type'"=="logistic" | "`type'"=="cox") {
 			generate ExpB = exp(B)

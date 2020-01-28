@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.6 27jan2020}{...}
+{* *! version 1.1.7 28jan2020}{...}
 {viewerdialog confound "dialog confound"}{...}
 {vieweralsosee "[R] regress" "help regress"}{...}
 {vieweralsosee "[R] logit" "help logit"}{...}
@@ -92,6 +92,12 @@ If you find any bugs or want to suggest any improvements, please send an e-mail 
 {marker examples}{...}
 {title:Examples}
 
+{p 4 4}
+The zip file available for download on {browse "http://metodo.uab.cat/stata/Ejemplo_confound.zip"} contains a pdf file with an
+example of use of the {cmd:confound} command (in spanish). The zip file also contains example data. If
+the direct download fails, copy the download link (http://metodo.uab.cat/stata/Ejemplo_confound.zip) and paste in the 
+address bar of your web browser.
+
 Linear regression
 {p 4 4}{stata "use http://metodo.uab.cat/stata/Datatest_confound_MR.dta":. use http://metodo.uab.cat/stata/Datatest_confound_MR.dta}{p_end}
 {p 4 4}{cmd:. confound y x1 z1 z2 z3 i.z4, linear}{p_end}
@@ -113,7 +119,7 @@ Cox regression
 {title:Version}
 
 {p 4}
-Version 1.1.6 {hline 2} 27 January 2020
+Version 1.1.7 {hline 2} 28 January 2020
 
 
 {marker authors}{...}
@@ -132,7 +138,7 @@ stata@metodo.uab.cat{p_end}
 {p 4 6 2}
 Dom{c e'}nech JM, Navarro JB. Find the best subset for Linear, Logistic and Cox Regression:{break}
 User-written command confound for Stata [computer program].{break}
-V1.1.6. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2020.{break}
+V1.1.7. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2020.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 

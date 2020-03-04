@@ -1,4 +1,4 @@
-*! version 1.3.1  30sep2019
+*! version 1.3.2  03feb2020
 program nsize__utils
 	version 12.0
 	gettoken subcmd 0 : 0

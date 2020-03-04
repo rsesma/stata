@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.3.1  30sep2019}{...}
+{* *! version 1.3.2  03feb2020}{...}
 {viewerdialog nsize "dialog nsize"}{...}
 {viewerjumpto "Syntax" "nsize##syntax"}{...}
 {viewerjumpto "Description" "nsize##description"}{...}
@@ -952,7 +952,7 @@ The command stores the following scalars or matrices in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.3.1 {hline 2} 30 September 2019
+Version 1.3.2 {hline 2} 03 February 2020
 
 
 {marker authors}{...}
@@ -971,7 +971,7 @@ stata@metodo.uab.cat{p_end}
 {p 4 6 2}
 Dom{c e'}nech JM. Sample Size and Power: Comparisons and estimations for independent proportions, means,{break}
 correlations, risks and rates: User-written command nsize for Stata [computer program].{break}
-V1.3.1. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+V1.3.2. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2020.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 

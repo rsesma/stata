@@ -1,4 +1,4 @@
-*! version 1.3.1  30sep2019 JM. Domenech, R. Sesma
+*! version 1.3.2  03feb2020 JM. Domenech, R. Sesma
 /*
 SAMPLE SIZE & POWER
 **PROPORTIONS
@@ -1650,7 +1650,8 @@ program define nsize_co2r, rclass
 		foreach i of numlist 1/`rows'{
 			local note = cond(`i'==1 & (`warning' | `warn'),"*","")
 			di as txt _newline _c
-			if (inlist(`i',1,4,7)) di as txt cond(`i'==1,"Normal`note'",cond(`i'==4,"Normal corrected","ArcoSinus")) _c
+			if (inlist(`i',1,4,7)) di as txt cond(`i'==1,"Normal`note'",cond(`i'==4,"Normal (Fleiss","ArcoSinus")) _c
+			if (`i'==5) di as txt "{ralign 15:correction)}" _c
 			local c = cond(inlist(`i',1,4,7),"`c0'",cond(inlist(`i',2,5,8),"`c1'","Total"))
 			di as txt _col(17) "{ralign 5:`c'}" _c
 			di as txt " {c |}" _c
@@ -1701,20 +1702,20 @@ program define nsize_co2r, rclass
 
 		local rows = rowsof(`res')
 		local cols = colsof(`res')
-		di as txt _col(19) "{c |}{center 33:POWER (%)}"
-		di as txt " METHOD" _col(19) "{c |} Two-Sided Test {c |} One-Sided Test "
-		di as txt "{hline 18}{c +}{hline 16}{c +}{hline 16}" _c
+		di as txt _col(23) "{c |}{center 33:POWER (%)}"
+		di as txt " METHOD" _col(23) "{c |} Two-Sided Test {c |} One-Sided Test "
+		di as txt "{hline 22}{c +}{hline 16}{c +}{hline 16}" _c
 		foreach i of numlist 1/`rows'{
 			local note = cond(`i'==1 & (`warning' | `warn'),"*","")
-			di as txt _newline cond(`i'==1,"Normal`note'",cond(`i'==2,"Normal corrected","ArcoSinus")) _c
-			di as txt _col(19) "{c |}" _c
+			di as txt _newline cond(`i'==1,"Normal`note'",cond(`i'==2,"Normal (Fleiss corr.)","ArcoSinus")) _c
+			di as txt _col(23) "{c |}" _c
 			foreach j of numlist 1/`cols'{
 				local v = `res'[`i',`j']
 				print_pct `v', a(10) nopercent
-				if (`j'==1) di as txt _col(36) "{c |}" _c
+				if (`j'==1) di as txt _col(40) "{c |}" _c
 			}
 		}
-		di as txt _newline "{hline 18}{c BT}{hline 16}{c BT}{hline 16}"
+		di as txt _newline "{hline 22}{c BT}{hline 16}{c BT}{hline 16}"
 
 		matrix rownames `res' = Normal NormalCor ArcoSinus
 		matrix colnames `res' = TwoSided OneSided

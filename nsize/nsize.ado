@@ -1,4 +1,4 @@
-*! version 1.3.2  03feb2020 JM. Domenech, R. Sesma
+*! version 1.3.5  17mar2020 JM. Domenech, R. Sesma
 /*
 SAMPLE SIZE & POWER
 **PROPORTIONS
@@ -81,8 +81,8 @@ program define nsize_cop, rclass
 	if ("`beta'"=="") local beta 20 15 10
 
 	*Title
-	di as res "SAMPLE SIZE & POWER DETERMINATION: " /*
-	*/	cond("`type'"=="co1p","One single proportion","Two-independent proportions")
+	nsize__utils get_title, type("`type'")
+	di as res "`r(title)'"
 	if ("`nst'"!="") display as text "{bf:STUDY:} `nst'"
 	*Header
 	di
@@ -257,9 +257,8 @@ program define nsize_cpe, rclass
 	}
 
 	*Title
-	di as res "SAMPLE SIZE & POWER DETERMINATION: " /*
-	*/	cond("`type'"=="c1pe","One single proportion (equivalence)", /*
-	*/	"Two-independent samples (equivalence)")
+	nsize__utils get_title, type("`type'")
+	di as res "`r(title)'"
 	if ("`nst'"!="") display as text "{bf:STUDY:} `nst'"
 	*Header
 	local c = cond(`lim'==1,"Non-Inferiority",cond(`lim'==2,"Superiority","Equivalence"))
@@ -419,7 +418,8 @@ program define nsize_copp, rclass
 	if ("`pd'"!="") local diff= `pd'*(`or'-1)/(`or'+1)		//Estimate of the difference of proportions P1-P0
 
 	*Title
-	di "{bf:SAMPLE SIZE & POWER: Paired proportions}"
+	nsize__utils get_title, type("copp")
+	di as res "`r(title)'"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
 
 	*Header
@@ -630,10 +630,10 @@ program define nsize_com, rclass
 	if ("`alpha'"=="") local alpha 5
 
 	*Title
-	if ("`type'" == "co1m") di as txt "{bf:SAMPLE SIZE (MEAN) & POWER DETERMINATION: One sample}"
-	if ("`type'" == "co2m") di as txt "{bf:SAMPLE SIZE (MEAN) & POWER DETERMINATION: Two-independent samples}"
-	if ("`type'" == "c2me") di as txt "{bf:SAMPLE SIZE (EQUIVALENCE MEANS) & POWER DETERMINATION: Two-independent samples}"
+	nsize__utils get_title, type("`type'")
+	di as res "`r(title)'"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
+	*Header
 	di
 	di as txt "Common standard deviation = `sd'"
 	if ("`effect'"!="") di as txt "Minimum expected effect size = `effect'"
@@ -883,7 +883,8 @@ program define nsize_cokm, rclass
 	}
 
 	*Title
-	di as txt "{bf:SAMPLE SIZE (MEAN) & POWER: k-independents samples (ANOVA)}"
+	nsize__utils get_title, type("cokm")
+	di as res "`r(title)'"
 	if ("`nst'"!="") display as text "{bf:STUDY:} `nst'"
 
 	*Header
@@ -1029,10 +1030,8 @@ program define nsize_ci, rclass
 	}
 
 	*Title
-	if ("`type'" == "ci1p") di as res "SAMPLE SIZE: Estimation of population proportion"
-	if ("`type'" == "ci2p") di as res "SAMPLE SIZE: CI of difference between two proportions (independent samples)"
-	if ("`type'" == "ci1m") di as res "SAMPLE SIZE: Estimation of population mean"
-	if ("`type'" == "ci2m") di as res "SAMPLE SIZE: Difference between two means (independent samples)"
+	nsize__utils get_title, type("`type'")
+	di as res "`r(title)'"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
 
 	*Header
@@ -1352,8 +1351,8 @@ program define nsize_cor, rclass
 	if ("`alpha'"=="") local alpha 5
 
 	*Title & Header
-	di as res "SAMPLE SIZE & POWER DETERMINATION: " cond("`type'"=="co1c","One","Two") /*
-	*/			" correlation coefficient" cond("`type'"=="co1c","","s")
+	nsize__utils get_title, type("`type'")
+	di as res "`r(title)'"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
 	di
 	if ("`type'" == "co1c") {
@@ -1448,7 +1447,8 @@ program define nsize_ncr, rclass
 	if ("`beta'" == "") local beta 20 15 10
 
 	*Title & Header
-	di as res "NUMBER OF COMMUNITIES (RISK): Intervention trials"
+	nsize__utils get_title, type("ncr")
+	di as res "`r(title)'"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
 	di
 	di as txt "Supposed Between Group Variance= " `vb'
@@ -1576,7 +1576,8 @@ program define nsize_co2r, rclass
 	if (`r'<=0) print_error "r() invalid -- invalid number, outside of allowed range"
 
 	*Title
-	di as res "SAMPLE SIZE (RISK) & POWER: Two-independent samples"
+	nsize__utils get_title, type("co2r")
+	di as res "`r(title)'"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
 
 	*Header
@@ -1770,7 +1771,8 @@ program define nsize_co2i, rclass
 	if ("`beta'"=="") local beta 20 15 10
 
 	*Title
-	di as res "SAMPLE SIZE (RATE) & POWER: Two-independent samples"
+	nsize__utils get_title, type("co2i")
+	di as res "`r(title)'"
 	if ("`nst'"!="") di as txt "{bf:STUDY:} `nst'"
 
 	*Header

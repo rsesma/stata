@@ -1,4 +1,4 @@
-*! version 1.3.2  03feb2020
+*! version 1.3.5  17mar2020
 program nsize__utils
 	version 12.0
 	gettoken subcmd 0 : 0
@@ -463,11 +463,7 @@ program define get_nsize, rclass
 			local i = cond("`type'"=="co1m",1,2)
 			local n = ceil(`i'*(`sd'^2)*(`za'+`zb')^2/(`effect')^2)
 			
-			* (v1.3.0) obtain results using Student's T, using invnormal n as df
-			local ta = invttail((`i'*`n')-`i',(100-`alpha')/100)
-			local tb = invttail((`i'*`n')-`i',(100-`beta')/100)
-			local n = ceil(`i'*(`sd'^2)*(`ta'+`tb')^2/(`effect')^2)
-			
+			* stored results
 			return scalar n = `n'
 			return scalar warn = (`n'<30)
 		}
@@ -477,14 +473,6 @@ program define get_nsize, rclass
 			else local n0 = ceil(`n1'*`r')
 			local n1 = ceil(`n1')
 			local n = `n1'+`n0'
-			
-			* (v1.3.0) obtain results using Student's T, using invnormal n as df
-			local ta = invttail(`n'-2,(100-`alpha')/100)
-			local tb = invttail(`n'-2,(100-`beta')/100)
-			local n1 = (`r'+1)*(`sd'^2)*(`ta'+`tb')^2/(`r'*(`effect')^2)
-			if (mod(`r',1)==0) local n0 = ceil(`n1')*`r'
-			else local n0 = ceil(`n1'*`r')
-			local n1 = ceil(`n1')
 			
 			* stored results
 			return scalar n1 = `n1'
@@ -861,4 +849,28 @@ program define get_effect, rclass
 		local r `3'
 		return scalar effect = `sd'*(`za'+`zb')*sqrt((`r'+1)/(`r'*`n1'))
 	}
+end
+
+program define get_title, rclass
+	syntax [anything], type(string)
+
+	if ("`type'"=="co1p") return local title "SAMPLE SIZE & POWER: One-sample proportion test z test"
+	if ("`type'"=="co2p") return local title "SAMPLE SIZE & POWER: Two-sample proportions z test"
+	if ("`type'"=="c1pe") return local title "SAMPLE SIZE & POWER: One-sample proportion equivalence z test"
+	if ("`type'"=="c2pe") return local title "SAMPLE SIZE & POWER: Two-sample proportions equivalence z test"
+	if ("`type'"=="copp") return local title "SAMPLE SIZE & POWER: Two-sample paired-proportions z test"
+	if ("`type'"=="co1m") return local title "SAMPLE SIZE & POWER: One-sample mean z test"
+	if ("`type'"=="co2m") return local title "SAMPLE SIZE & POWER: Two-sample means z test"
+	if ("`type'"=="c2me") return local title "SAMPLE SIZE & POWER: Two-sample means equivalence z test"
+	if ("`type'"=="cokm") return local title "SAMPLE SIZE & POWER: One-way ANOVA"
+	if ("`type'"=="ci1p") return local title "SAMPLE SIZE: Estimation of population proportion (Normal z CI)"
+	if ("`type'"=="ci2p") return local title "SAMPLE SIZE: Two-proportions-difference (Normal z CI)"
+	if ("`type'"=="ci1m") return local title "SAMPLE SIZE: Estimation of population mean (Normal z CI)"
+	if ("`type'"=="ci2m") return local title "SAMPLE SIZE: Two-means-difference (Normal z CI)"
+	if ("`type'"=="co1c") return local title "SAMPLE SIZE & POWER: One-sample correlation z test"
+	if ("`type'"=="co2c") return local title "SAMPLE SIZE & POWER: Two-sample correlations z test"
+	if ("`type'"=="co2r") return local title "SAMPLE SIZE & POWER: Two-sample risks z test"
+	if ("`type'"=="co2i") return local title "SAMPLE SIZE & POWER: Two-sample rates z test"
+	if ("`type'"=="ncr")  return local title "SAMPLE SIZE: Number of communities for intervention trials z test"
+	
 end

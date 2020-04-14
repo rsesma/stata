@@ -1,4 +1,4 @@
-*! version 1.1.3  20jan2020 JM. Domenech, R. Sesma
+*! version 1.1.4  14apr2020 JM. Domenech, R. Sesma
 /*
 Association Measures - immediate data
 */
@@ -1077,9 +1077,10 @@ program define print_paired_tables
 			if (`j'<3) di as txt " {c |} " _c
 		}
 		if (`i'==1) di as res _col(57) %9.0g `p'[1,1] _c
+		if ("`relatsymm'"=="" & `i'==2) di as res _col(57) %9.0g `p'[1,3] _c
 	}
-	if ("`relatsymm'"=="") di as txt _n "{ralign 20:Proportion} {c |}" _c
-	if ("`relatsymm'"=="") di as res _col(33) "{c |} " %8.0g `p'[1,2] " {c |}"
+	if ("`relatsymm'"=="") di as txt _n "{ralign 20:Proportion} {c |} " _c
+	if ("`relatsymm'"=="") di as res %8.0g `p'[1,4] _col(33) "{c |} " %8.0g `p'[1,2] " {c |}"
 	if ("`relatsymm'"!="") di as txt _n "{ralign 20:Prop. of changes} {c |} " _c
 	if ("`relatsymm'"!="") di as res %8.0g `p'[1,2] " {c |} " %8.0g `p'[1,3] " {c |}"
 

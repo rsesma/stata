@@ -1,4 +1,4 @@
-*! version 1.3.5  17mar2020
+*! version 1.3.6  18mar2020
 program nsize__utils
 	version 12.0
 	gettoken subcmd 0 : 0
@@ -864,9 +864,9 @@ program define get_title, rclass
 	if ("`type'"=="c2me") return local title "SAMPLE SIZE & POWER: Two-sample means equivalence z test"
 	if ("`type'"=="cokm") return local title "SAMPLE SIZE & POWER: One-way ANOVA"
 	if ("`type'"=="ci1p") return local title "SAMPLE SIZE: Estimation of population proportion (Normal z CI)"
-	if ("`type'"=="ci2p") return local title "SAMPLE SIZE: Two-proportions-difference (Normal z CI)"
+	if ("`type'"=="ci2p") return local title "SAMPLE SIZE: Difference between two independent proportions (Normal z CI)"
 	if ("`type'"=="ci1m") return local title "SAMPLE SIZE: Estimation of population mean (Normal z CI)"
-	if ("`type'"=="ci2m") return local title "SAMPLE SIZE: Two-means-difference (Normal z CI)"
+	if ("`type'"=="ci2m") return local title "SAMPLE SIZE: Difference between two independent means (Normal z CI)"
 	if ("`type'"=="co1c") return local title "SAMPLE SIZE & POWER: One-sample correlation z test"
 	if ("`type'"=="co2c") return local title "SAMPLE SIZE & POWER: Two-sample correlations z test"
 	if ("`type'"=="co2r") return local title "SAMPLE SIZE & POWER: Two-sample risks z test"

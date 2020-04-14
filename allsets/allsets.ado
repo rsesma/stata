@@ -199,23 +199,35 @@ program allsets
 		label variable AUC "Area Under the Curve"
 		label variable Se "Sensibility (%)"
 		label variable Sp "Specificity (%)"
-		quietly{
-			*Compute pfit using df, chi2 from mata results
-			generate pfit = 1 - chi2(df,chi2)
-			replace pfit = 1 if (pearson==1 & df==0)
-			generate pfitHL = string(pfit,"%5.3f")		//Generate string variable (with * for pearson chi2)
-			replace pfitHL = pfitHL + "*" if (pearson==1 & df!=0)
-			count if (pearson==1)
-			local lpearson = (`r(N)'>0)		//There's some pearson chi2 results
-
-			local sumvars AIC BIC AUC Se Sp pfit
+		local sumvars AIC BIC AUC Se Sp 
+		local lpearson = 0
+		if ("`weight'"!="") {
+			*p not computed on weighted regressions
+			qui drop pfitHL pGof
+		} 
+		else {
+			local sumvars `sumvars' pfitHL pGof
 		}
-		label variable pfitHL "Hosmer-Lemeshow goodness-of-fit"
+/*		if ("`weight'"=="") {
+			*pfitHL not computed on weighted regressions
+			quietly{
+				*Compute pfit using df, chi2 from mata results
+				generate pfitHL = 1 - chi2(df,chi2)
+				replace pfitHL = 1 if (pearson==1 & df==0)
+				label variable pfitHL "Hosmer-Lemeshow goodness-of-fit"
+				format pfitHL %5.3f
+				*There's some pearson chi2 results?
+				count if (pearson==1)
+				if (`r(N)'>0) local lpearson = 1
+				
+				local sumvars `sumvars' pfitHL
+			}
+		}
+		qui drop df chi2 pearson		//drop auxiliary vars*/
+		qui drop pearson
 		format AIC BIC %9.1f
 		format AUC %5.3f
 		format Se Sp %5.1f
-		format pfitHL %-6s
-		if ("`weight'"!="") qui drop pfitHL		//pfitHL not computed on weighted regressions
 	}
 	if ("`type'"=="cox") {
 		if (`maxvar'==1) {
@@ -255,7 +267,6 @@ program allsets
 		matrix `r' = r(StatTotal)
 		qui drop if NVar>`maxvar' & NVar<.
 	}
-	if ("`type'"=="logistic") drop df chi2 pearson pfit		//drop auxiliary vars
 
 	local fmt : format Variables
 	local fmt : subinstr local fmt "%" "%-"
@@ -272,6 +283,7 @@ program allsets
 	restore     //Restore original data
 
 	//Print results
+	di as res "{break}{break}"
 	if ("`type'"=="linear") di "ALLSETS - Linear regression"
 	if ("`type'"=="logistic") di "ALLSETS - Logistic regression"
 	if ("`type'"=="cox") di "ALLSETS - Cox regression"
@@ -319,12 +331,12 @@ program allsets
 		if (`z'==2) matrix `m' = `rmax'
 		local cs = cond(`z'==2,"*","")
 		if ("`type'"=="logistic") {
-			local c = cond(`lpearson',"*","")
-			if ("`weight'"=="") matrix colnames `m' = "AIC BIC AUC Se Sp pfitHL`c'"
+			// local c = cond(`lpearson',"*","")
+			if ("`weight'"=="") matrix colnames `m' = "AIC BIC AUC Se Sp pfitHL pGof"
 		}
 		if ("`type'"=="cox") matrix colnames `m' = "AIC BIC HarrellC _2ll"
 		print_matrix, m(`m') rname("stats`cs'") rsize(8)
-		if ("`type'"=="logistic" & "`weight'"=="" & `lpearson') di as txt "p values with * are from Pearson's Chi2 instead of Hosmer-Lemeshow test"
+		if ("`type'"=="logistic" & "`weight'"=="" & `lpearson') di as txt "(*)some p values computed with Pearson's Chi2 instead of Hosmer-Lemeshow test"
 		if ("`type'"=="logistic" & "`weight'"!="") di as txt "For weighted data the Hosmer-Lemeshow test is not computed"
 		if (`z'==2) di as txt "(*)Results computed including maximum model results"
 	}
@@ -476,15 +488,17 @@ void getresults(string scalar dep, string scalar indep, string scalar inter, str
 	}
 	if (r.type=="logistic") {
 		x = st_addvar(("str" + strofreal(len),"float","float","float","float","float","float","float","float","float","float","float","float","float"), /*
-				*/	("Variables","OR","pValue","AIC","BIC","AUC","Se","Sp","df","chi2","pearson","NVar","time","iCat"))
+				*/	("Variables","OR","pValue","AIC","BIC","AUC","Se","Sp","pfitHL","pGof","pearson","NVar","time","iCat"))
 		st_sstore(.,"Variables",vnames)
 		st_store(.,"AIC",results[.,1])
 		st_store(.,"BIC",results[.,2])
 		st_store(.,"AUC",results[.,3])
 		st_store(.,"Se",results[.,4])
 		st_store(.,"Sp",results[.,5])
-		st_store(.,"df",results[.,6])
-		st_store(.,"chi2",results[.,7])
+		//st_store(.,"df",results[.,6])
+		//st_store(.,"chi2",results[.,7])
+		st_store(.,"pfitHL",results[.,6])
+		st_store(.,"pGof",results[.,7])
 		st_store(.,"pearson",results[.,9])
 		st_store(.,"NVar",results[.,8])
 		st_store(.,"pValue",results[.,10])
@@ -619,6 +633,8 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 	real scalar		ires, icat
 	real matrix		coef
 	string matrix	coef_names
+	real scalar 	pct
+	real scalar     pHL, pPearson
 
 	//Declare matrix
 	nrows = rows(combs)
@@ -650,7 +666,16 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 
 	ires = 1
 	icat = 0
+	printf("allsets running "+ strofreal(len) + " submodels...\n")
+	printf("0%%")
+	displayflush()
+	pct = round(len/10)
 	for (i=1; i<=rows(combs); i++) {
+		if (mod(i,pct)==0) {
+			printf("..." + strofreal(10*trunc(i/pct)) + "%%")
+			displayflush()
+		}
+		
 		lexe = 1
 		comb = combs[i]
 
@@ -740,7 +765,22 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 					stata("estat classification",1)			//Se,Sp
 					se = st_numscalar("r(P_p1)")
 					sp = st_numscalar("r(P_n0)")
-					//gof: by default, HL -- if not possible, Pearson chi2
+					pHL = .
+					if (_stata("estat gof, group(10)",1) == 0) {
+						//By default, Hosmer-Lemeshow test, group(10)
+						df = st_numscalar("r(df)")
+						chi2 = st_numscalar("r(chi2)")
+						if (df > 0) {
+							pHL = (1 - chi2(df,chi2))
+						}
+					}
+					pPearson = .
+					if (_stata("estat gof",1) == 0) {
+						df = st_numscalar("r(df)")
+						chi2 = st_numscalar("r(chi2)")
+						pPearson = (1 - chi2(df,chi2))
+					}
+/*					//gof: by default, HL -- if not possible, Pearson chi2
 					pearson = 1
 					if (_stata("estat gof, group(10)",1) == 0) {
 						//By default, Hosmer-Lemeshow test, group(10)
@@ -759,7 +799,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 							df = .
 							chi2 = .
 						}
-					}
+					}*/
 				}
 				else {
 					//Weighted regression; AUC and Se, Sp are computed in a different way to apply pweight
@@ -783,10 +823,10 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 				results[ires,3] = auc
 				results[ires,4] = se
 				results[ires,5] = sp
-				results[ires,6] = df
-				results[ires,7] = chi2
+				results[ires,6] = pHL
+				results[ires,7] = pPearson
 				results[ires,8] = nvar
-				results[ires,9] = pearson
+				results[ires,9] = .
 				results[ires,10]= pValue
 			}
 			if (r.type == "cox") {

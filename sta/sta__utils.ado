@@ -1,4 +1,4 @@
-*! version 1.1.3  20jan2020
+*! version 1.1.4  14apr2020
 program sta__utils
 	version 12.0
 	gettoken subcmd 0 : 0
@@ -1449,11 +1449,18 @@ program define get_paired_results, rclass
 		local pu = r(p)
 		local lbwu = r(lb)
 		local ubwu = r(ub)
+		get_ci `m0' `n', level(`level') method(wilson)		//Proportion of Y-
+		local py = r(p)
+		get_ci `n0' `n', level(`level') method(wilson)		//Proportion of X-
+		local px = r(p)
 		
-		matrix `p' = J(1,2,.)
-		matrix colnames `p' = pe pu
+		
+		matrix `p' = J(1,4,.)
+		matrix colnames `p' = pe pu pY pX
 		matrix `p'[1,1] = `pe'
 		matrix `p'[1,2] = `pu'
+		matrix `p'[1,3] = `py'
+		matrix `p'[1,4] = `px'
 
 		***DIFFERENCE
 		local rd =(`a0'-`b1')/`n'

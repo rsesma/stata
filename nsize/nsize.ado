@@ -1,4 +1,4 @@
-*! version 1.3.5  17mar2020 JM. Domenech, R. Sesma
+*! version 1.3.6  18mar2020 JM. Domenech, R. Sesma
 /*
 SAMPLE SIZE & POWER
 **PROPORTIONS

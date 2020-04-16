@@ -1,0 +1,50 @@
+/*
+  intcon.dlg
+
+*! VERSION 0.0.9  ?apr2020
+
+*/
+
+VERSION 12.0
+
+INCLUDE _std_large
+INCLUDE header
+HELP hlp1, view("help intcon")
+RESET res1
+
+DIALOG main, label("intcon - Internal Consistency") tabtitle("Main")
+BEGIN
+	TEXT  		tx_vars   _lft   _top 	_iwd  	., label("Variables:")
+	VARLIST		vl_vars	  _lft   _ss	_iwd  	., numeric label("Variables")
+
+    CHECKBOX    cb_cont   _lft   _xls   _iwd    ., label(Continuous measures) option("cont")
+    CHECKBOX    cb_ord    _lft   _ms    _iwd    ., label(Ordinal measures) option("ord")
+
+	GROUPBOX	gb_nst	_lft  	220		_iwd    60, label("Name of the study")
+	EDIT		ed_nst	_ilft   _ms	 	_inwd	., option(nst)
+END
+
+INCLUDE ifin
+INCLUDE weights_fpa
+
+PROGRAM command
+BEGIN
+    require main.vl_vars
+
+    if !main.cb_cont & !main.cb_ord {
+        stopbox stop `"On the "Main" tab "Continuous measures" and/or "Ordinal measures" must be specified"'
+    }
+    else {
+        put "intcon "
+        varlist main.vl_vars
+        put " " /program ifin_output
+        put " " /program weights_output
+
+        beginoptions
+            option main.cb_cont
+            option main.cb_ord
+
+            optionarg main.ed_nst
+        endoptions
+    }
+END

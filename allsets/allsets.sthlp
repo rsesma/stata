@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.2.6 30sep2019}{...}
+{* *! version 1.2.7 04may2020}{...}
 {viewerdialog allsets "dialog allsets"}{...}
 {vieweralsosee "[R] regress" "help regress"}{...}
 {vieweralsosee "[R] logit" "help logit"}{...}
@@ -69,9 +69,9 @@ R-squared (R2) and adjusted R-squared (R2Adj) are computed for each subset.
 
 {p 4 4}
 For Logistic regression Akaike Information Criteria (AIC), Schwarz Bayesian Criterion (BIC), the Area Under the Curve (AUC),
-Sensitivity (Se), Specificity (Sp) and Hosmer-Lemeshow goodness-of-fit (pfitHL) are computed for each subset. The
-Hosmer-Lemeshow goodness-of-fit test is computed using 10 quantiles to group data: {cmd:estat gof, group(10)}. If
-Hosmer-Lemeshow test is not evaluable, Pearson Chi2 is used instead and result is marked with a * on the results dataset.
+Sensitivity (Se), Specificity (Sp), Hosmer-Lemeshow goodness-of-fit (pfitHL) and Pearson goodness-of-fit (pGof) are computed
+for each subset. Hosmer-Lemeshow goodness-of-fit test is computed using 10 quantiles to group data: {cmd:estat gof, group(10)}. Pearson
+goodness-of-fit test is computed using: {cmd:estat gof}. To remove non fitting subsets from the results dataset, execute: {cmd:drop if min(pfitHL, pGof)<0.10}.
 
 {p 4 4}
 For Cox regression Akaike Information Criteria (AIC), Schwarz Bayesian Criterion (BIC), Harrell's C (HarrellC) and
@@ -86,6 +86,11 @@ the pValue variable. If {opt maxvar(1)} the Coefficients of the linear regressio
 {p 4 4}
 The results are stored in a new dataset named by default {it:allsets_results} and stored in the current (working)
 directory. Option {cmd: using} allows to use another path for results dataset. Existing datasets are replaced by default.
+
+{p 4 4}
+A maximum of {bf:14} independent variables is recommended. For 14 variables 16383 submodels are estimated, and around 10
+minutes of execution time is necessary. The number of estimated submodels and the execution time grows exponentially with each
+added variable.
 
 {p 4 4}
 You can click {dialog allsets:here} to pop up a {dialog allsets:dialog} or type {inp: db allsets}.
@@ -134,7 +139,7 @@ Cox regression
 {title:Version}
 
 {p 4}
-Version 1.2.6 {hline 2} 30 September 2019
+Version 1.2.7 {hline 2} 04 May 2020
 
 
 {marker authors}{...}
@@ -152,7 +157,7 @@ stata@metodo.uab.cat{break}
 
 {p 4 6 2}
 Dom{c e'}nech JM, Navarro JB. Find the best subset for Linear, Logistic and Cox Regression: User-written command allsets for Stata [computer program].{break}
-V1.2.6. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019{break}
+V1.2.7. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 

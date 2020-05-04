@@ -1,0 +1,143 @@
+/*
+  getaccess.dlg
+
+*! VERSION 0.0.4  ?apr2020
+
+*/
+
+VERSION 12.0
+SYNCHRONOUS_ONLY
+
+INCLUDE _std_large
+INCLUDE header
+DEFINE _dlght 430
+HELP hlp1, view("help getaccess")
+RESET res1
+
+SCRIPT PREINIT
+BEGIN
+	create BOOLEAN isLoading
+	.isLoading.settrue
+	/* set true when dialog is loading to block events that might be triggered by the initial populating of the
+	 * variable combobox. */
+
+     create BOOLEAN isLoadingTbl
+ 	.isLoadingTbl.setfalse
+
+	create STRING dlgName
+	dlgName.setvalue class _dlg_rsrcname
+END
+
+SCRIPT POSTINIT
+BEGIN
+	.isLoading.setfalse
+END
+
+DIALOG main, label("getaccess - Import data from Access") tabtitle("Main")
+BEGIN
+    TEXT        tx_using    _lft    _top   _iwd    ., label("Access file:")
+    FILE        f_using     _lft    _ss    _iwd    ., label("Browse...")        ///
+                    filter("Access database|*.accdb;*.mdb")         ///
+                    onchange(program db_selected) error("Access file") nomemory
+
+    RADIO 		rb_import	_lft  	_ms   	_iwd   	., first label("Import data") onclickon(program select)
+    TEXT        tx_tables   _lft    _ss    _cwd1    ., label("Tables:")
+    LISTBOX     lb_tables   _lft    _ss    @      160, nomemory contents(tbls) onselchange(program tb_selected) option(table)
+    TEXT        tx_tc       _lft2   @      @        ., label("Clock date variables:")
+    COMBOBOX    co_tc       _lft2   _ss    @        ., dropdown nomemory contents(vars) append option(tc)
+    TEXT        tx_vl       _lft2   _ls    @        ., label("Import value labels from:")
+    COMBOBOX    co_vl       _lft2   _ss    @        ., dropdown nomemory contents(tbls) append option(vl)
+    CHECKBOX    cb_clear	_lft2 	_ls    @	    ., label("Overwrite dataset in memory") option(clear)
+
+    RADIO 		rb_descr	_lft    260    _iwd   	., last label("Describe data") onclickon(program select)
+    CHECKBOX    cb_novar	_ilft 	_ss    _iwd		., label("Do not display variable names") option(novarnames)
+END
+
+LIST tbls
+BEGIN
+    // initially empty
+END
+
+LIST vars
+BEGIN
+    // initially empty
+END
+
+PROGRAM select
+BEGIN
+    if (main.rb_import) {
+        call main.lb_tables.enable
+        call main.tx_tc.enable
+        call main.co_tc.enable
+        call main.tx_vl.enable
+        call main.co_vl.enable
+        call main.cb_clear.enable
+
+        call main.cb_novar.disable
+    }
+    if (main.rb_descr) {
+        call main.lb_tables.disable
+        call main.tx_tc.disable
+        call main.co_tc.disable
+        call main.tx_vl.disable
+        call main.co_vl.disable
+        call main.cb_clear.disable
+
+        call main.cb_novar.enable
+    }
+END
+
+PROGRAM db_selected
+BEGIN
+    if !isLoading {
+        call .isLoadingTbl.settrue
+
+        put "getaccess using "
+        put `"""'
+        put main.f_using
+        put `"", loadTables "'
+        put "clsname(" dlgName ")"
+        stata hidden
+
+        call .isLoadingTbl.setfalse
+
+        call program tb_selected
+    }
+END
+
+PROGRAM tb_selected
+BEGIN
+    if !isLoading & !isLoadingTbl {
+        put "getaccess using "
+        put `"""'
+        put main.f_using
+        put `"", table(""'
+        put main.lb_tables
+        put `"") loadVars "'
+        put "clsname(" dlgName ")"
+        stata hidden
+    }
+END
+
+
+PROGRAM command
+BEGIN
+    require main.f_using
+
+    put `"getaccess using ""'
+    put main.f_using
+    put `"""'
+
+    beginoptions
+        if (main.rb_import) {
+            optionarg main.lb_tables
+            optionarg main.co_tc
+            optionarg main.co_vl
+            option main.cb_clear
+        }
+        if (main.rb_descr) {
+            put " describe "
+            option main.cb_novar
+        }
+    endoptions
+END

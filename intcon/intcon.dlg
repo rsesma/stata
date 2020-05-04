@@ -1,7 +1,7 @@
 /*
   intcon.dlg
 
-*! VERSION 0.0.9  ?apr2020
+*! VERSION 1.0.0  24apr2020
 
 */
 
@@ -17,8 +17,8 @@ BEGIN
 	TEXT  		tx_vars   _lft   _top 	_iwd  	., label("Variables:")
 	VARLIST		vl_vars	  _lft   _ss	_iwd  	., numeric label("Variables")
 
-    CHECKBOX    cb_cont   _lft   _xls   _iwd    ., label(Continuous measures) option("cont")
-    CHECKBOX    cb_ord    _lft   _ms    _iwd    ., label(Ordinal measures) option("ord")
+    CHECKBOX    cb_cont   _lft   _xls   _iwd    ., label(Continuous indexes) option("cont")
+    CHECKBOX    cb_ord    _lft   _ms    _iwd    ., label(Ordinal indexes) option("ord")
 
 	GROUPBOX	gb_nst	_lft  	220		_iwd    60, label("Name of the study")
 	EDIT		ed_nst	_ilft   _ms	 	_inwd	., option(nst)
@@ -32,7 +32,7 @@ BEGIN
     require main.vl_vars
 
     if !main.cb_cont & !main.cb_ord {
-        stopbox stop `"On the "Main" tab "Continuous measures" and/or "Ordinal measures" must be specified"'
+        stopbox stop `"On the "Main" tab at least one of "Continuous indexes" or "Ordinal indexes" must be selected"'
     }
     else {
         put "intcon "

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.0.9 ?apr2020}{...}
+{* *! version 1.0.0 24apr2020}{...}
 {viewerdialog intcon "dialog intcon"}{...}
 {viewerjumpto "Syntax" "intcon##syntax"}{...}
 {viewerjumpto "Description" "intcon##description"}{...}
@@ -17,27 +17,27 @@
 {title:Syntax}
 
 {p 4 12 2}
-{cmd:intcon} {varlist} {ifin} {weight}{cmd:, cont | ord}
+{cmd:intcon} {varlist} {ifin} {weight}{cmd:, {cont | ord}} [nst]
 
 
 {marker options}{...}
 {synoptset 16 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synopt :{opt cont}}Continuous measures{p_end}
-{synopt :{opt ord}}Ordinal measures{p_end}
-{synopt :{opt nst(string)}}name of the study (label){p_end}
+{synopt :{opt cont}}Continuous indexes{p_end}
+{synopt :{opt ord}}Ordinal indexes{p_end}
+{synopt :{opt nst(string)}}Name of the study (label){p_end}
 {synoptline}
-{p 4 4 2}{bf:aweight}s, {bf:fweight}s and {bf:pweight}s are allowed. However, {bf:pweight}s may not be used with continuous measures.{p_end}
+{p 4 4 2}{bf:aweight}s, {bf:fweight}s and {bf:pweight}s are allowed. {bf:pweight}s may not be used with continuous indexes.{p_end}
 
 
 {marker description}{...}
 {title:Description}
 
 {p 4 4}
-This command computes statistical indexes to evaluate internal consistency. Cronbach's alpha, Armor's theta and McDonald's omega(t)
-are computed for continuous measures, as well as its equivalents for ordinal measures. At least two numerical variables must be
-specified.
+This command computes statistical coefficients to evaluate internal consistency. Cronbach's alpha, Armor's theta and McDonald's omega(t)
+are computed for continuous indexes, as well as its equivalents for ordinal indexes. At least two numerical variables must be
+specified. At least one {cmd:cont} or {cmd:ord} option is needed.
 
 {p 4 4}
 You can click {dialog intcon:here} to pop up a {dialog intcon:dialog} or type {inp: db intcon}.
@@ -62,6 +62,8 @@ If you find any bugs or want to suggest any improvements, please send an e-mail 
 {marker examples}{...}
 {title:Examples}
 
+{p 4 4}{stata "use http://metodo.uab.cat/stata/intcon.dta":. use http://metodo.uab.cat/stata/intcon.dta}{p_end}
+{p 4 4}{cmd:. intcon Item1 Item2 Item3 Item4 Item5 Item6, cont ord}{p_end}
 
 {marker results}{...}
 {title:Stored results}
@@ -85,7 +87,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 0.0.9 {hline 2} ? April 2020
+Version 1.0.0 {hline 2} 24 April 2020
 
 
 {marker authors}{...}
@@ -103,5 +105,5 @@ stata@metodo.uab.cat{p_end}
 
 {p 4 6 2}
 Dom{c e'}nech JM, Navarro JB. Internal Consistency: User-written command intcon for Stata [computer program].{break}
-V0.0.9. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2020.{break}
+V1.0.0. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2020.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}

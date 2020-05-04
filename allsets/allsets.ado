@@ -1,4 +1,4 @@
-*! version 1.2.6  30sep2019 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.2.7  04may2020 JM. Domenech, JB.Navarro, R. Sesma
 
 program allsets
 	version 12
@@ -199,16 +199,19 @@ program allsets
 		label variable AUC "Area Under the Curve"
 		label variable Se "Sensibility (%)"
 		label variable Sp "Specificity (%)"
-		local sumvars AIC BIC AUC Se Sp 
-		local lpearson = 0
-		if ("`weight'"!="") {
-			*p not computed on weighted regressions
-			qui drop pfitHL pGof
-		} 
-		else {
-			local sumvars `sumvars' pfitHL pGof
-		}
-/*		if ("`weight'"=="") {
+		label variable pfitHL "Hosmer-Lemeshow goodness-of-fit"
+		label variable pGof "Pearson goodness-of-fit"
+		format AIC BIC %9.1f
+		format AUC %5.3f
+		format Se Sp %5.1f
+		format pfitHL pGof %5.3f
+		local sumvars AIC BIC AUC Se Sp
+		if ("`weight'"!="") qui drop pfitHL pGof		// p not computed on weighted regressions
+		else local sumvars `sumvars' pfitHL pGof
+		qui drop pearson			// this var is mising and never used, but mantained for compatibility
+
+/*		DISABLED: both variables pfitHL and pGof are computed
+		if ("`weight'"=="") {
 			*pfitHL not computed on weighted regressions
 			quietly{
 				*Compute pfit using df, chi2 from mata results
@@ -219,15 +222,11 @@ program allsets
 				*There's some pearson chi2 results?
 				count if (pearson==1)
 				if (`r(N)'>0) local lpearson = 1
-				
+
 				local sumvars `sumvars' pfitHL
 			}
 		}
 		qui drop df chi2 pearson		//drop auxiliary vars*/
-		qui drop pearson
-		format AIC BIC %9.1f
-		format AUC %5.3f
-		format Se Sp %5.1f
 	}
 	if ("`type'"=="cox") {
 		if (`maxvar'==1) {
@@ -336,7 +335,7 @@ program allsets
 		}
 		if ("`type'"=="cox") matrix colnames `m' = "AIC BIC HarrellC _2ll"
 		print_matrix, m(`m') rname("stats`cs'") rsize(8)
-		if ("`type'"=="logistic" & "`weight'"=="" & `lpearson') di as txt "(*)some p values computed with Pearson's Chi2 instead of Hosmer-Lemeshow test"
+		// if ("`type'"=="logistic" & "`weight'"=="" & `lpearson') di as txt "(*)some p values computed with Pearson's Chi2 instead of Hosmer-Lemeshow test"
 		if ("`type'"=="logistic" & "`weight'"!="") di as txt "For weighted data the Hosmer-Lemeshow test is not computed"
 		if (`z'==2) di as txt "(*)Results computed including maximum model results"
 	}
@@ -495,10 +494,8 @@ void getresults(string scalar dep, string scalar indep, string scalar inter, str
 		st_store(.,"AUC",results[.,3])
 		st_store(.,"Se",results[.,4])
 		st_store(.,"Sp",results[.,5])
-		//st_store(.,"df",results[.,6])
-		//st_store(.,"chi2",results[.,7])
-		st_store(.,"pfitHL",results[.,6])
-		st_store(.,"pGof",results[.,7])
+		st_store(.,"pfitHL",results[.,6])			//st_store(.,"df",results[.,6])
+		st_store(.,"pGof",results[.,7])				//st_store(.,"chi2",results[.,7])
 		st_store(.,"pearson",results[.,9])
 		st_store(.,"NVar",results[.,8])
 		st_store(.,"pValue",results[.,10])
@@ -675,7 +672,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 			printf("..." + strofreal(10*trunc(i/pct)) + "%%")
 			displayflush()
 		}
-		
+
 		lexe = 1
 		comb = combs[i]
 
@@ -759,28 +756,34 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 					coef = st_matrix("e(b)")
 					coef_names = st_matrixcolstripe("e(b)")
 				}
+				pHL = .
+				pPearson = .
 				if (r.weight=="") {
 					stata("lroc, nograph",1)				//AUC
 					auc = st_numscalar("r(area)")
 					stata("estat classification",1)			//Se,Sp
 					se = st_numscalar("r(P_p1)")
 					sp = st_numscalar("r(P_n0)")
-					pHL = .
 					if (_stata("estat gof, group(10)",1) == 0) {
-						//By default, Hosmer-Lemeshow test, group(10)
+						// Hosmer-Lemeshow goodness-of-fit, pfitHL
+						pHL = st_numscalar("r(p)")
 						df = st_numscalar("r(df)")
-						chi2 = st_numscalar("r(chi2)")
-						if (df > 0) {
-							pHL = (1 - chi2(df,chi2))
+						if (nvar==1 & df==0 & pHL==.) {
+							// if df = 0 and p = .,there's only 1 binary indep. variable so p must be 1
+							pHL = 1
 						}
 					}
-					pPearson = .
 					if (_stata("estat gof",1) == 0) {
+						// Pearson goodness-of-fit, pGof
+						pPearson = st_numscalar("r(p)")
 						df = st_numscalar("r(df)")
-						chi2 = st_numscalar("r(chi2)")
-						pPearson = (1 - chi2(df,chi2))
+						if (nvar==1 & df==0 & pPearson==.) {
+							// if df = 0 and p = .,there's only 1 binary indep. variable so p must be 1
+							pPearson = 1
+						}
 					}
-/*					//gof: by default, HL -- if not possible, Pearson chi2
+/*					DISABLED: the 2 gof (HL,Pearson) are computed
+					//gof: by default, HL -- if not possible, Pearson chi2
 					pearson = 1
 					if (_stata("estat gof, group(10)",1) == 0) {
 						//By default, Hosmer-Lemeshow test, group(10)
@@ -826,7 +829,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 				results[ires,6] = pHL
 				results[ires,7] = pPearson
 				results[ires,8] = nvar
-				results[ires,9] = .
+				results[ires,9] = .						// pearson
 				results[ires,10]= pValue
 			}
 			if (r.type == "cox") {

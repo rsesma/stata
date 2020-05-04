@@ -1,4 +1,4 @@
-*! version 0.0.9  ?apr2020 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.0.0  24apr2020 JM. Domenech, JB.Navarro, R. Sesma
 /*
 intcon: internal consistency
 */
@@ -22,13 +22,13 @@ program define intcon, rclass
 		di in red "{bf:WARNING!}"
 		if (!`polyok') {
 			di in red "  User-defined command {bf:polychoric} is not installed."
-			di in red "  This command is necessary to compute ordinal measures statistics."
+			di in red "  This command is necessary to compute ordinal indexes."
 			di in red "  Execute {search polychoric:search polychoric} to install."
 		}
 		if (!`alphawgtok') {
 			if (!`polyok') di ""
 			di in red "  User-defined command {bf:alphawgt} is not installed."
-			di in red "  This command is necessary to compute continuous measures weighted statistics."
+			di in red "  This command is necessary to compute weighted continuous indexes."
 			di in red "  Execute {search alphawgt:search alphawgt} to install."
 		}
 		exit 198
@@ -54,7 +54,7 @@ program define intcon, rclass
 	if ("`cont'"!="") {
 		* continuous measures
 		if (`lweight' & `pw') {
-			di as txt _n "{bf:WARNING!} continuous measures can't be computed with sampling weights {cmd:[pweight]} "
+			di as txt _n "{bf:WARNING!} continuous indexes can't be computed with sampling weights {cmd:[pweight]} "
 		}
 		else {
 			* use alpha / alphawgt to compute Cronbach's alpha
@@ -89,46 +89,41 @@ program define intcon, rclass
 		qui polychoric `varlist' if `touse' `w'
 		mata: st_numscalar("`nm'", missing(st_matrix("r(R)")))
 		if (`nm' > 0) {
-			di as txt _n "{bf:WARNING!} Polychoric correlation matrix contains missing values"
-			di as txt "Polychoric correlation matrix"
+			di as txt _n "Polychoric correlation matrix"
 			matrix list r(R), noheader
+			di as txt _n "{bf:WARNING!} Polychoric correlation matrix contains missing values."
+			di as txt "Try to delete items that generate missing coefficients."
 		}
 		else {
 			local n = r(N)
-			qui capture factormat r(R), n(`n') factors(1)
-			if (_rc==0) {
-				scalar `p' = rowsof(e(L))
-				matrix `vp'= e(Ev)
+			qui factormat r(R), n(`n') factors(1) forcepsd
+			scalar `p' = rowsof(e(L))
+			matrix `vp'= e(Ev)
 
-				* alpha ordinal
-				mata: st_numscalar("`f'", colsum(st_matrix("e(L)")) / st_numscalar("`p'"))
-				mata: st_numscalar("`f2'", colsum(st_matrix("e(L)") :^2) / st_numscalar("`p'"))
-				mata: st_numscalar("`u2'", rowsum(st_matrix("e(Psi)")) / st_numscalar("`p'"))
-				local pf2 = `p' * `f'^2
-				local alpha_ord = `p' / (`p' - 1) * (`pf2' - `f2') / (`pf2' + `u2')
+			* alpha ordinal
+			mata: st_numscalar("`f'", colsum(st_matrix("e(L)")) / st_numscalar("`p'"))
+			mata: st_numscalar("`f2'", colsum(st_matrix("e(L)") :^2) / st_numscalar("`p'"))
+			mata: st_numscalar("`u2'", rowsum(st_matrix("e(Psi)")) / st_numscalar("`p'"))
+			local pf2 = `p' * `f'^2
+			local alpha_ord = `p' / (`p' - 1) * (`pf2' - `f2') / (`pf2' + `u2')
 
-				* theta ordinal
-				local theta_ord = (`p' / (`p' - 1))*(1-1/`vp'[1,1])
+			* theta ordinal
+			local theta_ord = (`p' / (`p' - 1))*(1-1/`vp'[1,1])
 
-				* omega ordinal
-				mata: st_numscalar("`scf'", colsum(st_matrix("e(L)")))		// scf: sum of factorial charges
-				mata: st_numscalar("`se'", rowsum(st_matrix("e(Psi)")))		// se: sum of errors
-				local omega_ord = `scf'^2 / (`scf'^2 + `se')
+			* omega ordinal
+			mata: st_numscalar("`scf'", colsum(st_matrix("e(L)")))		// scf: sum of factorial charges
+			mata: st_numscalar("`se'", rowsum(st_matrix("e(Psi)")))		// se: sum of errors
+			local omega_ord = `scf'^2 / (`scf'^2 + `se')
 
-				* print results
-				di as txt _n "Ordinal alpha: " _col(17) as res %6.4f `alpha_ord'
-				di as txt "Ordinal theta: " _col(17) as res %6.4f `theta_ord'
-				di as txt "Ordinal omega: " _col(17) as res %6.4f `omega_ord'
+			* print results
+			di as txt _n "Ordinal alpha: " _col(17) as res %6.4f `alpha_ord'
+			di as txt "Ordinal theta: " _col(17) as res %6.4f `theta_ord'
+			di as txt "Ordinal omega: " _col(17) as res %6.4f `omega_ord'
 
-				* stored results
-				return scalar alpha = `alpha_ord'
-				return scalar theta = `theta_ord'
-				return scalar omega = `omega_ord'
-			}
-			else {
-				di as txt _n "{bf:WARNING!} Correlation matrix is not positive definite.
-				di as txt "Try to delete collinear variables."
-			}
+			* stored results
+			return scalar alpha_ord = `alpha_ord'
+			return scalar theta_ord = `theta_ord'
+			return scalar omega_ord = `omega_ord'
 		}
 	}
 end

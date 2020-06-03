@@ -1,4 +1,4 @@
-*! version 0.0.4  ?apr2020
+*! version 0.0.6  06may2020
 
 program define getaccess, rclass
 	version 14
@@ -19,7 +19,7 @@ program define getaccess, rclass
 				gettoken tbl tables : tables, parse(";")
 				while ("`tbl'"!="") {
 					if ("`tbl'"!=";") {
-						`dlg'.tbls.Arrpush "[`tbl']"
+						`dlg'.tbls.Arrpush "`tbl'"
 					}
 					gettoken tbl tables : tables, parse(";")
 				}
@@ -27,13 +27,14 @@ program define getaccess, rclass
 				`dlg'.main.co_vl.repopulate
 			}
 			if ("`loadVars'"!="") {
-				local table = subinstr(subinstr("`table'","[","",.),"]","",.)
+				* local table = subinstr(subinstr("`table'","[","",.),"]","",.)
 				javacall com.leam.stata.getaccess.GetDataFromAccess getTblData, jars(getaccess.jar) args(`"`using'"' `"`table'"')
 
 				`dlg'.vars.Arrdropall
 				gettoken var vars : vars, parse(";")
 				while ("`var'"!="") {
 					if ("`var'"!=";") {
+						local var = subinstr(subinstr("`var'","'","",.),"*","",.)
 						`dlg'.vars.Arrpush "`var'"
 					}
 					gettoken var vars : vars, parse(";")
@@ -57,12 +58,10 @@ program define getaccess, rclass
 			display in red "file is not an MS-Access database"
 			exit 198
 		}
-
 		if ("`table'"=="" & "`describe'"=="") {
 			display in red "table or describe options missing"
 			exit 198
 		}
-
 
 		if ("`describe'"!="") {
 			javacall com.leam.stata.getaccess.GetDataFromAccess getTables, jars(getaccess.jar) args(`"`using'"')
@@ -102,30 +101,12 @@ program define getaccess, rclass
 				}
 				gettoken tbl tables : tables, parse(";")
 			}
-			di as txt "(')string variable; (*)date variable"
+			if ("`varnames'"=="") di as txt "(')string variable; (*)date variable"
 		}
 		else {
 			if (!c(changed) | (c(changed) & ("`clear'"!=""))) {
 				qui clear
-				javacall com.leam.stata.getaccess.GetDataFromAccess getData, jars(getaccess.jar) args(`"`using'"' `"`table'"')
-
-				foreach v of varlist _Date__* {
-					capture confirm string variable `v'
-					if (!_rc) {
-						local name = substr("`v'",8,.)
-						local tc = lower("`tc'")
-						local namelow = lower("[" + "`name'" + "]")
-						qui generate double `name' = clock(`v',"YMDhms#"), after(`v')
-						if (`: list namelow in tc') {
-							format `name' %tc
-						}
-						else {
-							qui replace `name' = dofc(`name')
-							format `name' %td
-						}
-						qui drop `v'
-					}
-				}
+				javacall com.leam.stata.getaccess.GetDataFromAccess getData, jars(getaccess.jar) args(`"`using'"' `"`table'"' `"`tc'"')
 				qui compress
 
 				if ("`labels'"!="") {
@@ -139,15 +120,15 @@ program define getaccess, rclass
 					if ("`ok'"!="") {
 						local ok = trim("`ok'")
 						di as txt ""
-						di as txt "{bf:`ok'} value label(s) added."
-						di as txt "Use {cmd:label values} to assign value labels to variables,"
-						di as txt "{cmd:label list} to list value labels defined and"
-						di as txt "{cmd:label save} to save value label definitions in a do-file."
+						di as txt "{bf:`ok'} label values added."
+						di as txt "Use {cmd:label values} to assign label values to variables,"
+						di as txt "{cmd:label list} to list label values and"
+						di as txt "{cmd:label save} to save label values syntax definition to a do-file."
 					}
 					if ("`err'"!="") {
 						local err = trim("`err'")
 						di as txt ""
-						di as txt "{bf:WARNING!}: create value label(s) using table(s) {bf:`err'} is not possible."
+						di as txt "{bf:WARNING!}: create label values using {bf:`err'} is not possible."
 					}
 				}
 

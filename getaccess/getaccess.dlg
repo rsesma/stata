@@ -1,7 +1,7 @@
 /*
   getaccess.dlg
 
-*! VERSION 0.0.4  ?apr2020
+*! VERSION 0.0.6  06may2020
 
 */
 
@@ -9,8 +9,8 @@ VERSION 12.0
 SYNCHRONOUS_ONLY
 
 INCLUDE _std_large
+DEFINE _dlght 350
 INCLUDE header
-DEFINE _dlght 430
 HELP hlp1, view("help getaccess")
 RESET res1
 
@@ -35,21 +35,21 @@ END
 
 DIALOG main, label("getaccess - Import data from Access") tabtitle("Main")
 BEGIN
-    TEXT        tx_using    _lft    _top   _iwd    ., label("Access file:")
-    FILE        f_using     _lft    _ss    _iwd    ., label("Browse...")        ///
-                    filter("Access database|*.accdb;*.mdb")         ///
-                    onchange(program db_selected) error("Access file") nomemory
+    TEXT        tx_using    _lft    _top   _iwd     ., label("Access file:")
+    FILE        f_using     _lft    _ss    _iwd     ., label("Browse...")        ///
+                    filter("Access database|*.accdb;*.mdb") error("Access file") nomemory
 
-    RADIO 		rb_import	_lft  	_ms   	_iwd   	., first label("Import data") onclickon(program select)
+    RADIO 		rb_import	_lft  	_ls   	_iwd   	., first label("Import data") onclickon(program select)
+    BUTTON      bt_pop      _lft    _ms    _vnwd    ., label("Populate") onpush(program db_selected)
     TEXT        tx_tables   _lft    _ss    _cwd1    ., label("Tables:")
     LISTBOX     lb_tables   _lft    _ss    @      160, nomemory contents(tbls) onselchange(program tb_selected) option(table)
     TEXT        tx_tc       _lft2   @      @        ., label("Clock date variables:")
     COMBOBOX    co_tc       _lft2   _ss    @        ., dropdown nomemory contents(vars) append option(tc)
     TEXT        tx_vl       _lft2   _ls    @        ., label("Import value labels from:")
-    COMBOBOX    co_vl       _lft2   _ss    @        ., dropdown nomemory contents(tbls) append option(vl)
+    COMBOBOX    co_vl       _lft2   _ss    @        ., dropdown nomemory contents(tbls) append option(labels)
     CHECKBOX    cb_clear	_lft2 	_ls    @	    ., label("Overwrite dataset in memory") option(clear)
 
-    RADIO 		rb_descr	_lft    260    _iwd   	., last label("Describe data") onclickon(program select)
+    RADIO 		rb_descr	_lft    300    _iwd   	., last label("Describe data") onclickon(program select)
     CHECKBOX    cb_novar	_ilft 	_ss    _iwd		., label("Do not display variable names") option(novarnames)
 END
 
@@ -72,6 +72,7 @@ BEGIN
         call main.tx_vl.enable
         call main.co_vl.enable
         call main.cb_clear.enable
+        call main.bt_pop.enable
 
         call main.cb_novar.disable
     }
@@ -82,6 +83,7 @@ BEGIN
         call main.tx_vl.disable
         call main.co_vl.disable
         call main.cb_clear.disable
+        call main.bt_pop.disable
 
         call main.cb_novar.enable
     }

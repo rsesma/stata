@@ -17,7 +17,7 @@ end
 
 program define open
 	version 15
-	syntax [anything]
+	syntax [anything], [dni(string)]
 
 	* abrir el archivo de datos
 	local files : dir "$dir" files "*.dta", respectcase
@@ -26,22 +26,33 @@ program define open
 			use "$dir/`f'", clear
 		}
 	}
-	* obtener el periodo
+	* obtener el periodo, el curso y la PEC
 	local p = periodo[1]
+	local curso = curso[1]
+	if ("`curso'"=="ST1") local pec = "PEC2"
+	if ("`curso'"=="ST2") local pec = "PEC1"
 	* recorrer la matriz y encontrar el primer no corregido
 	local found = 0
 	local Ntotal = _N
 	foreach i of numlist 1/`Ntotal' {
-		if (correg[`i']==0 & entrega[`i']==1) {
-			local dni = DNI[`i']
-			local curso = curso[`i']
-			local nom = nombre[`i'] + " " + ape1[`i'] + " " + ape2[`i']
-			if ("`curso'"=="ST1") local pec = "PEC2"
-			if ("`curso'"=="ST2") local pec = "PEC1"
+		local obs = 0
+		if ("`dni'"=="") {
+			if (correg[`i']==0 & entrega[`i']==1) {
+				local obs = `i'
+			}
+		}
+		else {
+			if (DNI[`i']=="`dni'") {
+				local obs = `i'
+			}
+		}
+		if (`obs'>0) {
+			local dni = DNI[`obs']
+			local nom = nombre[`obs'] + " " + ape1[`obs'] + " " + ape2[`obs']
+			local found = 1
 			* marcar como corregida
 			qui replace correg = 1 in `i'
 			qui save, replace
-			local found = 1
 
 			continue, break
 		}
@@ -76,7 +87,8 @@ program define open
 		local ntot = r(N)
 		qui count if (correg==1)
 		local corr = r(N)
-		di as res "Corrigiendo PEC `corr' de `ntot' (`dni' `nom')"
+		if ("`dni'"=="") di as res "Corrigiendo PEC `corr' de `ntot' (`dni' `nom')"
+		if ("`dni'"!="") di as res "Corrigiendo PEC `dni' (`nom')"
 	}
 	else {
 		di as res "No hay más PECs"
@@ -85,7 +97,7 @@ end
 
 program define nota
 	version 15
-	syntax [anything]
+	syntax [anything], [dni(string)]
 
 	* obtener los nombres de los archivos de datos y solución
 	local files : dir "$dir" files "*.dta", respectcase
@@ -96,20 +108,30 @@ program define nota
 	* abrir el archivo de datos
 	use "$dir/`dta'", clear
 
-	* obtener el periodo
+	* obtener el periodo, el curso y la PEC
 	local p = periodo[1]
-	* recorrer la matriz y encontrar el último corregido
+	local curso = curso[1]
+	if ("`curso'"=="ST1") local pec = "PEC2"
+	if ("`curso'"=="ST2") local pec = "PEC1"
+	* recorrer la matriz y encontrar el último corregido o el dni proporcionado
 	local found = 0
 	local Ntotal = _N
 	foreach i of numlist 1/`Ntotal' {
-		if (correg[`i']==1 & PEC[`i']>=.) {
-			local dni = DNI[`i']
-			local curso = curso[`i']
-			local nom = nombre[`i'] + " " + ape1[`i'] + " " + ape2[`i']
-			if ("`curso'"=="ST1") local pec = "PEC2"
-			if ("`curso'"=="ST2") local pec = "PEC1"
+		local obs = 0
+		if ("`dni'"=="") {
+			if (correg[`i']==1 & PEC[`i']>=.) {
+				local obs = `i'
+			}
+		}
+		else {
+			if (DNI[`i']=="`dni'") {
+				local obs = `i'
+			}
+		}
+		if (`obs'>0) {
+			local dni = DNI[`obs']
+			local nom = nombre[`obs'] + " " + ape1[`obs'] + " " + ape2[`obs']
 			local found = 1
-			local obs = `i'
 
 			continue, break
 		}
@@ -135,7 +157,9 @@ program define nota
 		capture drop sum
 		qui egen sum = rowtotal(w*_*), missing
 		qui replace PEC = 10 * (sum/wtot) in `obs'
+		qui replace correg = 1 in `obs'
 		list DNI nombre ape1 ape2 PC clase PEC in `obs'
+		qui drop sum
 		qui save, replace
 	}
 	else {
@@ -188,7 +212,6 @@ program define entrega
 		di as res "PECs con problemas: `r(N)'"
 		list grupo DNI nom ape1 ape2 email if problema==0
 	}
-
 end
 
 program define getdta
@@ -215,8 +238,10 @@ program define getdta
 		generate honor = .
 		generate problema = 0
 		generate PEC = .
+		generate copia = 0
+		generate IDcopia = .
 		label define dSiNo 0 "No" 1 "Sí"
-		label values fijo correg entrega honor problema dSiNo
+		label values fijo correg entrega honor problema copia dSiNo
 		label define dNotaClase 1 "Aprobado" 2 "Bien" 3 "Notable" 4 "Excelente"
 		label values clase dNotaClase
 		* asegurar que existe una variable coment string
@@ -227,7 +252,7 @@ program define getdta
 		}
 		* ordenar las variables
 		order periodo curso DNI grupo nombre ape1 ape2 PC fijo clase correg entrega  ///
-		   honor problema PEC coment prov pobl trabajo email
+		   honor problema PEC copia ID copia coment prov pobl trabajo email
 		* mantener solo los que asistieron a clase
 		keep if PC<.
 		* eliminar variable labels
@@ -327,4 +352,18 @@ program define sintaxis
 			jars(statapecs.jar)
 
 	di as res "Proceso terminado"
+end
+
+program define buides
+	version 15
+	syntax [anything]
+
+	foreach v of varlist P*_* {
+		qui generate __`v' = (`v'=="?")
+	}
+	capture drop __buides
+	qui egen __buides = rowtotal(__P*)
+	qui drop __P*
+
+	list DNI P*_* if __buides == 1, clean
 end

@@ -1,4 +1,4 @@
-*! version 1.1.3  30sep2019 JM. Domenech, R. Sesma
+*! version 1.1.4  16jun2020 JM. Domenech, R. Sesma
 
 program define cohenkapi, rclass
 	version 12
@@ -113,11 +113,12 @@ program define cohenkapi, rclass
 		foreach i of numlist 1/`len' {
 			di as txt _newline "{ralign 12:`rlab`i''}{c |}" _c
 			foreach j of numlist 1/7 {
-				if (`j'<=5) di as txt " " _c
-				local fmt = cond(`j'>5,"%7.4f","%6.4f")
+				*if (`j'<=5) di as txt " " _c
+				*local fmt = cond(`j'>5,"%7.4f","%6.4f")
+				if (`j'==1) di as txt " " _c
 				local v = `r'[`i',`j']
 				if (`j'==1) print_pct `v'
-				else di as res `fmt' `v' _c
+				else di as res %7.4f `v' _c
 				if (`j'==1) di as txt " " _c
 				if (`j'<=5) di as txt " {c |}" _c
 				if (`j'==6) di as txt " to" _c
@@ -168,8 +169,8 @@ program define cohenkapi, rclass
 		di as txt "  kappa {c |}    SE0 {c |}    SE1 {c |}  value {c |} Confidence Interval"
 		di as txt "{hline 8}{c +}{hline 8}{c +}{hline 8}{c +}{hline 8}{c +}{hline 20}"
 		foreach j of numlist 2/7 {
-			local fmt = cond(`j'>5,"%7.4f","%6.4f")
-			di as txt " " _c
+			local fmt = cond(`j'>5,"%8.4f","%7.4f")
+			*di as txt " " _c
 			di as res `fmt' `r'[1,`j'] _c
 			if (`j'<=5) di as txt " {c |}" _c
 			if (`j'==6) di as txt "  to" _c

@@ -210,13 +210,13 @@ program define entrega
 	qui count if (problema==1)
 	if (`r(N)'>0) {
 		di as res "PECs con problemas: `r(N)'"
-		list grupo DNI nom ape1 ape2 email if problema==0
+		list grupo DNI nom ape1 ape2 email if problema==1
 	}
 end
 
 program define getdta
 	version 15
-	syntax [anything], p(string) folder(string)
+	syntax [anything], p(string) curso(string) folder(string)
 
 	cd "`folder'"
 
@@ -297,7 +297,7 @@ program define getdta
 	format PEC %4.1f
 	frame drop sol
 
-	local file = "$dir/`p'.dta"
+	local file = "$dir/`p'_`curso'.dta"
 	save `file', replace
 end
 
@@ -317,6 +317,7 @@ program define getsol
 	generate p2 = ""
 	generate periodo = "`p'", before(p)
 	generate curso = "`curso'", after(periodo)
+	save "$dir/`p'_`curso'_sol.dta", replace
 end
 
 program define sintaxis
@@ -366,4 +367,123 @@ program define buides
 	qui drop __P*
 
 	list DNI P*_* if __buides == 1, clean
+end
+
+program define PEC1
+	version 15
+	syntax [anything]
+
+	* obtener el nombre del archivo de datos
+	local files : dir "$dir" files "*.dta", respectcase
+	foreach f in `files' {
+		if (strpos("`f'","sol")==0) local dta = "`f'"
+	}
+	* abrir el archivo de datos
+	use "$dir/`dta'", clear
+	capture drop PEC1
+
+	* obtener el nombre del archivo xlsx
+	local files : dir "$dir" files "*.xlsx", respectcase
+	foreach f in `files' {
+		local xlsx = "`f'"
+	}
+	local name = subinstr("`xlsx'",".xlsx","",.)
+	* abrir el archivo xlsx
+	frame create xls
+	frame xls: import excel using "$dir/`xlsx'", sheet("`name'") firstrow
+	frame xls: rename Periodo periodo
+	* linkar e importar PEC1
+	frlink 1:1 periodo DNI, frame(xls)
+	frget PEC1, from(xls)
+	* deshacer vínculo y borrar xls dataset
+	drop xls
+	frame drop xls
+	order PEC1, before(PEC)
+
+	label variable PEC1 ""
+	save, replace
+end
+
+program define notafin
+	version 15
+
+	local files : dir "$dir" files "*.dta", respectcase
+	foreach f in `files' {
+		if (strpos("`f'","sol")==0) local dta = "`f'"
+	}
+	use "$dir/`dta'", clear
+	capture drop NOTA
+
+	quietly{
+		generate NOTA = PEC, after(PEC)
+		capture confirm variable PEC1
+		if (_rc==0) {
+			* sumar la nota de la PEC1, hasta un máximo de 9.5
+			generate __plus = PEC1 * 0.125
+			replace __plus = 0 if __plus == .
+			replace NOTA = min(9.5, PEC + __plus) if PEC < 9.5
+			drop __plus
+		}
+		replace NOTA = round(NOTA,0.1)
+		* sumar las notas de clase para las notas al filo
+		replace NOTA = 7 if (inrange(NOTA,6.6,7) & clase >=3)
+		replace NOTA = 9 if (inrange(NOTA,8.6,9) & clase >=4)
+		format NOTA %3.1f
+		* las copias, los no presentados y los suspensos se convierten en 5
+		replace NOTA = 5 if (copia==1 | PEC==. | NOTA<5)
+	}
+	save, replace
+end
+
+program define export_data
+	version 15
+
+	local files : dir "$dir" files "*.dta", respectcase
+	foreach f in `files' {
+		if (strpos("`f'","sol")==0) local dta = "`f'"
+	}
+	use "$dir/`dta'", clear
+
+	quietly{
+		local curso = curso[1]
+		local periodo = periodo[1]
+		if ("`curso'"=="ST1") {
+			* exportar los datos de la PEC1
+			preserve
+			keep if PEC1<.
+			generate t1 = substr(grupo,3,2)
+			generate t2 = substr(grupo,4,2)
+			local name = "`curso'_`periodo'_datos_PEC1"
+			export delimited DNI curso t1 t2 PEC1 using "$dir/`name'.txt", delimiter(";") novarnames nolabel quote replace
+			restore
+		}
+		preserve
+		keep if entrega==1
+		if ("`curso'"=="ST1") local name = "`curso'_`periodo'_PEC2_datos"
+		if ("`curso'"=="ST2") local name = "`curso'_`periodo'_PEC1_datos"
+		export delimited ape1 ape2 nombre DNI honor P*_* using "$dir/`name'.txt", delimiter(",") novarnames nolabel quote replace
+		restore
+	}
+end
+
+program define alumnos
+	version 15
+	syntax [anything], using(string)
+
+	local files : dir "$dir" files "*.dta", respectcase
+	foreach f in `files' {
+		if (strpos("`f'","sol")==0) local dta = "`f'"
+	}
+	use "$dir/`dta'", clear
+
+	quietly{
+		drop correg honor problema P*_* w*
+		save "$dir/__alumnos.dta", replace
+
+		use "`using'", clear
+		append using "$dir/__alumnos.dta"
+		save, replace
+
+		erase "$dir/__alumnos.dta"
+	}
 end

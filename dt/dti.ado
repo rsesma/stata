@@ -1,4 +1,4 @@
-*! version 1.1.7  02jan2020 JM. Domenech, R. Sesma
+*! version 1.1.8  19jun2020 JM. Domenech, R. Sesma
 /*
 dti: Diagnostics Tests (immediate command)
 For cross-sectional and case-control studies 4 elements are provided: a1 a0 b1 b0
@@ -413,7 +413,17 @@ end
 program define print_pct
 	syntax anything, [col(numlist max=1) nopercent]
 	local p = `anything'
-	local fmt = cond(abs(`p')<10,cond(abs(`p')<1,"%5.0g","%5.2f"),"%5.1f")
+	local fmt = "%5.1f"
+	if (abs(`p')<10) {
+		local fmt = "%5.2f"
+		if (abs(`p')<1) {
+			local fmt = "%5.0g"
+			if (abs(`p')<0.01 & abs(`p')>0) {
+				local fmt = "%5.3f"
+			}
+		}
+	}
+	*local fmt = cond(abs(`p')<10,cond(abs(`p')<1,"%5.0g","%5.2f"),"%5.1f")
 	if ("`col'"=="") di as res `fmt' `p' _c
 	else di as res _col(`col') `fmt' `p' _c
 	if ("`percent'"=="") di as txt "%" _c

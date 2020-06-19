@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.7 02jan2020}{...}
+{* *! version 1.1.8 19jun2020}{...}
 {viewerdialog dt "dialog dt"}{...}
 {viewerdialog dti "dialog dti"}{...}
 {viewerjumpto "Syntax" "dt##syntax"}{...}
@@ -216,7 +216,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.7 {hline 2} 02 January 2020
+Version 1.1.8 {hline 2} 19 June 2020
 
 
 {marker authors}{...}
@@ -234,7 +234,7 @@ stata@metodo.uab.cat{p_end}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Diagnostic tests: User-written command dt for Stata [computer program].{break}
-V1.1.7. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2020.{break}
+V1.1.8. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2020.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 

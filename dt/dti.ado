@@ -1,4 +1,4 @@
-*! version 1.1.8  19jun2020 JM. Domenech, R. Sesma
+*! version 1.1.9  26jun2020 JM. Domenech, R. Sesma
 /*
 dti: Diagnostics Tests (immediate command)
 For cross-sectional and case-control studies 4 elements are provided: a1 a0 b1 b0
@@ -153,7 +153,13 @@ program define dti, rclass
 			local lcont = ("`st'"=="cs") | ("`st'"=="cc" & ("`m1'"!="" & "`n'"!=""))
 			if ("`st'"=="cs") {
 				csi `a1' `b1' `a0' `b0', level(`level') or		//Odds ratio
-				matrix `r' = `r' \ (r(or), r(lb_or), r(ub_or))
+				if (r(or)<.) {
+					matrix `r' = `r' \ (r(or), r(lb_or), r(ub_or))
+				}
+				else {
+					* if or is not computable, neither is the ci
+					matrix `r' = `r' \ (., ., .)
+				}
 
 				cii `nt' `m1t', level(`level') `method'			//Prevalence
 				matrix `r' = `r' \ (100*r(mean), 100*r(lb), 100*r(ub))

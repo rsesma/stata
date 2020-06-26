@@ -451,9 +451,9 @@ program define export_data
 			* exportar los datos de la PEC1
 			preserve
 			keep if PEC1<.
-			generate t1 = substr(grupo,3,2)
-			generate t2 = substr(grupo,4,2)
-			local name = "`curso'_`periodo'_datos_PEC1"
+			generate t1 = substr(grupo,4,2)
+			generate t2 = substr(grupo,6,2)
+			local name = "`curso'_`periodo'_PEC1_datos"
 			export delimited DNI curso t1 t2 PEC1 using "$dir/`name'.txt", delimiter(";") novarnames nolabel quote replace
 			restore
 		}

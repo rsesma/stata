@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.0 24apr2020}{...}
+{* *! version 1.0.0 03jul2020}{...}
 {viewerdialog intcon "dialog intcon"}{...}
 {viewerjumpto "Syntax" "intcon##syntax"}{...}
 {viewerjumpto "Description" "intcon##description"}{...}
@@ -87,7 +87,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.0.0 {hline 2} 24 April 2020
+Version 1.0.0 {hline 2} 03 July 2020
 
 
 {marker authors}{...}

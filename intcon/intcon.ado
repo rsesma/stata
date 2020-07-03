@@ -1,4 +1,4 @@
-*! version 1.0.0  24apr2020 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.0.0  03jul2020 JM. Domenech, JB.Navarro, R. Sesma
 /*
 intcon: internal consistency
 */

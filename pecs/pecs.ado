@@ -4,6 +4,7 @@ program pecs
 
 	if ("`c(os)'" == "Windows") {
 		global dir = "C:\CorregirPECs"
+		global PEC1 = "C:\CorregirPECs\ST1\PEC1"
 		global mv = "move"
 		global reader = "C:\Program Files (x86)\Adobe\Acrobat Reader DC\Reader\AcroRd32.exe"
 	}
@@ -485,5 +486,106 @@ program define alumnos
 		save, replace
 
 		erase "$dir/__alumnos.dta"
+	}
+end
+
+program define getxlsx
+	version 15
+	syntax [anything], [using(string) j(integer 25)]
+
+	* importar el archivo de excel con el DNI de los alumnos
+	import excel "`using'", sheet("Alumnos") firstrow clear
+	keep DNI
+	* generar semilla s a partir del DNI
+	gen s = DNI
+	* eliminar las letras del DNI
+	foreach i of numlist 65/90 {
+	    local c = char(`i')
+	    replace s = subinstr(s,"`c'","",.)
+	}
+	* desempatar posibles semillas repetidas
+	by s, sort: gen _t = _n
+	replace s =  string(real(s) + runiformint(20,50),"%12.0f") if _t > 1
+	drop _t
+
+	* generar los archivos de excel de cada alumno a partir de los datos originales
+	foreach i of numlist 1/`c(N)' {
+		* DNI del alumno y semilla asociada de la tabla
+		local dni = DNI[`i']
+		local seed = s[`i']
+
+	    preserve
+	    import excel "$PEC1/Salud.xlsx", sheet("Salud") firstrow clear
+
+		* modificar las variables aleatoriamente
+		set seed `seed'
+		replace SexFe = runiformint(0,1) in `j'/L
+		replace Peso = Peso + round(runiform(-10,10),0.1) in `j'/L
+		replace Talla = Talla + runiformint(-10,10) in `j'/L
+		replace FN = FN + runiformint(-365,365) in `j'/L
+		replace PAS = PAS + runiformint(-10,10) in `j'/L
+		replace PAD = PAD + runiformint(-5,5) in `j'/L
+		replace Fuma = runiformint(0,2) in `j'/L
+		replace EdadF = . if Fuma==0 in `j'/L
+		replace EdadF = runiformint(13,20) if Fuma>0 & Fuma<. in `j'/L
+		replace Tab = 0 if Fuma<2 in `j'/L
+		replace Tab = runiformint(5,40) if Fuma==2 in `j'/L
+		replace H1 = runiformint(0,2) in `j'/L
+		replace H2 = runiformint(0,2) in `j'/L
+		replace H3 = runiformint(0,2) in `j'/L
+		replace H4 = runiformint(1,3) in `j'/L
+		replace H5 = runiformint(1,3) in `j'/L
+
+		* exportar a excel
+		export excel using "$PEC1/xlsx/`dni'.xlsx", sheet("Salud") firstrow(variables) replace
+
+		restore
+	}
+end
+
+program define get_results_tuto
+	version 15
+	syntax [anything]
+
+	* añadir las variables para almacenar las respuestas
+	foreach i of numlist 1/10 {
+		if (`i'<10) local n = "T0`i'"
+		else local n = "T`i'"
+		capture drop `n' `n'_A
+		gen `n' = .
+		gen `n'_A = .
+	}
+
+	cd "$PEC1"
+
+	* generar los archivos de excel de cada alumno a partir de los datos originales
+	foreach i of numlist 1/`c(N)' {
+		* DNI del alumno
+		local dni = DNI[`i']
+
+		preserve
+		* ejecutar sintaxis para generar dta con variables calculadas
+		run Salud.do `dni'
+
+		* obtener resultados
+		count if H6==1 & SexFe == 1
+		local T01 = r(N)
+		tabstat IMC Edad PT, statistics(count min max mean sd) save
+		matrix R1 = r(StatTotal)
+		tabstat HabitFum F15 Obs SexFe, statistics(count sum mean) save
+		matrix R2 = r(StatTotal)
+		restore
+
+		* almacenar resultados en la matriz de alumnos
+		replace T01 = `T01' in `i'
+		replace T02 = round(R1[4,1],0.01) in `i'
+		replace T03 = round(R1[5,1],0.01) in `i'
+		replace T04 = round(R1[2,2],0.01) in `i'
+		replace T05 = round(R1[3,2],0.01) in `i'
+		replace T06 = round(R1[4,3],0.01) in `i'
+		replace T07 = round(R2[3,1],0.01) in `i'
+		replace T08 = R2[2,2] in `i'
+		replace T09 = round(R2[3,3],0.01) in `i'
+		replace T10 = R2[2,4] in `i'
 	}
 end

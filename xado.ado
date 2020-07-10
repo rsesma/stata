@@ -52,6 +52,7 @@ program define xado
 	}
 
 	*force update
+	discard
 	program drop _allado
 
 	di as res "`command' v`version' UPDATED"

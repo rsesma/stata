@@ -238,11 +238,14 @@ program define getdta
 		generate entrega = .
 		generate honor = .
 		generate problema = 0
-		generate PEC = .
+		generate PEC2 = .
 		generate copia = 0
 		generate IDcopia = .
+		generate ePEC1 = .
+		generate hPEC1 = .
+		generate PEC1 = .
 		label define dSiNo 0 "No" 1 "Sí"
-		label values fijo correg entrega honor problema copia dSiNo
+		label values fijo correg entrega honor problema copia ePEC1 hPEC1 dSiNo
 		label define dNotaClase 1 "Aprobado" 2 "Bien" 3 "Notable" 4 "Excelente"
 		label values clase dNotaClase
 		* asegurar que existe una variable coment string
@@ -252,8 +255,9 @@ program define getdta
 			generate coment = "", after(clase)
 		}
 		* ordenar las variables
-		order periodo curso DNI grupo nombre ape1 ape2 PC fijo clase correg entrega  ///
-		   honor problema PEC copia ID copia coment prov pobl trabajo email
+		order periodo curso DNI grupo nombre ape1 ape2 PC fijo clase correg  ///
+		   ePEC1 hPEC1 PEC1 entrega honor problema PEC2 copia IDcopia        ///
+		   coment prov pobl trabajo email
 		* mantener solo los que asistieron a clase
 		keep if PC<.
 		* eliminar variable labels
@@ -276,8 +280,15 @@ program define getdta
 	* unir en un único dta por periodo y grabar
 	clear
 	append using `dta'
+	local file = "$dir/`p'_`curso'.dta"
+	save `file', replace
+end
 
+program define addPvars
+	version 15
+	syntax [anything]
 	* añadir las variables P
+
 	* datos solución
 	local files : dir "$dir" files "*.dta", respectcase
 	foreach f in `files' {
@@ -285,8 +296,10 @@ program define getdta
 	}
 	frame create sol
 	frame sol: use "$dir/`sol'", clear
+
 	* obtener los nombres de las preguntas
 	frame sol: qui levelsof p, local(names)
+
 	* añadir las varibles a la matriz
 	foreach n in `names' {
 		qui g `n' = ""
@@ -298,8 +311,7 @@ program define getdta
 	format PEC %4.1f
 	frame drop sol
 
-	local file = "$dir/`p'_`curso'.dta"
-	save `file', replace
+	save, replace
 end
 
 program define getsol
@@ -548,12 +560,11 @@ program define get_results_tuto
 	syntax [anything]
 
 	* añadir las variables para almacenar las respuestas
-	foreach i of numlist 1/10 {
-		if (`i'<10) local n = "T0`i'"
-		else local n = "T`i'"
-		capture drop `n' `n'_A
-		gen `n' = .
-		gen `n'_A = .
+	foreach i of numlist 65/74 {
+		local n = char(`i')
+		capture drop R01_`n' T01_`n'
+		gen R01_`n' = .
+		gen T01_`n' = .
 	}
 
 	cd "$PEC1"
@@ -577,15 +588,68 @@ program define get_results_tuto
 		restore
 
 		* almacenar resultados en la matriz de alumnos
-		replace T01 = `T01' in `i'
-		replace T02 = round(R1[4,1],0.01) in `i'
-		replace T03 = round(R1[5,1],0.01) in `i'
-		replace T04 = round(R1[2,2],0.01) in `i'
-		replace T05 = round(R1[3,2],0.01) in `i'
-		replace T06 = round(R1[4,3],0.01) in `i'
-		replace T07 = round(R2[3,1],0.01) in `i'
-		replace T08 = R2[2,2] in `i'
-		replace T09 = round(R2[3,3],0.01) in `i'
-		replace T10 = R2[2,4] in `i'
+		replace T01_A = `T01' in `i'
+		replace T01_B = round(R1[4,1],0.01) in `i'
+		replace T01_C = round(R1[5,1],0.01) in `i'
+		replace T01_D = round(R1[2,2],0.01) in `i'
+		replace T01_E = round(R1[3,2],0.01) in `i'
+		replace T01_F = round(R1[4,3],0.01) in `i'
+		replace T01_G = round(R2[3,1],0.01) in `i'
+		replace T01_H = R2[2,2] in `i'
+		replace T01_I = round(R2[3,3],0.01) in `i'
+		replace T01_J = R2[2,4] in `i'
+	}
+end
+
+program define getPEC1
+	version 15
+	syntax [anything]
+
+	* generar los archivos de excel de cada alumno a partir de los datos originales
+	foreach i of numlist 1/`c(N)' {
+		* DNI del alumno
+		local dni = DNI[`i']
+		local name = "PEC1_ST1_`dni'.pdf"
+
+		* ruta del archivo
+		mata: st_local("file", pathjoin(st_global("PEC1"),"pdf"))
+		mata: st_local("file", pathjoin(st_local("file"),st_local("name")))
+
+		javacall com.leam.stata.pecs.StataPECs getPEC1, args(`"`file'"' `"`i'"' "10")       ///
+				jars(statapecs.jar)
+	}
+
+	* obtener resultados PEC1 comparando variables T (correctas) con R (respuestas)
+	foreach i of numlist 65/74 {
+		local n = char(`i')
+		capture quietly drop V01_`n'
+		capture quietly drop c01_`n'
+		gen V01_`n' = (R01_`n' == T01_`n')
+		gen c01_`n' = string(V01_`n',"%2.0f")
+	}
+	* calcular la nota sobre 10 sumando
+	capture quietly drop PEC1
+	qui egen PEC1 = rowtotal(V01_*) if ePEC1==1 & hPEC1==1, missing
+	order PEC1, after(hPEC1)
+
+	* exportar
+	export delimited ape1 ape2 nombre DNI hPEC1 c01_* using "$PEC1/PEC1_data.txt" if PEC1<., delimiter(",") novarnames nolabel quote replace
+
+	qui count if ePEC1 == 0
+	if (r(N)>0) {
+		di "`r(N)' PEC1 no entregadas"
+		list DNI nombre ape1 ape2 if ePEC1 ==0, noobs sep(0)
+	}
+
+	qui count if hPEC1 == 0
+	if (r(N)>0) {
+		di "`r(N)' PEC1 sin HONOR"
+		list DNI nombre ape1 ape2 if hPEC1 ==0, noobs sep(0)
+	}
+
+	qui count if ePEC1 == 1 & missing(hPEC1)
+	if (r(N)>0) {
+		di "`r(N)' PEC1 problemas"
+		list DNI nombre ape1 ape2 if ePEC1 == 1 & missing(hPEC1), noobs sep(0)
 	}
 end

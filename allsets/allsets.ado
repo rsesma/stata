@@ -1,4 +1,4 @@
-*! version 1.2.8  25aug2020 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.2.9  01sep2020 JM. Domenech, JB.Navarro, R. Sesma
 
 program allsets
 	version 12
@@ -139,7 +139,9 @@ program allsets
 			di in red "{bf:WARNING!}"
 			di in red "  User-defined command {bf:somersd} is not installed."
 			di in red "  This command is necessary to compute Harrell's C with Time Variable Covariates."
-			di in red "  Execute {bf:ssc install somersd} to install."
+			if (`c(stata_version)'>=16) di in red "  Execute {bf:ssc install somersd} to install."
+			else di in red `"  Execute {bf:net install somersd, force from("http://www.rogernewsonresources.org.uk/stata10")} to install."'
+
 			exit 198
 		}
 	}
@@ -867,10 +869,19 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 					stata("predict " + hr,1)
 					stata("gen " + invhr + "=1/" + hr,1)
 					stata("gen " + censind + "=1-_d if _st==1",1)
-					stata("somersd _t " + invhr + " if _st==1, cenind(" + censind + ") tdist transf(c)",1)
-					som = st_matrix("e(b)")
-					hc = som[1,1]
-					stata("drop " + hr + " " + invhr + " " + censind,1)
+					if (_stata("somersd _t " + invhr + " if _st==1, cenind(" + censind + ") tdist transf(c)",1)==0) {
+						som = st_matrix("e(b)")
+						hc = som[1,1]
+						stata("drop " + hr + " " + invhr + " " + censind,1)
+					}
+					else {
+						if (st_numscalar("c(stata_version)") < 16) {
+							errprintf("\nERROR!\nsomersd user-written command execution failed\n")
+							errprintf("to install somersd compatible with your Stata version, execute:\n")
+							errprintf("ado uninstall somersd\nnet install somersd, force from(http://www.rogernewsonresources.org.uk/stata10)\n")
+							exit(3200)
+						}
+					}
 				}
 				results[ires,1] = aic
 				results[ires,2] = bic

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.2.7 04may2020}{...}
+{* *! version 1.2.8 25aug2020}{...}
 {viewerdialog allsets "dialog allsets"}{...}
 {vieweralsosee "[R] regress" "help regress"}{...}
 {vieweralsosee "[R] logit" "help logit"}{...}
@@ -139,7 +139,7 @@ Cox regression
 {title:Version}
 
 {p 4}
-Version 1.2.7 {hline 2} 04 May 2020
+Version 1.2.8 {hline 2} 25 August 2020
 
 
 {marker authors}{...}
@@ -157,7 +157,7 @@ stata@metodo.uab.cat{break}
 
 {p 4 6 2}
 Dom{c e'}nech JM, Navarro JB. Find the best subset for Linear, Logistic and Cox Regression: User-written command allsets for Stata [computer program].{break}
-V1.2.7. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019{break}
+V1.2.8. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 

@@ -563,9 +563,12 @@ program define get_results_tuto
 	foreach i of numlist 65/74 {
 		local n = char(`i')
 		capture drop R01_`n' T01_`n'
-		gen R01_`n' = .
-		gen T01_`n' = .
+		qui gen R01_`n' = .
+		qui gen T01_`n' = .
 	}
+	format R01_A R01_H R01_J T01_A T01_H T01_J %2.0f
+	format R01_B R01_C R01_F R01_G R01_I T01_B T01_C T01_F T01_G T01_I %6.3f
+	format R01_D R01_E T01_D T01_E %5.2f
 
 	cd "$PEC1"
 
@@ -579,25 +582,32 @@ program define get_results_tuto
 		run Salud.do `dni'
 
 		* obtener resultados
-		count if H6==1 & SexFe == 1
-		local T01 = r(N)
-		tabstat IMC Edad PT, statistics(count min max mean sd) save
-		matrix R1 = r(StatTotal)
-		tabstat HabitFum F15 Obs SexFe, statistics(count sum mean) save
-		matrix R2 = r(StatTotal)
+		quietly {
+			count if H4==1 & SexFe == 1
+			local T01 = r(N)
+			tabstat IMC Edad PT, statistics(count min max mean sd) save
+			matrix R1 = r(StatTotal)
+			tabstat HabitFum F15 Obs SexFe, statistics(count sum mean) save
+			matrix R2 = r(StatTotal)
+		}
 		restore
 
 		* almacenar resultados en la matriz de alumnos
-		replace T01_A = `T01' in `i'
-		replace T01_B = round(R1[4,1],0.01) in `i'
-		replace T01_C = round(R1[5,1],0.01) in `i'
-		replace T01_D = round(R1[2,2],0.01) in `i'
-		replace T01_E = round(R1[3,2],0.01) in `i'
-		replace T01_F = round(R1[4,3],0.01) in `i'
-		replace T01_G = round(R2[3,1],0.01) in `i'
-		replace T01_H = R2[2,2] in `i'
-		replace T01_I = round(R2[3,3],0.01) in `i'
-		replace T01_J = R2[2,4] in `i'
+		quietly {
+			replace T01_A = `T01' in `i'
+			replace T01_B = round(R1[4,1],0.001) in `i'
+			replace T01_C = round(R1[5,1],0.001) in `i'
+			replace T01_D = round(R1[2,2],0.01) in `i'
+			replace T01_E = round(R1[3,2],0.01) in `i'
+			replace T01_F = round(R1[4,3],0.001) in `i'
+			replace T01_G = round(R2[3,1],0.001) in `i'
+			replace T01_H = R2[2,2] in `i'
+			replace T01_I = round(R2[3,3],0.001) in `i'
+			replace T01_J = R2[2,4] in `i'
+		}
+		* export txt data for each DNI
+		qui export delimited T01_* using "txt/`dni'_sol.txt" in `i', delimiter(",") novarnames datafmt replace
+		di "`dni'"
 	}
 end
 
@@ -605,7 +615,7 @@ program define getPEC1
 	version 15
 	syntax [anything]
 
-	* generar los archivos de excel de cada alumno a partir de los datos originales
+	* leer las respuestas de los alumnos de los archivos PDF
 	foreach i of numlist 1/`c(N)' {
 		* DNI del alumno
 		local dni = DNI[`i']
@@ -622,18 +632,16 @@ program define getPEC1
 	* obtener resultados PEC1 comparando variables T (correctas) con R (respuestas)
 	foreach i of numlist 65/74 {
 		local n = char(`i')
-		capture quietly drop V01_`n'
-		capture quietly drop c01_`n'
 		gen V01_`n' = (R01_`n' == T01_`n')
-		gen c01_`n' = string(V01_`n',"%2.0f")
 	}
 	* calcular la nota sobre 10 sumando
 	capture quietly drop PEC1
 	qui egen PEC1 = rowtotal(V01_*) if ePEC1==1 & hPEC1==1, missing
 	order PEC1, after(hPEC1)
+	drop V01_*
 
 	* exportar
-	export delimited ape1 ape2 nombre DNI hPEC1 c01_* using "$PEC1/PEC1_data.txt" if PEC1<., delimiter(",") novarnames nolabel quote replace
+	* export delimited ape1 ape2 nombre DNI hPEC1 c01_* using "$PEC1/PEC1_data.txt" if PEC1<., delimiter(",") novarnames nolabel quote replace
 
 	qui count if ePEC1 == 0
 	if (r(N)>0) {

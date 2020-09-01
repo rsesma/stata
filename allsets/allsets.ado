@@ -1,4 +1,4 @@
-*! version 1.2.7  04may2020 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.2.8  25aug2020 JM. Domenech, JB.Navarro, R. Sesma
 
 program allsets
 	version 12
@@ -766,8 +766,10 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 					sp = st_numscalar("r(P_n0)")
 					if (_stata("estat gof, group(10)",1) == 0) {
 						// Hosmer-Lemeshow goodness-of-fit, pfitHL
-						pHL = st_numscalar("r(p)")
+						// pHL = st_numscalar("r(p)") not available in version 14
+						chi2 = st_numscalar("r(chi2)")
 						df = st_numscalar("r(df)")
+						pHL = 1 - chi2(df,chi2)			// compute with df, chi2
 						if (nvar==1 & df==0 & pHL==.) {
 							// if df = 0 and p = .,there's only 1 binary indep. variable so p must be 1
 							pHL = 1
@@ -775,8 +777,10 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 					}
 					if (_stata("estat gof",1) == 0) {
 						// Pearson goodness-of-fit, pGof
-						pPearson = st_numscalar("r(p)")
+						// pPearson = st_numscalar("r(p)") not available in version 14
+						chi2 = st_numscalar("r(chi2)")
 						df = st_numscalar("r(df)")
+						pPearson = 1 - chi2(df,chi2)			// compute with df, chi2
 						if (nvar==1 & df==0 & pPearson==.) {
 							// if df = 0 and p = .,there's only 1 binary indep. variable so p must be 1
 							pPearson = 1

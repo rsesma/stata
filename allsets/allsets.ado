@@ -1,4 +1,4 @@
-*! version 1.2.9  01sep2020 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.3.0  03sep2020 JM. Domenech, JB.Navarro, R. Sesma
 
 program allsets
 	version 12
@@ -140,7 +140,7 @@ program allsets
 			di in red "  User-defined command {bf:somersd} is not installed."
 			di in red "  This command is necessary to compute Harrell's C with Time Variable Covariates."
 			if (`c(stata_version)'>=16) di in red "  Execute {bf:ssc install somersd} to install."
-			else di in red `"  Execute {bf:net install somersd, force from("http://www.rogernewsonresources.org.uk/stata10")} to install."'
+			else di in red `"  Execute {bf:net install somersd, force from("http://www.rogernewsonresources.org.uk/stata12")} to install."'
 
 			exit 198
 		}
@@ -878,7 +878,7 @@ void executereg(real colvector results, string colvector vnames, string colvecto
 						if (st_numscalar("c(stata_version)") < 16) {
 							errprintf("\nERROR!\nsomersd user-written command execution failed\n")
 							errprintf("to install somersd compatible with your Stata version, execute:\n")
-							errprintf("ado uninstall somersd\nnet install somersd, force from(http://www.rogernewsonresources.org.uk/stata10)\n")
+							errprintf("ado uninstall somersd\nnet install somersd, force from(http://www.rogernewsonresources.org.uk/stata12)\n")
 							exit(3200)
 						}
 					}

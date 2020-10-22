@@ -33,6 +33,7 @@ program define open
 	if ("`curso'"=="ST1") local pec = "PEC2"
 	if ("`curso'"=="ST2") local pec = "PEC1"
 	* recorrer la matriz y encontrar el primer no corregido
+	local ldni 0
 	local found = 0
 	local Ntotal = _N
 	foreach i of numlist 1/`Ntotal' {
@@ -43,13 +44,14 @@ program define open
 			}
 		}
 		else {
+			local ldni 1
 			if (DNI[`i']=="`dni'") {
 				local obs = `i'
 			}
 		}
 		if (`obs'>0) {
 			local dni = DNI[`obs']
-			local nom = nombre[`obs'] + " " + ape1[`obs'] + " " + ape2[`obs']
+			local nom = nomcomp[`obs']
 			local found = 1
 			* marcar como corregida
 			qui replace correg = 1 in `i'
@@ -88,8 +90,8 @@ program define open
 		local ntot = r(N)
 		qui count if (correg==1)
 		local corr = r(N)
-		if ("`dni'"=="") di as res "Corrigiendo PEC `corr' de `ntot' (`dni' `nom')"
-		if ("`dni'"!="") di as res "Corrigiendo PEC `dni' (`nom')"
+		if (!`ldni') di as res "Corrigiendo PEC `corr' de `ntot' (`dni' `nom')"
+		if (`ldni') di as res "Corrigiendo PEC `dni' (`nom')"
 	}
 	else {
 		di as res "No hay más PECs"
@@ -155,11 +157,34 @@ program define nota
 		frame drop sol				// eliminar el frame solución
 
 		* calcular nota
-		capture drop sum
-		qui egen sum = rowtotal(w*_*), missing
-		qui replace PEC = 10 * (sum/wtot) in `obs'
-		qui replace correg = 1 in `obs'
-		list DNI nombre ape1 ape2 PC clase PEC in `obs'
+		quietly{
+			capture drop sum
+			qui egen sum = rowtotal(w*_*), missing
+			qui replace PEC = round(10 * (sum/wtot),0.1) in `obs'
+			qui replace correg = 1 in `obs'
+			qui count if (correg == 1)
+		
+			if ("`curso'"=="ST1") {
+				* curso ST1: PEC1 15% + PEC2 85%
+				replace NOTA = 0.15*PEC1 + 0.85*PEC in `obs'
+				* sumar la nota de la PEC0, hasta un máximo de 9.5
+				if (NOTA[`obs']<9.5 & PEC0[`obs']<.) replace NOTA = min(9.5, NOTA + PEC0 * 0.125) in `obs'
+			}
+			if ("`curso'"=="ST2") {
+				* curso ST2: la nota final es la de la PEC1
+				replace NOTA = PEC in `obs'
+			}
+			replace NOTA = round(NOTA,0.1) in `obs'
+			* sumar las notas de clase para las notas al filo
+			replace NOTA = 7 if (inrange(NOTA,6.6,7) & clase >=3) in `obs'
+			replace NOTA = 9 if (inrange(NOTA,8.6,9) & clase >=4) in `obs'
+			* las copias, los no presentados y los suspensos se convierten en 5
+			replace NOTA = 5 if (copia==1 | PEC==. | NOTA<5) in `obs'
+		}
+		
+		di "Corregida PEC `r(N)' de " _N
+		if ("`curso'"=="ST1") list DNI nomcomp clase PEC0 PEC1 PEC NOTA in `obs', noobs
+		if ("`curso'"=="ST2") list DNI nomcomp clase PEC NOTA in `obs', noobs
 		qui drop sum
 		qui save, replace
 	}
@@ -217,7 +242,7 @@ end
 
 program define getdta
 	version 15
-	syntax [anything], p(string) curso(string) folder(string)
+	syntax [anything], p(string) curso(string) folder(string) [online]
 
 	cd "`folder'"
 
@@ -229,24 +254,37 @@ program define getdta
 		import excel "`f'", sheet("Exported") firstrow clear
 		* renombrar, crear variables fijo+corr y diccionarios
 		generate periodo = "`p'"
-		rename (Grup DNINIE Nom Cognom1 Cognom2 Nota Comentari Provincia Població Feina eMail) ///
-			   (grupo DNI nombre ape1 ape2 clase coment prov pobl trabajo email)
-		generate curso = substr(grupo,1,3)
-		generate fijo = (Fixe=="Si")
-		drop Fixe
+		if ("`online'"=="") {
+			rename (Grup DNINIE Nom Cognom1 Cognom2 Nota Comentari Provincia Població Feina eMail) ///
+				   (grupo DNI nombre ape1 ape2 clase coment prov pobl trabajo email)
+			generate curso = substr(grupo,1,3)
+			generate fijo = (Fixe=="Si")
+			drop Fixe
+		} 
+		else {
+			gen grupo = Curs + B + C
+			drop B C Mòbil País
+			rename (Curs DNINIE Nom Cognom1 Cognom2 Provincia Poblaciò eMail) ///
+				   (curso DNI nombre ape1 ape2 prov pobl email)
+			gen PC = 0
+			gen fijo = 0
+			gen clase = 1
+			gen coment = ""
+			gen trabajo = ""
+		}
+		gen nomcomp = ustrtrim(nombre + " " + ape1 + " " + ape2)
 		generate correg = 0
 		generate entrega = .
 		generate honor = .
 		generate problema = 0
-		generate PEC2 = .
 		generate copia = 0
 		generate IDcopia = .
 		generate ePEC1 = .
 		generate hPEC1 = .
-		generate PEC1 = .
+		generate PEC = .
 		label define dSiNo 0 "No" 1 "Sí"
 		label values fijo correg entrega honor problema copia ePEC1 hPEC1 dSiNo
-		label define dNotaClase 1 "Aprobado" 2 "Bien" 3 "Notable" 4 "Excelente"
+		label define dNotaClase 0 "No asiste" 1 "Aprobado" 2 "Bien" 3 "Notable" 4 "Excelente"
 		label values clase dNotaClase
 		* asegurar que existe una variable coment string
 		local t : type coment
@@ -255,9 +293,8 @@ program define getdta
 			generate coment = "", after(clase)
 		}
 		* ordenar las variables
-		order periodo curso DNI grupo nombre ape1 ape2 PC fijo clase correg  ///
-		   ePEC1 hPEC1 PEC1 entrega honor problema PEC2 copia IDcopia        ///
-		   coment prov pobl trabajo email
+		order periodo curso DNI grupo nombre ape1 ape2 nomcomp PC fijo clase  ///
+		   ePEC1 hPEC1 entrega honor problema correg PEC copia IDcopia coment prov pobl trabajo email
 		* mantener solo los que asistieron a clase
 		keep if PC<.
 		* eliminar variable labels
@@ -272,7 +309,7 @@ program define getdta
 			format `v' %-`type's
 		}
 		* ordenar datos y grabar dta
-		sort periodo curso grupo PC
+		sort periodo curso grupo PC DNI
 		local name = grupo[1]
 		save `name'.dta, replace
 		local dta "`dta' `name'"
@@ -372,6 +409,23 @@ program define buides
 	version 15
 	syntax [anything]
 
+	frame copy default temp
+	* datos solución
+	local files : dir "$dir" files "*.dta", respectcase
+	foreach f in `files' {
+		if (strpos("`f'","sol")>0) local sol = "`f'"
+	}
+	frame create sol
+	frame change sol
+	use "$dir/`sol'", clear
+	* eliminar preguntas no eval prof
+	foreach i of numlist 1/`c(N)' {
+		if (tipo[`i']!=1) {
+			local n = p[`i']
+			frame temp: drop `n'
+		}
+	}
+	frame change temp
 	foreach v of varlist P*_* {
 		qui generate __`v' = (`v'=="?")
 	}
@@ -380,9 +434,13 @@ program define buides
 	qui drop __P*
 
 	list DNI P*_* if __buides == 1, clean
+	
+	frame change default
+	frame drop temp 
+	frame drop sol
 end
 
-program define PEC1
+program define PEC0
 	version 15
 	syntax [anything]
 
@@ -405,15 +463,15 @@ program define PEC1
 	frame create xls
 	frame xls: import excel using "$dir/`xlsx'", sheet("`name'") firstrow
 	frame xls: rename Periodo periodo
-	* linkar e importar PEC1
+	* linkar e importar PEC0
 	frlink 1:1 periodo DNI, frame(xls)
-	frget PEC1, from(xls)
+	frget PEC0, from(xls)
 	* deshacer vínculo y borrar xls dataset
 	drop xls
 	frame drop xls
-	order PEC1, before(PEC)
+	order PEC0, after(clase)
 
-	label variable PEC1 ""
+	label variable PEC0 ""
 	save, replace
 end
 
@@ -503,10 +561,16 @@ end
 
 program define getxlsx
 	version 15
-	syntax [anything], [using(string) j(integer 25)]
+	syntax [anything], [j(integer 25)]
 
-	* importar el archivo de excel con el DNI de los alumnos
-	import excel "`using'", sheet("Alumnos") firstrow clear
+	* abrir el dta con los DNIs de los alumnos
+	local files : dir "$dir" files "*.dta", respectcase
+	foreach f in `files' {
+		if (strpos("`f'","sol")==0) local dta = "`f'"
+	}
+	frame create semillas
+	frame change semillas
+	use "$dir/`dta'", clear
 	keep DNI
 	* generar semilla s a partir del DNI
 	gen s = DNI
@@ -550,9 +614,12 @@ program define getxlsx
 
 		* exportar a excel
 		export excel using "$PEC1/xlsx/`dni'.xlsx", sheet("Salud") firstrow(variables) replace
+		di "`dni'"
 
 		restore
 	}
+	frame reset
+	di "Proceso finalizado"
 end
 
 program define get_results_tuto
@@ -566,13 +633,12 @@ program define get_results_tuto
 		qui gen R01_`n' = .
 		qui gen T01_`n' = .
 	}
-	format R01_A R01_H R01_J T01_A T01_H T01_J %2.0f
-	format R01_B R01_C R01_F R01_G R01_I T01_B T01_C T01_F T01_G T01_I %6.3f
-	format R01_D R01_E T01_D T01_E %5.2f
+	format T*_* R*_* %5.2f
+	format *_F *_H %5.3f
 
 	cd "$PEC1"
 
-	* generar los archivos de excel de cada alumno a partir de los datos originales
+	* generar los resultados de cada alumno para sus datos personalizados
 	foreach i of numlist 1/`c(N)' {
 		* DNI del alumno
 		local dni = DNI[`i']
@@ -581,34 +647,45 @@ program define get_results_tuto
 		* ejecutar sintaxis para generar dta con variables calculadas
 		run Salud.do `dni'
 
-		* obtener resultados
+		* obtener y almacenar resultados
 		quietly {
-			count if H4==1 & SexFe == 1
-			local T01 = r(N)
-			tabstat IMC Edad PT, statistics(count min max mean sd) save
-			matrix R1 = r(StatTotal)
-			tabstat HabitFum F15 Obs SexFe, statistics(count sum mean) save
-			matrix R2 = r(StatTotal)
+			tabulate NivObs, matcell(F)
+			local T01_A = 100 * F[3,1] / r(N)
+			tabulate HabitFum, matcell(F)
+			local T01_B = 100 * F[2,1] / r(N)
+			tabulate H6, matcell(F)
+			local T01_C = 100 * F[3,1] / r(N)
+			tabulate H4 SexFe, matcell(F)
+			mata: st_numscalar("T01_D", 100 * st_matrix("F")[1,2] / colsum(st_matrix("F"))[1,2])
+			local T01_D = T01_D
+			tabulate NivObs SexFe, matcell(F)
+			mata: st_numscalar("T01_E", 100 * st_matrix("F")[2,1] / colsum(st_matrix("F"))[1,1])
+			local T01_E = T01_E
+			tabstat PT IMC EdadF, statistics(mean median sd) save
+			matrix R = r(StatTotal)
+			local T01_F = R[1,1]
+			local T01_G = R[2,2]
+			local T01_H = R[3,3]
+			summarize Edad if SexFe == 1
+			local T01_I = r(min)
+			summarize Talla if SexFe == 0
+			local T01_J = r(max)
 		}
 		restore
 
 		* almacenar resultados en la matriz de alumnos
 		quietly {
-			replace T01_A = `T01' in `i'
-			replace T01_B = round(R1[4,1],0.001) in `i'
-			replace T01_C = round(R1[5,1],0.001) in `i'
-			replace T01_D = round(R1[2,2],0.01) in `i'
-			replace T01_E = round(R1[3,2],0.01) in `i'
-			replace T01_F = round(R1[4,3],0.001) in `i'
-			replace T01_G = round(R2[3,1],0.001) in `i'
-			replace T01_H = R2[2,2] in `i'
-			replace T01_I = round(R2[3,3],0.001) in `i'
-			replace T01_J = R2[2,4] in `i'
+			foreach n in A B C D E G I J {
+				replace T01_`n' = round(`T01_`n'',0.01) in `i'
+			}
+			replace T01_F = round(`T01_F',0.001) in `i'
+			replace T01_H = round(`T01_H',0.001) in `i'
 		}
-		* export txt data for each DNI
-		qui export delimited T01_* using "txt/`dni'_sol.txt" in `i', delimiter(",") novarnames datafmt replace
-		di "`dni'"
+		di "`dni' (`i' de `c(N)')"
 	}
+	
+	save, replace
+	export delimited DNI T01_* using "results.csv", delimiter(";") datafmt replace
 end
 
 program define getPEC1
@@ -627,6 +704,7 @@ program define getPEC1
 
 		javacall com.leam.stata.pecs.StataPECs getPEC1, args(`"`file'"' `"`i'"' "10")       ///
 				jars(statapecs.jar)
+		di "`dni'"
 	}
 
 	* obtener resultados PEC1 comparando variables T (correctas) con R (respuestas)
@@ -660,4 +738,6 @@ program define getPEC1
 		di "`r(N)' PEC1 problemas"
 		list DNI nombre ape1 ape2 if ePEC1 == 1 & missing(hPEC1), noobs sep(0)
 	}
+	
+	di "Proceso finalizado"
 end

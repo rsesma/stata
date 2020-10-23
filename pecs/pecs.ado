@@ -521,11 +521,11 @@ program define export_data
 		if ("`curso'"=="ST1") {
 			* exportar los datos de la PEC1
 			preserve
-			keep if PEC1<.
+			keep if PEC0<.
 			generate t1 = substr(grupo,4,2)
 			generate t2 = substr(grupo,6,2)
-			local name = "`curso'_`periodo'_PEC1_datos"
-			export delimited DNI curso t1 t2 PEC1 using "$dir/`name'.txt", delimiter(";") novarnames nolabel quote replace
+			local name = "`curso'_`periodo'_PEC0_datos"
+			export delimited DNI curso t1 t2 PEC0 using "$dir/`name'.txt", delimiter(";") novarnames nolabel quote replace
 			restore
 		}
 		preserve
@@ -535,6 +535,7 @@ program define export_data
 		export delimited ape1 ape2 nombre DNI honor P*_* using "$dir/`name'.txt", delimiter(",") novarnames nolabel quote replace
 		restore
 	}
+	di "Proceso finalizado"
 end
 
 program define alumnos
@@ -630,8 +631,8 @@ program define get_results_tuto
 	foreach i of numlist 65/74 {
 		local n = char(`i')
 		capture drop R01_`n' T01_`n'
-		qui gen R01_`n' = .
-		qui gen T01_`n' = .
+		qui gen double R01_`n' = .
+		qui gen double T01_`n' = .
 	}
 	format T*_* R*_* %5.2f
 	format *_F *_H %5.3f
@@ -685,7 +686,8 @@ program define get_results_tuto
 	}
 	
 	save, replace
-	export delimited DNI T01_* using "results.csv", delimiter(";") datafmt replace
+	export excel DNI T*_* using "results.xlsx", sheet("resultados") firstrow(variables) replace
+	*export delimited DNI T01_* using "results.csv", delimiter(";") datafmt replace
 end
 
 program define getPEC1

@@ -294,7 +294,7 @@ program define getdta
 		}
 		* ordenar las variables
 		order periodo curso DNI grupo nombre ape1 ape2 nomcomp PC fijo clase  ///
-		   ePEC1 hPEC1 entrega honor problema correg PEC copia IDcopia coment prov pobl trabajo email
+		   ePEC1 hPEC1 entrega problema honor correg PEC copia IDcopia coment prov pobl trabajo email
 		* mantener solo los que asistieron a clase
 		keep if PC<.
 		* eliminar variable labels
@@ -549,7 +549,7 @@ program define alumnos
 	use "$dir/`dta'", clear
 
 	quietly{
-		drop correg honor problema P*_* w*
+		drop ePEC1 hPEC1 correg honor problema R*_* T*_* P*_* w*
 		save "$dir/__alumnos.dta", replace
 
 		use "`using'", clear
@@ -558,6 +558,7 @@ program define alumnos
 
 		erase "$dir/__alumnos.dta"
 	}
+	di "Proceso finalizado"
 end
 
 program define getxlsx
@@ -690,7 +691,7 @@ program define get_results_tuto
 	*export delimited DNI T01_* using "results.csv", delimiter(";") datafmt replace
 end
 
-program define getPEC1
+program define PEC1
 	version 15
 	syntax [anything]
 
@@ -709,16 +710,25 @@ program define getPEC1
 		di "`dni'"
 	}
 
-	* obtener resultados PEC1 comparando variables T (correctas) con R (respuestas)
-	foreach i of numlist 65/74 {
-		local n = char(`i')
-		gen V01_`n' = (R01_`n' == T01_`n')
+	quietly{
+		* obtener resultados PEC1 comparando variables T (correctas) con R (respuestas)
+		foreach n in A B C D E G I J {
+			replace T01_`n' = round(T01_`n',0.01)
+			replace R01_`n' = round(R01_`n',0.01)
+		}
+		foreach n in F H {
+			replace T01_`n' = round(T01_`n',0.001)
+			replace R01_`n' = round(R01_`n',0.001)
+		}
+		foreach n in A B C D E F G H I J {
+			gen V01_`n' = (R01_`n' == T01_`n')
+		}
+		* calcular la nota sobre 10 sumando
+		capture drop PEC1
+		egen PEC1 = rowtotal(V01_*) if ePEC1==1, missing
+		order PEC1, after(hPEC1)
+		drop V01_*
 	}
-	* calcular la nota sobre 10 sumando
-	capture quietly drop PEC1
-	qui egen PEC1 = rowtotal(V01_*) if ePEC1==1 & hPEC1==1, missing
-	order PEC1, after(hPEC1)
-	drop V01_*
 
 	* exportar
 	* export delimited ape1 ape2 nombre DNI hPEC1 c01_* using "$PEC1/PEC1_data.txt" if PEC1<., delimiter(",") novarnames nolabel quote replace
@@ -726,20 +736,27 @@ program define getPEC1
 	qui count if ePEC1 == 0
 	if (r(N)>0) {
 		di "`r(N)' PEC1 no entregadas"
-		list DNI nombre ape1 ape2 if ePEC1 ==0, noobs sep(0)
+		list grupo DNI nomcomp if ePEC1 ==0, noobs sep(0)
 	}
 
 	qui count if hPEC1 == 0
 	if (r(N)>0) {
 		di "`r(N)' PEC1 sin HONOR"
-		list DNI nombre ape1 ape2 if hPEC1 ==0, noobs sep(0)
+		list grupo DNI nomcomp email if hPEC1 ==0, noobs sep(0)
 	}
 
 	qui count if ePEC1 == 1 & missing(hPEC1)
 	if (r(N)>0) {
 		di "`r(N)' PEC1 problemas"
-		list DNI nombre ape1 ape2 if ePEC1 == 1 & missing(hPEC1), noobs sep(0)
+		list grupo DNI nomcomp if ePEC1 == 1 & missing(hPEC1), noobs sep(0)
 	}
 	
 	di "Proceso finalizado"
+	
+	* suspendidos
+	list grupo DNI nomcomp PEC1 email if PEC1 < 5, noobs sep(0) N(PEC1)
+	* estadística
+	summarize PEC1
+	* estadística aprobados
+	summarize PEC1 if PEC1 >= 5
 end

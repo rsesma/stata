@@ -730,9 +730,6 @@ program define PEC1
 		drop V01_*
 	}
 
-	* exportar
-	* export delimited ape1 ape2 nombre DNI hPEC1 c01_* using "$PEC1/PEC1_data.txt" if PEC1<., delimiter(",") novarnames nolabel quote replace
-
 	qui count if ePEC1 == 0
 	if (r(N)>0) {
 		di "`r(N)' PEC1 no entregadas"
@@ -751,12 +748,15 @@ program define PEC1
 		list grupo DNI nomcomp if ePEC1 == 1 & missing(hPEC1), noobs sep(0)
 	}
 	
-	di "Proceso finalizado"
-	
+	* duplicados
+	di "PEC1 duplicadas"
+	duplicates list R*_*
+		
 	* suspendidos
 	list grupo DNI nomcomp PEC1 email if PEC1 < 5, noobs sep(0) N(PEC1)
-	* estadística
-	summarize PEC1
-	* estadística aprobados
+	* estadística (solo aprobados)
 	summarize PEC1 if PEC1 >= 5
+	
+	di "Proceso finalizado"
+
 end

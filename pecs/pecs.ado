@@ -1,4 +1,4 @@
-*! version 0.0.2  ?jun2020
+*! version 0.0.3  29dec2020
 program pecs
 	version 15
 
@@ -110,6 +110,10 @@ program define nota
 	}
 	* abrir el archivo de datos
 	use "$dir/`dta'", clear
+	
+	* si la variable NOTA no existe, la creamos
+	capture confirm variable NOTA, exact
+	if (_rc > 0) gen NOTA = ., after(PEC)
 
 	* obtener el periodo, el curso y la PEC
 	local p = periodo[1]
@@ -178,8 +182,9 @@ program define nota
 			* sumar las notas de clase para las notas al filo
 			replace NOTA = 7 if (inrange(NOTA,6.6,7) & clase >=3) in `obs'
 			replace NOTA = 9 if (inrange(NOTA,8.6,9) & clase >=4) in `obs'
+			* EN LOS CURSOS ONLINE ESTO NO APLICA
 			* las copias, los no presentados y los suspensos se convierten en 5
-			replace NOTA = 5 if (copia==1 | PEC==. | NOTA<5) in `obs'
+			*replace NOTA = 5 if (copia==1 | PEC==. | NOTA<5) in `obs'
 		}
 		
 		di "Corregida PEC `r(N)' de " _N
@@ -475,6 +480,7 @@ program define PEC0
 	save, replace
 end
 
+/* ABANDONADO
 program define notafin
 	version 15
 
@@ -506,6 +512,7 @@ program define notafin
 	save, replace
 end
 
+ABANDONADO
 program define export_data
 	version 15
 
@@ -537,6 +544,7 @@ program define export_data
 	}
 	di "Proceso finalizado"
 end
+*/
 
 program define alumnos
 	version 15

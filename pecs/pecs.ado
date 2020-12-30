@@ -167,6 +167,7 @@ program define nota
 			qui replace PEC = round(10 * (sum/wtot),0.1) in `obs'
 			qui replace correg = 1 in `obs'
 			qui count if (correg == 1)
+			local ncor = r(N)
 		
 			if ("`curso'"=="ST1") {
 				* curso ST1: PEC1 15% + PEC2 85%
@@ -187,7 +188,9 @@ program define nota
 			*replace NOTA = 5 if (copia==1 | PEC==. | NOTA<5) in `obs'
 		}
 		
-		di "Corregida PEC `r(N)' de " _N
+		qui count if (entrega==1)
+		local ntot = r(N)
+		di "Corregida PEC `ncor' de `ntot'"
 		if ("`curso'"=="ST1") list DNI nomcomp clase PEC0 PEC1 PEC NOTA in `obs', noobs
 		if ("`curso'"=="ST2") list DNI nomcomp clase PEC NOTA in `obs', noobs
 		qui drop sum
@@ -236,12 +239,12 @@ program define entrega
 	qui count if (entrega==1 & honor==0)
 	if (`r(N)'>0) {
 		di as res "PECs sin HONOR: `r(N)'"
-		list grupo DNI nom ape1 ape2 email if entrega==1 & honor==0
+		list grupo DNI nomcomp ape1 ape2 email if entrega==1 & honor==0
 	}
 	qui count if (problema==1)
 	if (`r(N)'>0) {
 		di as res "PECs con problemas: `r(N)'"
-		list grupo DNI nom ape1 ape2 email if problema==1
+		list grupo DNI nomcomp ape1 ape2 email if problema==1
 	}
 end
 
@@ -456,7 +459,7 @@ program define PEC0
 	}
 	* abrir el archivo de datos
 	use "$dir/`dta'", clear
-	capture drop PEC1
+	capture drop PEC0
 
 	* obtener el nombre del archivo xlsx
 	local files : dir "$dir" files "*.xlsx", respectcase
@@ -703,7 +706,7 @@ program define PEC1
 	version 15
 	syntax [anything]
 
-	* leer las respuestas de los alumnos de los archivos PDF
+/*	* leer las respuestas de los alumnos de los archivos PDF
 	foreach i of numlist 1/`c(N)' {
 		* DNI del alumno
 		local dni = DNI[`i']
@@ -716,7 +719,7 @@ program define PEC1
 		javacall com.leam.stata.pecs.StataPECs getPEC1, args(`"`file'"' `"`i'"' "10")       ///
 				jars(statapecs.jar)
 		di "`dni'"
-	}
+	}*/
 
 	quietly{
 		* obtener resultados PEC1 comparando variables T (correctas) con R (respuestas)

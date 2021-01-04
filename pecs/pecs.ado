@@ -483,39 +483,6 @@ program define PEC0
 	save, replace
 end
 
-/* ABANDONADO
-program define notafin
-	version 15
-
-	local files : dir "$dir" files "*.dta", respectcase
-	foreach f in `files' {
-		if (strpos("`f'","sol")==0) local dta = "`f'"
-	}
-	use "$dir/`dta'", clear
-	capture drop NOTA
-
-	quietly{
-		generate NOTA = PEC, after(PEC)
-		capture confirm variable PEC1
-		if (_rc==0) {
-			* sumar la nota de la PEC1, hasta un máximo de 9.5
-			generate __plus = PEC1 * 0.125
-			replace __plus = 0 if __plus == .
-			replace NOTA = min(9.5, PEC + __plus) if PEC < 9.5
-			drop __plus
-		}
-		replace NOTA = round(NOTA,0.1)
-		* sumar las notas de clase para las notas al filo
-		replace NOTA = 7 if (inrange(NOTA,6.6,7) & clase >=3)
-		replace NOTA = 9 if (inrange(NOTA,8.6,9) & clase >=4)
-		format NOTA %3.1f
-		* las copias, los no presentados y los suspensos se convierten en 5
-		replace NOTA = 5 if (copia==1 | PEC==. | NOTA<5)
-	}
-	save, replace
-end
-
-ABANDONADO
 program define export_data
 	version 15
 
@@ -529,7 +496,7 @@ program define export_data
 		local curso = curso[1]
 		local periodo = periodo[1]
 		if ("`curso'"=="ST1") {
-			* exportar los datos de la PEC1
+			* exportar los datos de la PEC0
 			preserve
 			keep if PEC0<.
 			generate t1 = substr(grupo,4,2)
@@ -547,7 +514,6 @@ program define export_data
 	}
 	di "Proceso finalizado"
 end
-*/
 
 program define alumnos
 	version 15
@@ -771,3 +737,37 @@ program define PEC1
 	di "Proceso finalizado"
 
 end
+
+
+/* NO ES NECESARIO
+//program define notafin
+	version 15
+
+	local files : dir "$dir" files "*.dta", respectcase
+	foreach f in `files' {
+		if (strpos("`f'","sol")==0) local dta = "`f'"
+	}
+	use "$dir/`dta'", clear
+	capture drop NOTA
+
+	quietly{
+		generate NOTA = PEC, after(PEC)
+		capture confirm variable PEC1
+		if (_rc==0) {
+			* sumar la nota de la PEC1, hasta un máximo de 9.5
+			generate __plus = PEC1 * 0.125
+			replace __plus = 0 if __plus == .
+			replace NOTA = min(9.5, PEC + __plus) if PEC < 9.5
+			drop __plus
+		}
+		replace NOTA = round(NOTA,0.1)
+		* sumar las notas de clase para las notas al filo
+		replace NOTA = 7 if (inrange(NOTA,6.6,7) & clase >=3)
+		replace NOTA = 9 if (inrange(NOTA,8.6,9) & clase >=4)
+		format NOTA %3.1f
+		* las copias, los no presentados y los suspensos se convierten en 5
+		replace NOTA = 5 if (copia==1 | PEC==. | NOTA<5)
+	}
+	save, replace
+end
+*/

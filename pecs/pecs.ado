@@ -505,6 +505,9 @@ program define export_data
 			export delimited DNI curso t1 t2 PEC0 using "$dir/`name'.txt", delimiter(";") novarnames nolabel quote replace
 			restore
 		}
+		foreach v of varlist P*_* {
+			replace `v' = subinstr(`v',".",",",.)
+		}
 		preserve
 		keep if entrega==1
 		if ("`curso'"=="ST1") local name = "`curso'_`periodo'_PEC2_datos"
@@ -527,6 +530,7 @@ program define alumnos
 
 	quietly{
 		drop ePEC1 hPEC1 correg honor problema R*_* T*_* P*_* w*
+		drop if missing(NOTA)
 		save "$dir/__alumnos.dta", replace
 
 		use "`using'", clear
@@ -672,7 +676,7 @@ program define PEC1
 	version 15
 	syntax [anything]
 
-/*	* leer las respuestas de los alumnos de los archivos PDF
+	* leer las respuestas de los alumnos de los archivos PDF
 	foreach i of numlist 1/`c(N)' {
 		* DNI del alumno
 		local dni = DNI[`i']
@@ -685,7 +689,7 @@ program define PEC1
 		javacall com.leam.stata.pecs.StataPECs getPEC1, args(`"`file'"' `"`i'"' "10")       ///
 				jars(statapecs.jar)
 		di "`dni'"
-	}*/
+	}
 
 	quietly{
 		* obtener resultados PEC1 comparando variables T (correctas) con R (respuestas)
@@ -727,7 +731,7 @@ program define PEC1
 	
 	* duplicados
 	di "PEC1 duplicadas"
-	duplicates list R*_*
+	duplicates list R*_* if ePEC1 == 1
 		
 	* suspendidos
 	list grupo DNI nomcomp PEC1 email if PEC1 < 5, noobs sep(0) N(PEC1)

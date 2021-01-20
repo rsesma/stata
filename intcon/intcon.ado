@@ -1,4 +1,4 @@
-*! version 1.0.0  03jul2020 JM. Domenech, JB.Navarro, R. Sesma
+*! version 1.0.1  20jan2021 JM. Domenech, JB.Navarro, R. Sesma
 /*
 intcon: internal consistency
 */
@@ -48,9 +48,12 @@ program define intcon, rclass
 		local w = "[`weight' `exp']"
 		local wgt = "wgt"
 		if (substr("`weight'",1,1)=="p") local pw 1		// pweight?
+		* aweight not allowed in sem, use iweight instead
+		local ws = "`w'"
+		if (`lweight' & substr("`weight'",1,1)=="a" & "`cont'"!="") local ws = "[iweight `exp']"
 	}
 
-	tempname vp sl se f f2 u2 p scf nm
+	tempname vp sGamma sPsi se f f2 u2 p scf nm R
 	if ("`cont'"!="") {
 		* continuous measures
 		if (`lweight' & `pw') {
@@ -68,9 +71,15 @@ program define intcon, rclass
 			local theta = (`k'/(`k'-1))*(1-1/`vp'[1,1])
 
 			* McDonald’s omega(t)
+/*			v1.0.1: change calculations to use sem 
 			mata: st_numscalar("`sl'", colsum(st_matrix("e(L)")))		// sl: sum of lambdas
 			mata: st_numscalar("`se'", rowsum(st_matrix("e(Psi)")))		// se: sum of errors
-			local omega = `sl'^2 / (`sl'^2 + `se')
+			local omega = `sl'^2 / (`sl'^2 + `se')*/
+			qui sem (F1 -> `varlist')  if `touse' `ws', latent(F1) nocapslatent var(F1@1)
+			qui estat framework, fitted
+			mata: st_numscalar("`sGamma'", colsum(st_matrix("r(Gamma)")))
+			mata: st_numscalar("`sPsi'", colsum(diagonal(st_matrix("r(Psi)"))))
+			local omega = `sGamma'^2 / (`sGamma'^2 + `sPsi')
 
 			* print results
 			di as txt _n "Cronbach's alpha: " _col(24) as res %6.4f `alpha'
@@ -87,6 +96,7 @@ program define intcon, rclass
 	if ("`ord'"!="") {
 		* ordinal measures
 		qui polychoric `varlist' if `touse' `w'
+		matrix `R' = r(R)
 		mata: st_numscalar("`nm'", missing(st_matrix("r(R)")))
 		if (`nm' > 0) {
 			di as txt _n "Polychoric correlation matrix"
@@ -96,7 +106,7 @@ program define intcon, rclass
 		}
 		else {
 			local n = r(N)
-			qui factormat r(R), n(`n') factors(1) forcepsd
+			qui factormat `R', n(`n') factors(1) forcepsd
 			scalar `p' = rowsof(e(L))
 			matrix `vp'= e(Ev)
 
@@ -107,13 +117,16 @@ program define intcon, rclass
 			local pf2 = `p' * `f'^2
 			local alpha_ord = `p' / (`p' - 1) * (`pf2' - `f2') / (`pf2' + `u2')
 
-			* theta ordinal
-			local theta_ord = (`p' / (`p' - 1))*(1-1/`vp'[1,1])
-
 			* omega ordinal
 			mata: st_numscalar("`scf'", colsum(st_matrix("e(L)")))		// scf: sum of factorial charges
 			mata: st_numscalar("`se'", rowsum(st_matrix("e(Psi)")))		// se: sum of errors
 			local omega_ord = `scf'^2 / (`scf'^2 + `se')
+
+			* theta ordinal: add pcf option to factorformat (v1.0.1)
+			qui factormat `R', n(`n') pcf factors(1) forcepsd
+			scalar `p' = rowsof(e(L))
+			matrix `vp'= e(Ev)
+			local theta_ord = (`p' / (`p' - 1))*(1-1/`vp'[1,1])
 
 			* print results
 			di as txt _n "Ordinal alpha: " _col(17) as res %6.4f `alpha_ord'

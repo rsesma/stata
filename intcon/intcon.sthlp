@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.0 03jul2020}{...}
+{* *! version 1.0.1 20jan2021}{...}
 {viewerdialog intcon "dialog intcon"}{...}
 {viewerjumpto "Syntax" "intcon##syntax"}{...}
 {viewerjumpto "Description" "intcon##description"}{...}
@@ -7,6 +7,7 @@
 {viewerjumpto "Stored results" "intcon##results"}{...}
 {viewerjumpto "Version" "intcon##version"}{...}
 {viewerjumpto "Authors" "intcon##authors"}{...}
+{viewerjumpto "References" "intcon##references"}{...}
 {title:Title}
 
 {phang}
@@ -50,7 +51,7 @@ It is important to keep the commands updated. Execute {cmd: adoupdate intcon, up
 Execute {cmd: adoupdate, update} to update {bf:all} the user-written commands.
 
 {p 4 4}
-This command uses the {help alpha}, {help factor} and {help factormat} Stata commands. It also uses the
+This command uses the {help alpha}, {help factor}, {help factormat} and {help sem} Stata commands. It also uses the
 {stata "net describe alphawgt, from(http://fmwww.bc.edu/RePEc/bocode/a)":alphawgt} and
 {stata "net describe polychoric, from(http://staskolenikov.net/stata)":polychoric}
 user defined programs.
@@ -87,7 +88,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.0.0 {hline 2} 03 July 2020
+Version 1.0.1 {hline 2} 20 January 2021
 
 
 {marker authors}{...}
@@ -105,5 +106,12 @@ stata@metodo.uab.cat{p_end}
 
 {p 4 6 2}
 Dom{c e'}nech JM, Navarro JB. Internal Consistency: User-written command intcon for Stata [computer program].{break}
-V1.0.0. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2020.{break}
+V1.0.1. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2021.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
+
+
+{marker references}{...}
+{title:References}
+
+{p 0 2}
+Viladrich C, Angulo A, Doval E. Un viaje alrededor de alfa y omega para estimar la fiabilidad de consistencia interna. Anal. Psicol. [online]. 2017; 33(3): 755-82. Available from {browse "http://dx.doi.org/10.6018/analesps.33.3.268401"}{p_end}

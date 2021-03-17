@@ -1,7 +1,7 @@
 /*
   stai.dlg
 
-*! VERSION 1.1.4  14apr2020
+*! VERSION 1.1.5  17mar2021
 
 */
 
@@ -85,11 +85,11 @@ BEGIN
 	TEXT  		tx_u 	165  	25		90	., label("Unexposed") center
 	TEXT  		tx_e 	280  	@		90	., label("Exposed") center
 	FRAME 		fr1		_lft	50		400		35
-	TEXT  		tx_c 	75  	+7		70	., label("Cases") right
+	TEXT  		tx_c 	75  	+7		70	., label("Events") right
 	EDIT		ed_b	165 	@		90	., numonly max(10000000)
 	EDIT		ed_a	280 	@		90	., numonly max(10000000)
 	FRAME 		fr2		_lft	84		400		35
-	TEXT  		tx_nc 	75  	+7		70	., label("NonCases") right
+	TEXT  		tx_nc 	75  	+7		70	., label("NonEvents") right
 	EDIT		ed_d	165 	@		90	., numonly max(10000000)
 	EDIT		ed_c	280 	@		90	., numonly max(10000000)
 	FRAME 		fr3		150		50		120		69
@@ -100,13 +100,13 @@ BEGIN
 
 	TEXT  		tx_unex 	_col1 	30		145		., label("Unexposed") center
 	FRAME 		fr_unex		80		55		165		345
-	TEXT  		tx_ncases0 	_col1	65		_edw	., label("NonCases") center
-	TEXT  		tx_cases0 	+75		@		_edw	., label("Cases") center
+	TEXT  		tx_ncases0 	_col1	65		_edw	., label("NonEvents") center
+	TEXT  		tx_cases0 	+75		@		_edw	., label("Events") center
 
 	TEXT  		tx_ex 		_col2 	30		145		., label("Exposed") center
 	FRAME 		fr_ex		245		55		165		345
-	TEXT  		tx_ncases 	_col2	65		_edw	., label("NonCases") center
-	TEXT  		tx_cases 	+75		@		_edw	., label("Cases") center
+	TEXT  		tx_ncases 	_col2	65		_edw	., label("NonEvents") center
+	TEXT  		tx_cases 	+75		@		_edw	., label("Events") center
 
 	FRAME 		fr_1	_lft	_y1		_wi		40
 	TEXT  		tx_st1 	_ilft  	+10		60		., label("Str 1") left
@@ -315,34 +315,35 @@ BEGIN
 		}
 	}
 	
-	if main.rb_ex {
+	if (main.rb_ex | main.rb_co) {
 		call program show_nnt
 	}
 	else {
+		call program hide_nnt
+	}
+	if data.cb_str {
 		call program hide_nnt
 	}
 	
 	call main.cb_rare.hide
 	
 	if !data.cb_str {
+		call data.tx_c.setlabel "Events"
+		call data.tx_nc.setlabel "NonEvents"
 		if main.rb_co | main.rb_cs {
 			call data.tx_u.setlabel "Unexposed"
 			call data.tx_e.setlabel "Exposed"
-			call data.tx_c.setlabel "Cases"
-			call data.tx_nc.setlabel "NonCases"
 		}
 		if main.rb_ex {
 			call data.tx_u.setlabel "Treat. 0"
 			call data.tx_e.setlabel "Treat. 1"
-			call data.tx_c.setlabel "Events (1)"
-			call data.tx_nc.setlabel "NonEvents"
 		}		
 	}
 	else {
-		call data.tx_cases0.setlabel "Cases"
-		call data.tx_ncases0.setlabel "NonCases"
-		call data.tx_cases.setlabel "Cases"
-		call data.tx_ncases.setlabel "NonCases"
+		call data.tx_cases0.setlabel "Events"
+		call data.tx_ncases0.setlabel "NonEvents"
+		call data.tx_cases.setlabel "Events"
+		call data.tx_ncases.setlabel "NonEvents"
 	}
 
 END
@@ -353,7 +354,7 @@ BEGIN
 		call program show_rpe
 	}
 		
-	if opt.cb_str {
+	if data.cb_str {
 		call program show_or_ci
 	}
 	
@@ -363,7 +364,7 @@ BEGIN
 	else {
 		call main.cb_rare.hide
 	}
-	
+
 	call program hide_nnt
 	
 	if !data.cb_str {
@@ -431,10 +432,10 @@ BEGIN
 	
 	if main.rb_freq {
 		if !main.rb_cc {
-			call data.tx_cases0.setlabel "Cases"
-			call data.tx_ncases0.setlabel "NonCases"
-			call data.tx_cases.setlabel "Cases"
-			call data.tx_ncases.setlabel "NonCases"
+			call data.tx_cases0.setlabel "Events"
+			call data.tx_ncases0.setlabel "NonEvents"
+			call data.tx_cases.setlabel "Events"
+			call data.tx_ncases.setlabel "NonEvents"
 		}
 		else {
 			call data.tx_cases0.setlabel "Cases"
@@ -473,8 +474,8 @@ BEGIN
 		if main.rb_co | main.rb_cs {
 			call data.tx_u.setlabel "Unexposed"
 			call data.tx_e.setlabel "Exposed"
-			call data.tx_c.setlabel "Cases"
-			call data.tx_nc.setlabel "NonCases"
+			call data.tx_c.setlabel "Events"
+			call data.tx_nc.setlabel "NonEvents"
 		}
 		if main.rb_ex {
 			call data.tx_u.setlabel "Treat. 0"

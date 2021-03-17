@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.4 14apr2020}{...}
+{* *! version 1.1.5 17mar2021}{...}
 {viewerdialog sta "dialog sta"}{...}
 {viewerdialog stai "dialog stai"}{...}
 {viewerjumpto "Syntax" "sta_freq##syntax"}{...}
@@ -47,7 +47,7 @@ The recommended correction is {bf:reciprocal}{p_end}
 {synopt :{opt pe(#)}}proportion of exposed in the population{p_end}
 {synopt :{opt r(#)}}proportion of cases in the population; {bf: case-control} type only{p_end}
 {synopt :{opt rare}}rare disease; {bf: case-control} type only{p_end}
-{synopt :{opt nnt(#)}}compute number needed to treat. The code is 1 for a benefit outcome (default) and 0 for a harmful outcome; {bf:experimental} type only{p_end}
+{synopt :{opt nnt(#)}}compute number needed to treat. The code is 1 for a benefit outcome (default) and 0 for a harmful outcome; {bf:experimental} and {bf:cohort} type only{p_end}
 {synopt :{opt nst(string)}}name of the study (label){p_end}
 {synoptline}
 
@@ -63,7 +63,7 @@ Cross-sectional, cohort, experimental and case-control studies are available. Th
 exposure variables to compute the results.
 
 {p 4 4}
-For experimental studies [{cmd:st(ex)}] the {bf:number needed to treat} may be computed with option {cmd:nnt}.
+For experimental and cohort studies [{cmd:st(ex)}, {cmd:st(co)}] the {bf:number needed to treat} may be computed with option {cmd:nnt}.
 
 {p 4 4}
 For case-control studies [{cmd:st(cc)}] only one of {cmd:r} or {cmd:pe} may be included.
@@ -80,12 +80,12 @@ Newcombe (method 10) and Wald confidence intervals are computed for the Risk Dif
 and {it:#b0} come from a contingency table:{break}
 
 {p 4 4}
-{space 9}{c |}UnExposed{c |} Exposed {c |} Total{break}
-{hline 9}{c +}{hline 9}{c +}{hline 9}{c +}{hline 6} {break}
-{space 3}Cases {c |} {space 2}{bf:a0} {space 2} {c |} {space 2}{bf:a1} {space 2} {c |}{space 2} m1 {break}
-NonCases {c |} {space 2}{bf:b0}  {space 2} {c |} {space 2}{bf:b1}  {space 2} {c |}{space 2} m0 {break}
-{hline 9}{c +}{hline 9}{c +}{hline 9}{c +}{hline 6} {break}
-{space 3}Total {c |} {space 2}n0 {space 2} {c |} {space 2}n1 {space 2} {c |} {space 2}n {break}
+{space 10}{c |}UnExposed{c |} Exposed {c |} Total{break}
+{hline 10}{c +}{hline 9}{c +}{hline 9}{c +}{hline 6} {break}
+{space 3}Events {c |} {space 2}{bf:a0} {space 2} {c |} {space 2}{bf:a1} {space 2} {c |}{space 2} m1 {break}
+NonEvents {c |} {space 2}{bf:b0}  {space 2} {c |} {space 2}{bf:b1}  {space 2} {c |}{space 2} m0 {break}
+{hline 10}{c +}{hline 9}{c +}{hline 9}{c +}{hline 6} {break}
+{space 4}Total {c |} {space 2}n0 {space 2} {c |} {space 2}n1 {space 2} {c |} {space 2}n {break}
 
 
 {marker examples}{...}
@@ -197,9 +197,6 @@ The command stores the following scalars in {cmd:r()}:
 {synopt:{cmd:r(lb_rr)}}Woolf lower bound of CI for {bf:rr}{p_end}
 {synopt:{cmd:r(ub_rr)}}Woolf upper bound of CI for {bf:rr}{p_end}
 {synopt:{cmd:r(se_rr)}}Woolf estimate of standard error of {bf:rr}{p_end}
-{synopt:{cmd:r(nnt)}}number needed to treat (Experimental only){p_end}
-{synopt:{cmd:r(lb_nnt)}}lower bound of CI for {bf:nnt} (Experimental only){p_end}
-{synopt:{cmd:r(ub_nnt)}}upper bound of CI for {bf:nnt} (Experimental only){p_end}
 {synopt:{cmd:r(rdp)}}risk difference in the population ({bf:detail} only){p_end}
 {synopt:{cmd:r(lb_rdp)}}lower bound of CI for {bf:rdp} ({bf:detail} only){p_end}
 {synopt:{cmd:r(ub_rdp)}}upper bound of CI for {bf:rdp} ({bf:detail} only){p_end}

@@ -1,7 +1,7 @@
 /*
   sta.dlg
 
-*! VERSION 1.1.4  14apr2020
+*! VERSION 1.1.5  17mar2021
 
 */
 
@@ -210,11 +210,14 @@ BEGIN
 		}
 	}
 	
-	if main.rb_ex {
+	if (main.rb_ex | main.rb_co) {
 		call program show_nnt
 	}
 	else {
 		call program hide_nnt
+	}
+	if opt.cb_str {
+	    call program hide_nnt
 	}
 	
 	call main.cb_rare.hide
@@ -449,6 +452,9 @@ BEGIN
 	else {
 		call main.rb_cs.enable
 		call main.rb_ex.enable
+		if main.rb_co {
+		    call program show_nnt
+		}
 	}
 END
 

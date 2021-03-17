@@ -1,4 +1,4 @@
-*! version 1.1.4  14apr2020
+*! version 1.1.5  17mar2021
 program sta__utils
 	version 12.0
 	gettoken subcmd 0 : 0
@@ -549,28 +549,10 @@ program define get_cor_results, rclass
 	matrix `res'[5,4] = r(se)
 
 	*Number Needed to Treat
-	if ("`st'"=="ex" & `nnt'>=0) {
-		if (`nnt'==1) {
-			*1 is good outcome - default: use data as is
-			matrix `res'[6,1] = 1/`res'[1,1]
-			matrix `res'[6,2] = 1/`res'[1,3]
-			matrix `res'[6,3] = 1/`res'[1,2]
-		}
-		if (`nnt'==0) {
-			*0 is good outcome - reverse data
-			*Compute Risk difference and Newcombe CI with reverse data: a1 -> a0, n1 -> n0 and viceversa
-			scalar `a1' = `d'[1,2]
-			scalar `n1' = `d'[3,2]
-			matrix define `data' = J(3,3,.)
-			matrix `data'[1,2] = `d'[1,1]
-			matrix `data'[3,2] = `d'[3,1]
-			matrix `data'[1,1] = `a1'
-			matrix `data'[3,1] = `n1'
-			sta__utils get_rd, data(`data') level(`level')
-			matrix `res'[6,1] = 1/r(rd)
-			matrix `res'[6,2] = 1/r(ubn)
-			matrix `res'[6,3] = 1/r(lbn)
-		}
+	if (("`st'"=="ex" | "`st'"=="co") & `nnt'>=0) {
+		matrix `res'[6,1] = 1/`res'[1,1]
+		matrix `res'[6,2] = 1/`res'[1,3]
+		matrix `res'[6,3] = 1/`res'[1,2]
 	}
 	
 	*Detail results (Cuadro 2-2 pg.66 "Estudios de cohortes" (2015) Delgado M, Llorca J, Doménech JM 

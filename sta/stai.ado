@@ -1,4 +1,4 @@
-*! version 1.1.4  14apr2020 JM. Domenech, R. Sesma
+*! version 1.1.5  17mar2021 JM. Domenech, R. Sesma
 /*
 Association Measures - immediate data
 */
@@ -13,7 +13,7 @@ program define stai
 	*/   _incall _res(varname) _exp(varname) _time(varname) _by(varname) _touse(varname)]
 
 	tempname chi2 str_values p d str_zero res
-	
+
 	*Test options
 	if ("`data'"=="") local data "freq"
 	if ("`data'"!="" & "`data'"!="freq" & "`data'"!="pt" & "`data'"!="paired") print_error "data() invalid -- invalid value"
@@ -26,29 +26,29 @@ program define stai
 		foreach par of local params {
 			if ("``par''"!="") print_error "`par'() option is not compatible with paired data"
 		}
-		
+
 		*Print title
 		print_title	paired, st(paired) paired `relatsymm' nst(`nst')
-		
+
 		*Get data
 		local type "paired"
 		if ("`relatsymm'"!="") local type "relatsymm"
 		if ("`_incall'"!="") getdatafromdataset `type', exp(`_exp') res(`_res') time(`_time') by(`_by') touse(`_touse')
 		else getdataimmediate `anything', type(`type')
 		matrix `d' = r(data)
-		
+
 		*Compute results
 		sta__utils get_paired_results, d(`d') level(`level') `relatsymm'
 		matrix define `p' = r(p)
 		matrix define `res' = r(res)
 		matrix define `chi2' = r(chi2)
-		
+
 		*Print tables (if asked)
 		if ("`tables'"=="") print_paired_tables, d(`d') p(`p') exp(`_exp') res(`_res') `relatsymm'
 
 		*Print estimations
 		print_paired_estimations, d(`d') r(`res') level(`level') chi2(`chi2') `relatsymm'
-		
+
 		*Store results
 		store_paired_results, d(`d') r(`res') chi2(`chi2') `relatsymm'
 	}
@@ -57,7 +57,7 @@ program define stai
 		if ("`st'"!="" & "`st'"!="cs" & "`st'"!="co" & "`st'"!="ex" & "`st'"!="cc") print_error "st() invalid -- invalid value"
 		if ("`st'"=="") local st "cs"
 		if ("`data'"=="pt") local st "co"
-	
+
 		if ("`wilson'"!="" & ("`exact'"!="" | "`wald'"!="")) print_error "only one of wilson, exact, wald options is allowed"
 		if ("`exact'"!="" & "`wald'"!="") print_error "only one of wilson, exact, wald options is allowed"
 		if ("`wilson'"!="" | ("`wilson'"=="" & "`exact'"=="" & "`wald'"=="")) local ci = "wilson"	//wilson (default)
@@ -67,7 +67,7 @@ program define stai
 		local or_ci = 0								//Exact OR CI (default)
 		if ("`cornfield'"!="") local or_ci = 1		//Cornfield OR CI
 		if ("`woolf'"!="") local or_ci = 2		 	//Woolf OR CI
-		
+
 		if ("`pearson'"!="" & "`mh'"!="") print_error "pearson and mh options are incompatible"
 		if ("`pearson'"!="" | ("`pearson'"=="" & "`mh'"=="")) local chi2_type = 1	//pearson by default
 		if ("`mh'"!="") local chi2_type = 2
@@ -80,19 +80,19 @@ program define stai
 		if ("`rare'"!="") local rare_disease 1
 		else local rare_disease 0
 		if ("`st'"=="cc" & "`rare'"=="" & `r'==0 & `pe'==0 & "`detail'"!="") print_error "for not rare disease, detail results require r or pe"
-	
-		if ("`st'"!="ex" & "`nnt'"!="") print_error "option nnt is only available for experimental studies"
+
+		if ("`st'"!="ex" & "`st'"!="co" & "`nnt'"!="") print_error "option nnt is only available for cohort and experimental studies"
 		if ("`nnt'"!="" & "`by'"!="") print_error "nnt option not compatible with stratified analysis"
 		if ("`nnt'"=="") local nnt = -1
-	
+
 		if ("`zero'"=="") local zero = "n"				//No zero correction by default
 		if ("`zero'"!="" & "`zero'"!="n" & "`zero'"!="c" & "`zero'"!="p" & "`zero'"!="r") print_error "zero() invalid -- invalid value"
-	
+
 		if ("`method'"=="") local method = "mh"				//Mantel-Haenszel by default
 		if ("`method'"!="" & "`method'"!="mh" & "`method'"!="iv" & "`method'"!="is" & "`method'"!="es") print_error "method() invalid -- invalid value"
-			
+
 		if ("`relatsymm'"!="") print_error "relatsymm option only makes sense with paired data"
-		
+
 		*Print title
 		print_title `data', st(`st') `paired' `relatsymm' nst(`nst')
 
@@ -139,7 +139,7 @@ program define stai
 			if (`nstr'==1) sta__utils get_proportions, d(`d') level(`level') method(`ci')
 			else sta__utils get_str_props, d(`d') str(`str_values') st(`st') type(`data')
 			matrix `p' = r(p)
-			
+
 			*Cross-Sectional, Cohort & Experimental studies
 			local ldec = (`ldec'==1 | `lzero'==1)
 			local rare_disease 0
@@ -158,15 +158,15 @@ program define stai
 			*if (`ldec'==1) print_error "no decimal values allowed"
 			local lzero 0
 			if (`nstr'>1) matrix `str_zero' = J(1,`nstr',0)
-			
+
 			*Get incidence rates
 			if (`nstr'==1) sta__utils get_incidence_rates, d(`d') level(`level')
 			else sta__utils get_str_props, d(`d') str(`str_values') st(`st') type(`data')
 			matrix `p' = r(p)
-			
+
 			if (`nstr'==1) sta__utils get_coi_results, d(`d') level(`level') pe(`pe') detail(`det')
 			else sta__utils get_scoi_results, d(`d') str(`str_values') level(`level') method(`method')
-			matrix define `res' = r(results)			
+			matrix define `res' = r(results)
 		}
 
 
@@ -178,7 +178,7 @@ program define stai
 			}
 			else {
 				print_str_tables `data', d(`d') p(`p') st(`st') nstr(`nstr') str_values(`str_values') /*
-				*/ lzero(`lzero') str_zero(`str_zero') exp(`_exp') res(`_res') time(`_time') str(`_by') 
+				*/ lzero(`lzero') str_zero(`str_zero') exp(`_exp') res(`_res') time(`_time') str(`_by')
 			}
 		}
 
@@ -191,7 +191,7 @@ program define stai
 			print_str_estimations `data', d(`d') res(`res') st(`st') str(`_by') nstr(`nstr') str_values(`str_values') /*
 			*/	 level(`level') method(`method') chi2(`chi2') lzero(`lzero') str_zero(`str_zero') zero(`zero')
 		}
-		
+
 		*Store results
 		if (`nstr'==1) {
 			store_results `data', st(`st') d(`d') res(`res') chi2(`chi2') detail(`det') 	/*
@@ -202,7 +202,7 @@ program define stai
 			*/		nstr(`nstr') str_values(`str_values') or_ci(`or_ci')
 		}
 	}
-	
+
 end
 
 
@@ -214,7 +214,7 @@ program define store_paired_results, rclass
 	return scalar a11 = `d'[1,2]
 	return scalar a00 = `d'[2,1]
 	return scalar a01 = `d'[2,2]
-	
+
 	if ("`relatsymm'"=="") {
 		*Difference
 		return scalar d = `r'[1,1]
@@ -236,7 +236,7 @@ program define store_paired_results, rclass
 		return scalar lb_or_asym = `r'[7,2]
 		return scalar ub_or_asym = `r'[7,3]
 		return scalar se_or_asym = `r'[7,4]
-		
+
 		*Exact Simmetry
 		return scalar p_McNemar = `chi2'[1,2]
 		return scalar chi2_exact = `chi2'[2,1]
@@ -273,18 +273,18 @@ program define store_paired_results, rclass
 		return scalar chi2_cor = `chi2'[2,1]
 		return scalar p_cor = `chi2'[2,2]
 	}
-	
+
 end
 
 program define store_str_results, rclass
 	syntax anything(name=type), st(string) d(name) res(name) chi2(name) nstr(integer) str_values(name) or_ci(real)
-	
+
 	*Save Homogeinity results from previous executions
 	local pW = r(p_chi2W)
 	local chi2W = r(chi2W)
 	local pBD = r(p_chi2BD)
 	local chi2BD = r(chi2BD)
-	
+
 	*2x2 data matrix
 	matrix colnames `d' = Stratum Unexposed Exposed TOTAL
 	local len = `nstr'+1
@@ -296,7 +296,7 @@ program define store_str_results, rclass
 	}
 	matrix rownames `d' = `rnames'
 	return matrix Data = `d'
-	
+
 	*Ratios (RR,OR,IR) matrix
 	tempname r
 	matrix `r' = `res'[1..`len',1..5]
@@ -315,13 +315,13 @@ program define store_str_results, rclass
 	}
 	matrix rownames `r' = `rnames'
 	return matrix Ratios = `r'
-	
+
 	*Estimations
 	matrix `r' = `res'[`nstr'+2..`nstr'+5,1..6]
 	matrix colnames `r' = `c' StdError LowerBound UpperBound p Change
 	matrix rownames `r' = MH IoV IS ES
 	return matrix Estim = `r'
-	
+
 	*Chi2
 	matrix `chi2' = `chi2'[1..4,1..4]
 	matrix colnames `chi2' = Chi2 p Chi2_cor p_cor
@@ -346,7 +346,7 @@ end
 program define store_results, rclass
 	syntax anything(name=type), st(string) d(name) res(name) chi2(name) detail(integer) 	/*
 	*/				r(real) pe(real) p(name) dec(integer) zero(integer) nnt(integer)
-	
+
 	if ("`type'"=="freq") {
 		*2x2 table data
 		return scalar a0 = `d'[1,1]
@@ -358,7 +358,7 @@ program define store_results, rclass
 		return scalar n0 = `d'[3,1]
 		return scalar n1 = `d'[3,2]
 		return scalar n = `d'[3,3]
-		
+
 		*estimation results
 		if ("`st'"=="cs") {
 			*Prevalence difference PD
@@ -382,18 +382,6 @@ program define store_results, rclass
 			return scalar se_rd_wald = `res'[2,4]
 			return scalar lb_rd_wald = `res'[2,2]
 			return scalar ub_rd_wald = `res'[2,3]
-			if ("`st'"=="ex" & `nnt'>=0) {
-				if (`res'[6,3]<0 & `res'[6,2]>0 & `res'[1,1]==0) return scalar nnt = .
-				else return scalar nnt = `res'[6,1]				
-				if (`res'[6,2]>0 & `res'[6,3]>0) {
-					return scalar lb_nnt = `res'[6,2]
-					return scalar ub_nnt = `res'[6,3]
-				}
-				else {
-					return scalar lb_nnt = `res'[6,3]
-					return scalar ub_nnt = `res'[6,2]
-				}
-			}
 			*Risk ratio RR
 			return scalar rr = `res'[3,1]
 			return scalar se_rr = `res'[3,4]
@@ -424,7 +412,7 @@ program define store_results, rclass
 			return scalar pr = `res'[2,1]
 			return scalar pd = `res'[3,1]
 		}
-		
+
 		if (`detail'==1) {
 			*detail results
 			if ("`st'"!="cc") {
@@ -480,10 +468,10 @@ program define store_results, rclass
 					return scalar pfp = `res'[8,1]
 					return scalar lb_pfp = `res'[8,2]
 					return scalar ub_pfp = `res'[8,3]
-				}				
+				}
 			}
 		}
-		
+
 		*Chi2
 		return scalar chi2 = `chi2'[1,1]
 		return scalar p = `chi2'[1,2]
@@ -491,7 +479,7 @@ program define store_results, rclass
 		return scalar p_corr = `chi2'[2,2]
 		if (`dec'==0 | (`dec'==1 & `zero'==1)) return scalar p_exact = `chi2'[3,2]
 	}
-	
+
 	if ("`type'"=="pt") {
 		*2x2 table data
 		return scalar a0 = `d'[1,1]
@@ -503,7 +491,7 @@ program define store_results, rclass
 		return scalar i0 = `p'[1,1]
 		return scalar i1 = `p'[2,1]
 		return scalar i = `p'[3,1]
-		
+
 		*Incidence rate difference ID
 		return scalar id = `res'[1,1]
 		return scalar lb_id = `res'[1,2]
@@ -515,7 +503,7 @@ program define store_results, rclass
 		return scalar se_ir = `res'[3,4]
 		return scalar lb_ir = `res'[3,2]
 		return scalar ub_ir = `res'[3,3]
-		
+
 		if (`detail'==1) {
 			*detail results
 			*Prop. exposed pop.
@@ -544,7 +532,7 @@ program define store_results, rclass
 				return scalar ub_pfp = `res'[7,3]
 			}
 		}
-		
+
 		*Association Chi2
 		return scalar chi2 = `chi2'[1,1]
 		return scalar p = `chi2'[1,2]
@@ -554,12 +542,12 @@ end
 ***GET DATA programs
 program define getdatafromdataset, rclass
 	syntax anything(name=type), exp(varname) res(varname) touse(varname) [time(varname) by(varname)]
-	
+
 	tempname f d t total valid str_values
-	
+
 	qui count if `touse'	//Count number of total rows
 	scalar `total' = r(N)
-	
+
 	if ("`by'"!="") {
 		qui levelsof `by' if `touse'	//get stratum values
 		local values = r(levels)
@@ -570,13 +558,13 @@ program define getdatafromdataset, rclass
 		local nstr = 1
 		matrix define `str_values' = J(1,1,1)
 	}
-	
+
 	if ("`type'"=="freq") {
 		*Get tabulate data
 		if ("`by'"=="") {
 			qui tabulate `res' `exp' if `touse', matcell(`f')
 			scalar `valid' = r(N)
-			
+
 			*Build data matrix
 			matrix `d' = J(3,3,.)
 			matrix `d'[1,1] = `f'[2,1]		//a0
@@ -590,7 +578,7 @@ program define getdatafromdataset, rclass
 			foreach i of numlist 1/`nstr' {
 				local v = `str_values'[1,`i']
 				qui tabulate `res' `exp' if `touse' & `by'==`v', matcell(`f')
-				
+
 				local r1 = 1 + (`i'-1)*3
 				local r2 = `r1'+1
 				local r3 = `r1'+2
@@ -605,7 +593,7 @@ program define getdatafromdataset, rclass
 			//OVERALL
 			qui tabulate `res' `exp' if `touse', matcell(`f')
 			scalar `valid' = r(N)
-			
+
 			local r1 = (`nstr'*3) + 1
 			local r2 = `r1'+1
 			local r3 = `r1'+2
@@ -625,7 +613,7 @@ program define getdatafromdataset, rclass
 			qui collapse (sum) __a=`res' (sum) __t=`time' if `touse', by(`exp')
 			mkmat __a __t, matrix(`f')
 			restore
-		
+
 			*Build data matrix
 			matrix `d' = J(2,3,.)
 			matrix `d'[1,1] = `f'[1,1]		//a0
@@ -642,7 +630,7 @@ program define getdatafromdataset, rclass
 				qui collapse (sum) __a=`res' (sum) __t=`time' if `touse' & `by'==`v', by(`exp')
 				mkmat __a __t, matrix(`f')
 				restore
-				
+
 				local r1 = 1 + (`i'-1)*2
 				local r2 = `r1'+1
 				matrix `d'[`r1',1] = `v'			//stratum
@@ -673,7 +661,7 @@ program define getdatafromdataset, rclass
 		***PAIRED DATA: get tabulate data
 		qui tabulate `res' `exp' if `touse', matcell(`f')
 		scalar `valid' = r(N)
-		
+
 		*Build data matrix
 		matrix `d' = J(3,3,.)
 		matrix `d'[1,1] = `f'[2,1]		//a0
@@ -690,7 +678,7 @@ program define getdatafromdataset, rclass
 	}
 	if (`nstr'==1) mata: get_totals("`d'","","`type'")
 	else mata: get_totals("`d'","`str_values'","`type'")
-	
+
 	*Print valid & total cases
 	di as txt "Valid observations: " as res `valid' as txt " (" as res %5.1f 100*`valid'/`total' as txt "%)"
 	di as txt "Total observations: " as res `total'
@@ -714,7 +702,7 @@ program define getdataimmediate, rclass
 		else local nstr = `nstr'+1
 		gettoken tok t : t
 	}
-	
+
 	*Build stratum matrix
 	if (`nstr'>1) {
 		matrix define `str_values' = J(1,`nstr',.)
@@ -725,7 +713,7 @@ program define getdataimmediate, rclass
 	else {
 		matrix define `str_values' = J(1,1,1)
 	}
-	
+
 	*Build data matrix: Mata
 	mata: get_data_matrix("`data'", "`d'", "`type'")
 	if ("`type'"=="relatsymm") {
@@ -770,14 +758,14 @@ end
 program define print_str_tables
 	syntax anything(name=type), d(name) p(name) st(string) nstr(real) str_values(name) lzero(integer) /*
 	*/	[str_zero(name) exp(varname) res(varname) time(varname) str(varname)]
-	
+
 	if ("`exp'"!="") {
 		*Get variable labels for exposure / response-time / stratum variables
 		sta__utils get_var_labels `exp', abb_name(21) abb_lbl(10)
 		local col_header = r(vname)
 		local col_lb1 = r(lbl0)
 		local col_lb2 = r(lbl1)
-		
+
 		if ("`type'"=="freq") {
 			sta__utils get_var_labels `res', abb_name(17) abb_lbl(17)
 			local row_header = r(vname)
@@ -792,7 +780,7 @@ program define print_str_tables
 			sta__utils get_varlabel `time', len(17)
 			local row_lb2 = r(label)
 		}
-		
+
 		sta__utils get_var_labels `str', abb_name(17) abb_lbl(17)
 		local str_name = r(vname)
 	}
@@ -802,14 +790,22 @@ program define print_str_tables
 		local col_lb1 = "Unexposed"
 		local col_lb2 = "Exposed"
 		local row_header ""
-		local row_lb1 "Cases"
-		local row_lb2 "NonCases"
-		if ("`st'"=="cc") local row_lb2 "Controls"
-		if ("`type'"=="pt") local row_lb2 "Person-time"
+		if ("`st'"!="cc") {
+			local row_lb1 "Events"
+			local row_lb2 "NonEvents"		
+		} 
+		else {
+			local row_lb1 "Cases"
+			local row_lb2 "Controls"
+		}
+		if ("`type'"=="pt") {
+			local row_lb1 "Cases"
+			local row_lb2 "Person-time"
+		}
 		local str_name ""
 	}
-	
-	
+
+
 	*Print header an column labels
 	di ""
 	if ("`col_header'"!="" & "`type'"!="pt") di as res "{lalign 17:`str_name'} {c |}{center 21:`col_header'}{c |}"
@@ -817,24 +813,24 @@ program define print_str_tables
 	if ("`type'"=="freq") di as txt "{bf:{ralign 17:`row_header'}} {c |}{ralign 10:`col_lb1'}{c |}{ralign 10:`col_lb2'}{c |}{ralign 9:TOTAL} {c |}"
 	if ("`type'"=="pt") di as txt "{bf:{ralign 17:`str_name'}} {c |}{ralign 10:`col_lb1'}{c |}{ralign 10:`col_lb2'}{c |}{ralign 9:TOTAL} {c |}"
 	di as txt "{hline 18}{c +}{hline 10}{c +}{hline 10}{c +}{hline 10}{c +}{hline 14}" _c
-	
+
 	local k 1
 	local istr 1
 	local len = rowsof(`d')
 	foreach i of numlist 1/`len' {
 		local v = `d'[`i',1]		//Stratum value
-		
+
 		if (`k'==1 & `v'<. & "`exp'"!="") di as txt _n "{lalign 17:`r(lbl`v')'}" _c
 		if (`k'==1 & `v'<. & "`exp'"=="") di as txt _n "{lalign 17:Stratum `v'}" _c
 		if (`k'==1 & `v'==.) di as txt _n "{lalign 17:OVERALL}" _c
 		if (`k'==1) di as txt _col(19) "{c |}" _col(30) "{c |}" _col(41) "{c |}" _col(52) "{c |}" _c
-		
+
 		if ("`type'"=="freq") {
 			*Zero correction
 			local z " "
 			if (`istr' <= `nstr' & `str_zero'[1,`istr']==1) local z "*"
 			if (`istr' > `nstr' & `lzero'==1) local z "*"
-			
+
 			if (`k'<3) di as txt _n "{ralign 17:`row_lb`k''} {c |} " _c
 			if (`k'==3) di as txt _n _col(19) "{c LT}{hline 10}{c +}{hline 10}{c +}{hline 10}{c RT}" _c
 			if (`k'==3) di as txt _n "{ralign 17:TOTAL} {c |} " _c
@@ -843,7 +839,7 @@ program define print_str_tables
 			if (`k'==2 & "`st'"=="cc") di as txt " Pe0= " as res %8.0g `p'[`istr',2] "`z'" _c
 			if (`k'==3 & "`st'"=="cc") di as txt " OR = " as res %8.0g `p'[`istr',3] "`z'" _c
 			if (`k'==3 & "`st'"!="cc") di as txt " Pe= " as res %9.0g `p'[`istr',1] "`z'" _c
-			
+
 			if (`k'<3) {
 				local k = `k'+1
 			}
@@ -853,19 +849,19 @@ program define print_str_tables
 					di as res %8.0g `p'[`istr',2] " {c |} " %8.0g `p'[`istr',3] " {c |} " %8.0g `p'[`istr',4] " {c |} " _c
 					di as txt "RR= " as res %9.0g `p'[`istr',5] "`z'" _c
 				}
-				
+
 				if (`i'!=`len') di as txt _n "{hline 18}{c +}{hline 10}{c +}{hline 10}{c +}{hline 10}{c +}{hline 14}" _c
 				if (`i'==`len') di as txt _n "{hline 18}{c BT}{hline 10}{c BT}{hline 10}{c BT}{hline 10}{c BT}{hline 14}"
-				
+
 				local k 1
 				local istr = `istr'+1
-			}		
+			}
 		}
 		if ("`type'"=="pt") {
 			di as res _n "{ralign 17:`row_lb`k''} {c |} " _c
 			di as res %8.0g `d'[`i',2] " {c |} " %8.0g `d'[`i',3] " {c |} " %8.0g `d'[`i',4] " {c |}" _c
 			if (`k'==2) di as txt " Pe= " as res %9.0g `p'[`istr',1] "`z'" _c
-			
+
 			if (`k'<2) {
 				local k = `k'+1
 			}
@@ -875,13 +871,13 @@ program define print_str_tables
 				di as txt _n "{ralign 17:Incidence Rate} {c |}" _c
 				di as res %9.0g `p'[`istr',2] " {c |}" %9.0g `p'[`istr',3] " {c |}" %9.0g `p'[`istr',4] " {c |}" _c
 				di as txt " IR= " as res %9.0g `p'[`istr',5] _c
-			
+
 				if (`i'!=`len') di as txt _n "{hline 18}{c +}{hline 10}{c +}{hline 10}{c +}{hline 10}{c +}{hline 14}" _c
 				if (`i'==`len') di as txt _n "{hline 18}{c BT}{hline 10}{c BT}{hline 10}{c BT}{hline 10}{c BT}{hline 14}"
-				
+
 				local k 1
 				local istr = `istr'+1
-			}		
+			}
 
 		}
 	}
@@ -891,14 +887,14 @@ end
 program define print_tables
 	syntax anything(name=type), d(name) st(string) p(name) lzero(integer) level(real) /*
 	*/	method(string) r(real) pe(real) [exp(varname) res(varname) time(varname)]
-	
+
 	if ("`exp'"!="") {
 		*Get variable labels for exposure / response /time variables
 		sta__utils get_var_labels `exp', abb_name(21) abb_lbl(10)
 		local col_header = r(vname)
 		local col_lb1 = r(lbl0)
 		local col_lb2 = r(lbl1)
-		
+
 		if ("`type'"=="freq") {
 			sta__utils get_var_labels `res', abb_name(17) abb_lbl(17)
 			local row_header = r(vname)
@@ -918,19 +914,21 @@ program define print_tables
 		//Defaults labels for immediate calls
 		local row_header
 		local col_header
-		if ("`st'"!="ex" | "`type'"=="pt") {
-			local col_lb1 = "Unexposed "
-			local col_lb2 = "Exposed "
-			local row_lb1 = "Cases"
-			if ("`type'"=="freq") local row_lb2 = "NonCases"
-			if ("`type'"=="pt") local row_lb2 = "Person-time"
-			if ("`type'"=="freq" & "`st'"=="cc") local row_lb2 "Controls"				
-		}
-		else {
-			local row_lb1 = "Events"
-			local row_lb2 = "NonEvents"
+		local col_lb1 "Unexposed "
+		local col_lb2 "Exposed "
+		if ("`st'"=="ex") {
 			local col_lb1 = "Treat.0 "
-			local col_lb2 = "Treat.1 "
+			local col_lb2 = "Treat.1 "		
+		}
+		local row_lb1 "Events"
+		local row_lb2 "NonEvents"
+		if ("`type'"=="freq" & "`st'"=="cc") {
+			local row_lb1 "Cases"
+			local row_lb2 "Controls"
+		}
+		if ("`type'"=="pt") {
+			local row_lb1 "Cases"
+			local row_lb2 = "Person-time"
 		}
 	}
 	local col_lb3 = "TOTAL "
@@ -940,15 +938,15 @@ program define print_tables
 
 	local z " "
 	if (`lzero'==1) local z "*"
-	
+
 	*Print header an column labels
 	if ("`res'"!="") di as txt _n _col(19) "{c |}{bf:{center 21:`exp'}}" _col(41) "{c |}" _c
 	if ("`res'"=="" & (("`st'"=="cs" | "`st'"=="cc"))) di ""
 	if ("`st'"=="cs" | "`st'"=="cc") di as txt _col(52) "{c |}  Exposed proportion" _c
 	foreach i of numlist 0/4 {
 		if (`i'==0) di as res _n "{ralign 17:`row_header'} " _c
-		else if (`i'>0 & `i'<4) di as txt "{c |}{ralign 10:`col_lb`i''}" _c 
-		else if (`i'==4 & ("`st'"=="cs" | "`st'"=="cc")) di as txt "{c |}  `col_lb`i''" _c 
+		else if (`i'>0 & `i'<4) di as txt "{c |}{ralign 10:`col_lb`i''}" _c
+		else if (`i'==4 & ("`st'"=="cs" | "`st'"=="cc")) di as txt "{c |}  `col_lb`i''" _c
 	}
 	di _n "{hline 18}{c +}{hline 10}{c +}{hline 10}{c +}{hline 10}" _c
 	if ("`st'"=="cs" | "`st'"=="cc") di "{c +}{hline 23}" _c
@@ -1004,26 +1002,26 @@ program define print_tables
 		di as txt "{ralign 17:Proportions} {c |} " as res %8.0g r(r0) "`z'{c |} " %8.0g r(r1) "`z'{c |} " %8.0g r(re) "`z'{c |}"
 	}
 	di ""
-	
+
 end
 
 program define print_paired_tables
 	syntax [anything], d(name) p(name) [exp(varname) res(varname) relatsymm]
-	
+
 	if ("`exp'"!="") {
 		*Get variable labels for exposure / response variables
 		sta__utils get_var_labels `exp', abb_name(23) abb_lbl(10)
 		local col_header = r(vname)
 		local col_lb1 = r(lbl0)
 		local col_lb2 = r(lbl1)
-		
+
 		if ("`relatsymm'"=="") {
 			local row_header = ""
 			sta__utils get_var_labels `res', abb_name(18) abb_lbl(10)
 			local c1 = substr("`res'",1,9)
 			local c2 = substr("`res'",10,.)
 			local row_lb1 = r(lbl1)
-			local row_lb2 = r(lbl0)			
+			local row_lb2 = r(lbl0)
 		}
 		else {
 			local row_header = "CHANGE of"
@@ -1054,7 +1052,7 @@ program define print_paired_tables
 		}
 	}
 	local row_lb3 "TOTAL"
-	
+
 	if ("`exp'"=="") di ""
 	di as txt _col(22) "{c |}{bf:{center 21: `col_header'}}{c |}"
 	di as txt "{bf:{lalign 20:`row_header'}} {c |}{ralign 10:`col_lb1'}{c |}{ralign 10:`col_lb2'}{c |}    TOTAL  Proportion"
@@ -1095,7 +1093,7 @@ program define print_str_estimations
 		sta__utils get_varlabel `str', len(17)
 		local str_label = r(label)
 	}
-	
+
 	*Print stratum data & estimations
 	di ""
 	di "{hline 18}{c TT}{hline 44}{c TT}{hline 15}"
@@ -1105,12 +1103,12 @@ program define print_str_estimations
 	if ("`type'"=="pt") di as txt "{ralign 10:IR}" _c
 	di as txt "  Std. Err.  [`level'% Conf. Interval] {c |} " _col(71) upper("`method'") " Weight" _c
 	di _n "{hline 18}{c +}{hline 44}{c +}{hline 15}" _c
-	
+
 	if ("`str'"!="") sta__utils get_var_labels `str', abb_name(17) abb_lbl(17)
 	local len = rowsof(`res')
 	foreach i of numlist 1/`len' {
 		if (`i'<=`nstr') local v = `str_values'[1,`i']
-		
+
 		local z " "
 		if (`i'<=`nstr' & `str_zero'[1,`i']==1) local z "*"
 		if (`i'>`nstr' & `lzero'==1) local z "*"
@@ -1124,7 +1122,7 @@ program define print_str_estimations
 		if (`i'==`nstr'+3) di as txt _n "{ralign 17:Inv. of Variance} {c |} " _c
 		if (`i'==`nstr'+4) di as txt _n "{ralign 17:Internal Std.} {c |} " _c
 		if (`i'==`nstr'+5) di as txt _n "{ralign 17:External Std.} {c |} " _c
-		
+
 		local or_ci = `res'[`i',7]
 		di as res %9.0g `res'[`i',1] "`z' " _c
 		if ((`i'>`nstr'+1 | "`st'"!="cc") | ("`st'"=="cc" & `i'<=`nstr'+1 & `or_ci'==2)) di as res %9.0g `res'[`i',2] _c
@@ -1137,7 +1135,7 @@ program define print_str_estimations
 			print_pct `p'
 		}
 		if (`i'<=`nstr'+1 & "`type'"=="freq" & "`st'"=="cc") di as txt cond(`or_ci'==0," (Exact)",cond(`or_ci'==1," (Cornfield)"," (Woolf)")) _c
-		
+
 		if (`res'[`i',1]<1) {
 			*Reciprocals
 			di as txt _n "{ralign 17:reciprocal} {c |} " _c
@@ -1146,7 +1144,7 @@ program define print_str_estimations
 		}
 	}
 	di _n "{hline 18}{c BT}{hline 44}{c BT}{hline 15}" _c
-	
+
 	*Print MH Chi2
 	di ""
 	di "{hline 18}{c TT}{hline 16}"
@@ -1155,7 +1153,7 @@ program define print_str_estimations
 	local len = rowsof(`chi2')
 	foreach i of numlist 1/`len' {
 		if (`i'<=`nstr') local v = `str_values'[1,`i']
-		
+
 		if (`i'<=`nstr' & "`str'"!="") di as txt _n "{ralign 17:`r(lbl`v')'} {c |} " _c
 		if (`i'<=`nstr' & "`str'"=="") di as txt _n "{ralign 17:Stratum `v'} {c |} " _c
 		if (`i'==`nstr'+1) di _n "{hline 18}{c +}{hline 16}" _c
@@ -1165,13 +1163,13 @@ program define print_str_estimations
 		di as res _n _col(19) "{c |} " %8.0g `chi2'[`i',3] "  " %5.3f `chi2'[`i',4] as txt" Corrected" _c
 	}
 	di _n "{hline 18}{c +}{hline 16}"
-	
+
 	*Print Homogeneity results
 	sta__utils get_homogeneity, d(`d') r(`res') type(`type') st(`st') str(`str_values') method(`method')
 	di as txt "HOMOGENEITY  Wald {c |} " as res %8.0g r(chi2W) "`z' " %5.3f r(p_chi2W) as txt upper(" `method'")
 	if ("`type'"=="freq" & "`st'"=="cc") di as txt "{ralign 17: Breslow-Day} {c |} " as res %8.0g r(chi2BD) "`z' " %5.3f r(p_chi2BD) as txt " MH"
 	di "{hline 18}{c BT}{hline 16}"
-	
+
 	*Print continuity correction warning
 	if (`lzero'==1) {
 		if ("`zero'"=="c") di as txt "(*)Computed with a constant continuity correction (k=0.5)"
@@ -1196,26 +1194,31 @@ program define print_estimations
 	*/	lzero(integer) zero(string) ldec(integer) r(real) pe(real) rare(integer) detail(integer)
 
 	tempname a1 a0 rr b1 or
-	
+
+	*nnt header
+	local nnt_h ""
+	if (("`st'"=="ex" | "`st'"=="co") & `nnt'==1) local nnt_h "Beneficial events"
+	if (("`st'"=="ex" | "`st'"=="co") & `nnt'==0) local nnt_h "Harmful events"
+
 	di ""
 	di as txt "{hline 22}{c TT}{hline 12}{c TT}{hline 31}"
-	di as txt "{txt}{col 23}{c |}{col 26}Estimate{col 36}{c |} Std. Err.  [`level'% Conf. Interval]"
+	di as txt "{txt}`nnt_h'{col 23}{c |}{col 26}Estimate{col 36}{c |} Std. Err.  [`level'% Conf. Interval]"
 	di as txt "{hline 22}{c +}{hline 12}{c +}{hline 31}" _c
-	
+
 	sta__utils get_note		//Get ASCII value for note Recommended CI
 	local note = r(note)
 
 	if ("`type'"=="freq") {
 		local z " "
 		if (`lzero'==1) local z "*"
-		
+
 		local rlabel1 = cond("`st'"=="cs","Prev. Diff. (PD)","Risk Diff. (RD)")
 		local note1 "Newcombe{c `note'}"
 		local rlabel2
 		local note2 "Wald"
 		local rlabel3 = cond("`st'"=="cs","Prev. Ratio (PR)","Risk Ratio (RR)")
 		local note3
-			
+
 		if ("`st'"!="cc") {
 			*Print Risk/Prevalence Difference & Ratio
 			foreach i of numlist 1/3 {
@@ -1244,7 +1247,7 @@ program define print_estimations
 					di as res %9.0g `res'[7,1] "`z' {c |} " _c
 					if (`pe'==0) di as res "(estimated)" _c
 					else di as res "(external)" _c
-					
+
 					*Risk / Prevalence difference in the population
 					if ("`st'"=="cs") di as txt _n "{ralign 21:Prev. Diff. pop.} {c |} " _c
 					else di as txt _n "{ralign 21:Risk Diff. pop.} {c |} " _c
@@ -1267,9 +1270,9 @@ program define print_estimations
 
 					di as txt _n "{hline 22}{c +}{hline 12}{c +}{hline 31}" _c
 				}
-				
-				*For experimental studies, print number needed to treat if asked
-				if (`i'==2 & "`st'"=="ex" & `nnt'>=0) print_nnt, res(`res') lzero(`lzero') detail(`detail')				
+
+				*For experimental/cohort studies, print number needed to treat if asked
+				if (`i'==2 & ("`st'"=="ex" | "`st'"=="co") & `nnt'>=0) print_nnt, res(`res') lzero(`lzero') detail(`detail') nnt(`nnt')
 			}
 		}
 
@@ -1277,7 +1280,7 @@ program define print_estimations
 		local note1 = cond(`ldec'==1,"Woolf",cond("`st'"=="cc","Exact{c `note'}","Cornfield{c `note'}"))
 		local fmt = cond(`ldec'==1,"txt","res")
 
-		local c_or = cond("`st'"=="cs","POR","OR")		
+		local c_or = cond("`st'"=="cs","POR","OR")
 		di as txt _n "{ralign 21:Odds Ratio (`c_or')} {c |} " as res %9.0g `res'[4,1] "`z' {c |} " _c
 		if (`ldec'==0) di as res _col(49) %9.0g `res'[4,2] " " %9.0g `res'[4,3] as `fmt' " `note1'" _c
 		else di as res %9.0g `res'[5,4] "  " %9.0g `res'[5,2] " " %9.0g `res'[5,3] as `fmt' " `note1'" _c
@@ -1293,7 +1296,7 @@ program define print_estimations
 			if (`ldec'==0 & "`st'"=="cc") di as res _n _col(23) "{c |}" _col(36) "{c |} " /*
 			*/	_col(49) %9.0g 1/`res'[9,3] " " %9.0g 1/`res'[9,2] as txt " Cornfield" _c
 			if (`ldec'==0) di as res _n _col(23) "{c |}" _col(36) "{c |} " /*
-			*/	_col(49) %9.0g 1/`res'[5,3] " " %9.0g 1/`res'[5,2] as txt " Woolf" _c		
+			*/	_col(49) %9.0g 1/`res'[5,3] " " %9.0g 1/`res'[5,2] as txt " Woolf" _c
 		}
 		di as txt _n "{hline 22}{c +}{hline 12}{c +}{hline 31}" _c
 
@@ -1312,7 +1315,7 @@ program define print_estimations
 				if (`detail'==1) di as txt _n "Prop. Diff. pop. (PDp){c |} " as res %9.0g `res'[6,1] "`z' {c |}" _c
 				di as txt _n "{hline 22}{c +}{hline 12}{c +}{hline 31}" _c
 			}
-				
+
 			if (`detail'==1) {
 				local c7 = "exp."
 				local c8 = "pop."
@@ -1329,13 +1332,13 @@ program define print_estimations
 				di as txt _n "{hline 22}{c +}{hline 12}{c +}{hline 31}" _c
 			}
 		}
-		
+
 		*Print Association Chi2
 		local c1 =cond(`chi2_type'==1,"","Chi2")
 		local rlabel1 = cond(`chi2_type'==1,"Pearson Chi2","Mantel-Haenszel")
 		local rlabel2 = "Corrected"
 		local rlabel3 = "Fisher Exact Test"
-		
+
 		di as txt _n "Association  `chi'" _col(23) "{c |}" _col(36) "{c |}"_c
 		foreach i of numlist 1/3 {
 			local c2 = cond(`chi2'[3,1]==1 & `i'==1,"**","")
@@ -1354,7 +1357,7 @@ program define print_estimations
 		local rlabel1 "Inc. rate Diff. (ID)"
 		local rlabel2 "Inc. rate Ratio (IR)"
 		local rlabel3
-			
+
 		foreach i of numlist 1/3 {
 			di as txt _n "{ralign 21: `rlabel`i''} {c |} " _c
 			if (inlist(`i',1,2)) di as res %9.0g `res'[`i', 1] "  {c |} " _c
@@ -1365,7 +1368,7 @@ program define print_estimations
 			if (`i'==2) di as res " Exact{c `note'}" _c
 			if (`i'==1) di as txt _n "{hline 22}{c +}{hline 12}{c +}{hline 31}" _c
 		}
-		
+
 		if (`detail'==1) {
 			local c4 "exp."
 			local c7 "pop."
@@ -1396,7 +1399,7 @@ program define print_estimations
 		di as txt " p= " as res %6.4f `chi2'[1,2] as txt " (2-sided)"  _c
 		di as txt _n "{hline 22}{c BT}{hline 12}{c BT}{hline 10}"
 	}
-	
+
 	*Print WARNINGS
 	di as txt "{c `note'}Recommended CI"
 	if ("`type'"=="freq" & `lzero'==1) {
@@ -1410,10 +1413,10 @@ end
 
 program define print_paired_estimations
 	syntax [anything], d(name) r(name) chi2(name) level(real) [relatsymm]
-	
+
 	sta__utils get_note		//Get ASCII value for note Recommended CI
 	local note = r(note)
-	
+
 	local a0 = `d'[1,1]
 	local a1 = `d'[1,2]
 	local b0 = `d'[2,1]
@@ -1423,7 +1426,7 @@ program define print_paired_estimations
 	di "{hline 21}{c TT}{hline 12}{c TT}{hline 32}"
 	di as txt _col(22) "{c |}  Estimate  {c |} Std. Err.  [`level'% Conf. Interval]"
 	di "{hline 21}{c +}{hline 12}{c +}{hline 32}" _c
-	
+
 	if ("`relatsymm'"=="") {
 		local row_headers "Difference" "Pr(Y+)-Pr(X+)" " " " "
 		local notes Exact Newcombe Asymptotic A.correct.
@@ -1435,14 +1438,14 @@ program define print_paired_estimations
 			else di _col(35) "{c |} " _c
 			if (`i'==3) di as res %9.0g `r'[`i',4] "  " _c
 			else di _col(48) _c
-			di as res %9.0g `r'[`i',2] "  " %9.0g `r'[`i',3] " " _c 
+			di as res %9.0g `r'[`i',2] "  " %9.0g `r'[`i',3] " " _c
 
 			local c : word `i' of `notes'
 			di as txt "`c'" _c
 			if (`i'==2) di as txt "{c `note'}" _c
 			if (`i'==4) di as txt _n _col(22) "{c |}" _col(35) "{c |}" _c
 		}
-		
+
 		*Odds ratio
 		di as txt _n "{ralign 20:Odds ratio (OR)} {c |} " _c
 		if (`b1'>0) di as res %9.0g `r'[5,1] "  {c |} " _c
@@ -1468,7 +1471,7 @@ program define print_paired_estimations
 			di as res _n _col(22) "{c |}" _col(35) "{c |} " %9.0g 1/`r'[6,3] "   infinity" as txt " Wilson" _c
 		}
 		di _n "{hline 21}{c +}{hline 12}{c +}{hline 32}" _c
-		
+
 		*Exact simmetry & Test of Association
 		local row_headers "McNemar matched-pair" "Chi-Square" "Corrected" "OR" "Chi-Square" "Corrected"
 		foreach i of numlist 1/6 {
@@ -1514,10 +1517,10 @@ program define print_paired_estimations
 			if (`i'==2) di as txt "{c `note'}" _c
 			if (`i'>2 & `r'[`i',1]<1) di as txt _n "{ralign 20:reciprocal} {c |} " as res %9.0g 1/`r'[`i',1] /*
 			*/		"  {c |} " _col(48) %9.0g 1/`r'[`i',3] "  " %9.0g 1/`r'[`i',2] _c
-			if ((`i'==3 | `i'==4) & `a1'==0) di as txt _n "{ralign 20:reciprocal} {c |}  infinity" _col(35) "{c |}" _c			
+			if ((`i'==3 | `i'==4) & `a1'==0) di as txt _n "{ralign 20:reciprocal} {c |}  infinity" _col(35) "{c |}" _c
 		}
 		di _n "{hline 21}{c +}{hline 12}{c +}{hline 32}" _c
-		
+
 		*Relative simmetry
 		local row_headers "Chi-Square" "Corrected" "OR"
 		foreach i of numlist 1/2 {
@@ -1540,44 +1543,63 @@ program define print_paired_estimations
 end
 
 program define print_nnt
-	syntax [anything], res(name) lzero(integer) detail(integer)
+	syntax [anything], res(name) lzero(integer) detail(integer) nnt(integer)
 
 	tempname nn lb ub
-	scalar `nn' = `res'[6,1]
-	scalar `lb' = `res'[6,2]
-	scalar `ub' = `res'[6,3]
+
+	scalar `nn' = abs(`res'[6,1])
+	scalar `lb' = min(abs(`res'[6,2]),abs(`res'[6,3]))
+	scalar `ub' = max(abs(`res'[6,2]),abs(`res'[6,3]))
+
+	local p = `res'[6,2]>0 & `res'[6,3]>0
+	local n = `res'[6,2]<0 & `res'[6,3]<0
+	local np = (`res'[6,2]<0 & `res'[6,3]>0) | (`res'[6,3]<0 & `res'[6,2]>0)
+	local zero = (`res'[1,1]==0)
 
 	local z " "
 	if (`lzero'==1) local z "*"
 
-	local p = `lb'>0 & `ub'>0
-	local n = `lb'<0 & `ub'<0
-	local np = `ub'<0 & `lb'>0
-	local zero = (`res'[1,1]==0)
-	
 	*Print NNT and bounds
-	if (`detail'==0) di as txt _n "{hline 22}{c +}{hline 12}{c +}{hline 31}" _c
-	
-	di as txt _n "Number needed to treat{c |} " as res _c
-	if (`np'==1 & `zero'==1) di as res "{ralign 9:infinity}  {c |}" _c
-	else di as res %9.0g `nn' "`z' {c |}" _c
-	if (`p'==1) di as res _col(46) %9.0g `lb' as txt " to " as res %9.0g `ub' _c
-	else  di as res _col(46) %9.0g `ub' as txt " to " as res %9.0g `lb' _c
-	di as txt " Newcombe" _c
-	if (`p'==1) di as txt _n "{ralign 21:Benefit (NNTB)} {c |}" _col(36) "{c |}" _c
-	if (`n'==1) di as txt _n "{ralign 21:Harm (NNTH)} {c |}" _col(36) "{c |}" /*
-	*/			as res _col(46) %9.0g abs(`ub') as txt " to " as res %9.0g abs(`lb') _c
-	if (`np'==1) di as txt _n "{ralign 21:Benefit (NNTB)} {c |}" _col(36) "{c |}" /*
-	*/			as res _col(46) %9.0g `lb' as txt " to " as res "infinity" _c
-	if (`np'==1) di as txt _n "{ralign 21:Harm (NNTH)} {c |}" _col(36) "{c |}" /*
-	*/			as res _col(46) %9.0g abs(`ub') as txt " to " as res "infinity" _c
-	display as text _n "{hline 22}{c +}{hline 12}{c +}{hline 31}" _c	
-	
+	if (`detail'==0) di as txt _n "{hline 22}{c +}{hline 12}{c +}{hline 31}"
+	else di as txt _n _c
+
+	if (`p'==1 | `n'==1) { 
+		*CI positive or negative
+		if ((`p'==1 & `nnt'==1) | (`n'==1 & `nnt'==0)) local header = "NNT Benefit (NNTB)"
+		if ((`p'==1 & `nnt'==0) | (`n'==1 & `nnt'==1)) local header = "NNT Harm (NNTH)"
+		di as txt "{ralign 21:`header'} {c |} " as res %9.0g `nn' "`z' {c |}" _c
+		di as res _col(46) %9.0g `lb' as txt " to " as res %9.0g `ub' as txt " Newcombe"
+	}
+	if (`np'==1) {
+		*CI negative AND positive
+		di as txt "{ralign 21:NNT Benefit (NNTB)} {c |} " _c
+		if ((`res'[1,1]>=0 & `nnt'==1) | (`res'[1,1]<=0 & `nnt'==0)) {
+			if (`res'[1,1]!=0) di as res %9.0g `nn' "`z' {c |}" _c
+			else di as txt " infinity  {c |}" _c		// RD = 0, nnt -> infinity
+			di as res _col(46) %9.0g `lb' _c
+		}
+		if ((`res'[1,1]>0 & `nnt'==0) | (`res'[1,1]<0 & `nnt'==1)) {
+			di as res _col(36) "{c |}" _col(46) %9.0g `ub' _c
+		}
+		di as txt " to  infinity Newcombe"
+		
+		di as txt "{ralign 21:NNT Harm (NNTH)} {c |} " _c
+		if ((`res'[1,1]>=0 & `nnt'==1) | (`res'[1,1]<=0 & `nnt'==0)) {
+			if (`res'[1,1]!=0) di as res _col(36) "{c |}" _c
+			else di as txt " infinity  {c |}" _c		// RD = 0, nnt -> infinity
+			di as res _col(46) %9.0g `ub' _c
+		}
+		if ((`res'[1,1]>0 & `nnt'==0) | (`res'[1,1]<0 & `nnt'==1)) {
+			di as res %9.0g `nn' "`z' {c |}" _col(46) %9.0g `lb' _c
+		}
+		di as txt " to  infinity Newcombe"
+	}
+	di as txt "{hline 22}{c +}{hline 12}{c +}{hline 31}" _c
 end
 
 program define print_error
 	args message
-	display in red "`message'" 
+	display in red "`message'"
 	exit 198
 end
 
@@ -1588,10 +1610,10 @@ void get_totals(string scalar data, string scalar stratum, string scalar type)
 {
 	real matrix d, str, sub, t
 	real scalar i, val, len
-	
+
 	if (type=="freq" | type=="paired") len = 3
 	if (type=="pt") len = 2
-	
+
 	d = st_matrix(data)
 	if (stratum != "") {
 		str = st_matrix(stratum)
@@ -1630,7 +1652,7 @@ void get_totals(string scalar data, string scalar stratum, string scalar type)
 			d[3,3] = t[1,1]+t[1,2]		//n=n1+n0
 		}
 	}
-	
+
 	st_matrix(data,d)
 }
 end
@@ -1644,10 +1666,10 @@ void get_data_matrix(string scalar data, string scalar m, string scalar type)
 	real scalar i, len, str, rows, cols, j
 	real scalar a1, a0, b1, b0
 	string scalar c
-	
+
 	if (type=="freq" | type=="paired" | type=="relatsymm") len = 3
 	if (type=="pt") len = 2
-	
+
 	t = tokens(data,"\")
 	str = (cols(t)+1)/2		//Number of strata
 
@@ -1666,7 +1688,7 @@ void get_data_matrix(string scalar data, string scalar m, string scalar type)
 	//Populate matrix with immediate data
 	a1 = 0
 	a0 = 0
-	b1 = 0 
+	b1 = 0
 	b0 = 0
 	i = 1
 	for (j=1; j<=cols(t); j++) {
@@ -1689,7 +1711,7 @@ void get_data_matrix(string scalar data, string scalar m, string scalar type)
 				b1 = b1 + st[1,3]
 				b0 = b0 + st[1,4]
 			}
-			
+
 			i = i + 1
 		}
 	}
@@ -1700,7 +1722,7 @@ void get_data_matrix(string scalar data, string scalar m, string scalar type)
 		d[2+str*len,2+offset] = b1
 		d[2+str*len,1+offset] = b0
 	}
-	
+
 	st_matrix(m,d)
 }
 end

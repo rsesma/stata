@@ -1,4 +1,4 @@
-*! version 1.1.9  21oct2019 JM. Domenech, R. Sesma
+*! version 1.2.0  26apr2021 JM. Domenech, R. Sesma
 
 /*
 Agreement: Passing-Bablok & Bland-Altman methods
@@ -249,6 +249,9 @@ program agree, byable(recall) sortpreserve rclass
 	    local b = `R'[1,1]			//Put Mata results in Stata macros
 	    local b_lo = `R'[1,2]
 	    local b_up = `R'[1,3]
+		local total_sij = `R'[1,4]
+		local dbl_ties = `R'[1,5]
+		local simp_ties = `R'[1,6]
 
 	    * compute the i elements for the a estimation; use tabstat median
 	    quietly {
@@ -280,6 +283,14 @@ program agree, byable(recall) sortpreserve rclass
 	    di as txt " A = " as res %9.0g `a' as txt "  (`level'% CI: " as res %9.0g `a_lo' as txt " to " as res %9.0g `a_up' as txt ")"
 	    di as txt " B = " as res %9.0g `b' as txt "  (`level'% CI: " as res %9.0g `b_lo' as txt " to " as res %9.0g `b_up' as txt ")"
 	    di as txt "{hline 48}"
+		if (`dbl_ties'>0 | `simp_ties'>0) {
+			di as txt "Ties: `dbl_ties' double ties out of `total_sij' slopes were excluded"
+			di as txt _col(7) "`simp_ties' simple ties in the denominator of the slopes"
+			di as txt _col(7) "were assigned to + or - infinity" _n
+		}
+		else {
+			di as txt "Ties: 0 ties out of `total_sij' slopes" _n
+		}
 
 	    * save results
 	    return scalar a = `a'
@@ -329,7 +340,7 @@ program agree, byable(recall) sortpreserve rclass
 	        local ciup "(function y = `a_up' +  `b_up' * x, range(`x') lcolor(black) lpattern(dash))"
 	    }
 		local pb_title = cond("`title'"=="","Passing Bablok Regression line","`title'")
-	    graph twoway (scatter `y' `x', mfcolor(none) msize(medlarge) mcolor(black)) `cilo' `ciup'	/*
+	    graph twoway (scatter `y' `x', mfcolor(none) msize(medium) mcolor(black)) `cilo' `ciup'	/*
 	    */	(function y = `a' +  `b' * x, range(`x') lcolor(black) lpattern(solid)) if `touse',		/*
 	    */	legend(off) ytitle("`y'", margin(small))		/*
 	    */	xtitle("`x'", margin(small))		/*
@@ -337,6 +348,18 @@ program agree, byable(recall) sortpreserve rclass
 		*/  subtitle("`nst'", margin(small))   /*
 	    */	name("pb`ngraph'", replace)
 
+		* graphic: Passing-Bablok residuals
+	    tempvar yi
+		generate `yi' = `y' - (`a' + `b'* `x')
+		local pb_title = cond("`title'"=="","Passing Bablok Regression: residuals","`title': residuals")
+	    graph twoway (scatter `yi' `x', mfcolor(none) msize(medium) mcolor(black))	/*
+	    */	(function y = 0, range(`x') lcolor(black) lpattern(solid)) if `touse',		/*
+	    */	legend(off) ytitle("`y' - F(x)", margin(small))		/*
+	    */	xtitle("`x'", margin(small))		/*
+	    */	title("`pb_title' `ntitle'", margin(vsmall))  /*
+		*/  subtitle("`nst'", margin(small))   /*
+	    */	name("pb_res`ngraph'", replace)
+		
 		* list input data
 	    if ("`list'"!="") {
 	        local id_list = cond("`id'"=="","`s'","`id'")
@@ -386,6 +409,7 @@ void getpbcoef(string scalar varx, string scalar vary, real scalar level, string
 	real scalar Sij, Sk
 	real scalar N, K, even
 	real scalar b, c, M1, M2, l, u
+	real scalar cnt, dbl, sim
 
 	//Get X, Y data from current dataset
 	X = st_data(., varx, touse)
@@ -394,11 +418,24 @@ void getpbcoef(string scalar varx, string scalar vary, real scalar level, string
 	//Compute the Sij elements (Passing and Bablok, J. Clin. Chem. Clin. Biochem. / Vol.21,1983 / No.11, pg.711)
 	lfirst = 1
 	len = rows(X)
+	cnt = 0
+	dbl = 0
+	sim = 0
 	for (i=1; i<=len; i++) {
 		for (j=i+1; j<=len; j++) {
-			//Measurements with Xi = Xj or Yi = Yj do not contribute to the estimation of B
-			if (Y[i]!=Y[j] & X[i]!=X[j]) {
-				Sij = (Y[i] - Y[j]) / (X[i] - X[j])
+			//Measurements with Xi = Xj and Yi = Yj do not contribute to the estimation of B
+			if (Y[i]!=Y[j] | X[i]!=X[j]) {
+				if (X[i]!=X[j]) {
+					Sij = (Y[i] - Y[j]) / (X[i] - X[j])
+				}
+				else {
+					//If Xi = Xj and yi > yj, the result is +infinite. Enter a large positive number
+					//If Xi = Xj and yi < yj, the result is −infinite. Enter a large negative number
+					//Since we are using the median of the Sij, the value won’t matter
+					if (Y[i]>Y[j])  Sij = 10^18
+					else Sij = -10^18
+					sim = sim + 1
+				}					
 				//Any Sij with a value of -1 is also disregarded
 				if (Sij!=-1) {
 					Sk = (Sij<-1)
@@ -411,6 +448,10 @@ void getpbcoef(string scalar varx, string scalar vary, real scalar level, string
 					}
 				}
 			}
+			else {
+				dbl = dbl + 1
+			}
+			cnt = cnt + 1
 		}
 	}
 	S = sort(S,1)			//Sort the Sij results
@@ -429,6 +470,6 @@ void getpbcoef(string scalar varx, string scalar vary, real scalar level, string
 	u = S[M2+K,1]
 
 	//Save results in Stata matrix
-	st_matrix(res,(b,l,u))
+	st_matrix(res,(b,l,u,cnt,dbl,sim))
 }
 end

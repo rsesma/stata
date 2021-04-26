@@ -512,7 +512,7 @@ program define export_data
 		keep if entrega==1
 		if ("`curso'"=="ST1") local name = "`curso'_`periodo'_PEC2_datos"
 		if ("`curso'"=="ST2") local name = "`curso'_`periodo'_PEC1_datos"
-		export delimited ape1 ape2 nombre DNI honor P*_* using "$dir/`name'.txt", delimiter(",") novarnames nolabel quote replace
+		export delimited ape1 ape2 nombre DNI honor P*_* using "$dir/`name'.txt" if copia == 0, delimiter(",") novarnames nolabel quote replace
 		restore
 	}
 	di "Proceso finalizado"
@@ -520,26 +520,20 @@ end
 
 program define alumnos
 	version 15
-	syntax [anything], using(string)
+	syntax [anything], dta(string) using(string)
 
-	local files : dir "$dir" files "*.dta", respectcase
-	foreach f in `files' {
-		if (strpos("`f'","sol")==0) local dta = "`f'"
-	}
-	use "$dir/`dta'", clear
+	tempfile f
 
 	quietly{
-		drop ePEC1 hPEC1 correg honor problema R*_* T*_* P*_* w*
-		drop if missing(NOTA)
-		save "$dir/__alumnos.dta", replace
-
 		use "`using'", clear
-		append using "$dir/__alumnos.dta"
-		save, replace
-
-		erase "$dir/__alumnos.dta"
+		keep periodo curso DNI grupo nombre ape1 ape2 nomcomp PC fijo clase entrega PEC0 PEC1 PEC NOTA copia IDcopia coment prov pobl trabajo email
+		drop if missing(NOTA)
+		save `f', replace
+		
+		use "`dta'", clear
+		append using `f'
 	}
-	di "Proceso finalizado"
+	di "Proceso finalizado; datos no grabados"
 end
 
 program define getxlsx

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.1.9 21oct2019}{...}
+{* *! version 1.2.0 26apr2021}{...}
 {viewerdialog agree "dialog agree"}{...}
 {viewerjumpto "Syntax" "agree##syntax"}{...}
 {viewerjumpto "Description" "agree##description"}{...}
@@ -128,7 +128,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.1.9 {hline 2} 21 October 2019
+Version 1.2.0 {hline 2} 26 April 2021
 
 
 {marker authors}{...}
@@ -146,17 +146,12 @@ stata@metodo.uab.cat{break}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Passing-Bablok & Bland-Altman methods: User-written command agree for Stata [computer program].{break}
-V1.1.9. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2019.{break}
+V1.2.0. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2021.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
 {marker references}{...}
 {title:References}
-
-{p 0 2}
-Bablok W, Passing H, Bender R, Schneider B. A general regression procedure for method transformation. Application
-of linear regression procedures for method comparison studies in clinical chemistry. Part III. J Clin
-Chem Clin Biochem. 1988;26:783-90.{p_end}
 
 {p 0 2}
 Bland M, Altman DG. Statistical methods for assessing agreement between two methods of clinical measurement. Lancet. 1986;1:307-10.{p_end}
@@ -178,6 +173,10 @@ Lin LI. Concordance Correlation Coefficient to Evaluate Reproducibility. Biometr
 Lin LI. Assay Validation Using the Concordance Correlation Coefficient. Biometrics. 1992;48:599-604.{p_end}
 
 {p 0 2}
+Passing H, Bablok W. Application of statistical procedures in analytical instrument testing. J Automat
+Chem. 1985;7(2):74-9.{p_end}
+
+{p 0 2}
 Passing H, Bablok W. A new biometrical procedure for testing the equality of measurements from two different
 analytical methods. Application of linear regression procedures for method comparison studies in clinical
 chemistry. Part I. J Clin Chem Clin Biochem. 1983;21:709-20.{p_end}
@@ -188,5 +187,6 @@ of sample size. Application of linear regression procedures for method compariso
 chemistry. Part II. J Clin Chem Clin Biochem. 1984;22:431-45.{p_end}
 
 {p 0 2}
-Passing H, Bablok W. Application of statistical procedures in analytical instrument testing. J Automat
-Chem. 1985;7(2):74-9.{p_end}
+Bablok W, Passing H, Bender R, Schneider B. A general regression procedure for method transformation. Application
+of linear regression procedures for method comparison studies in clinical chemistry. Part III. J Clin
+Chem Clin Biochem. 1988;26:783-90.{p_end}

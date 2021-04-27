@@ -1,4 +1,4 @@
-*! version 1.2.0  26apr2021 JM. Domenech, R. Sesma
+*! version 1.2.1  27apr2021 JM. Domenech, R. Sesma
 
 /*
 Agreement: Passing-Bablok & Bland-Altman methods
@@ -179,7 +179,7 @@ program agree, byable(recall) sortpreserve rclass
 			local c = cond(`i'==1,"Difference (Y-X)","100*(Y-X)/Average")
 			local reg = cond("`line'"=="","","(lfit `vx' `yx2')")
 			local ba_title = cond("`title'"=="","Bland-Altman Agreement","`title'")
-			graph twoway (scatter `vx' `yx2', mfcolor(none) msize(medlarge) mcolor(black)) `reg'	/*
+			graph twoway (scatter `vx' `yx2', mfcolor(none) msize(medium) mcolor(black)) `reg'	/*
 			*/	(function y = `bias', range(`x') lcolor(black) lpattern(solid))			/*
 			*/	(function y = `up', range(`x') lcolor(black) lpattern(dash))	/*
 			*/	(function y = `lo', range(`x') lcolor(black) lpattern(dash)) 			/*
@@ -195,16 +195,16 @@ program agree, byable(recall) sortpreserve rclass
 		di as txt _n "Tests of Normality (Y-X)   Statistic    p-value"
 		di as txt "{hline 47}"
 		qui swilk `yx' if `touse'
-		di as txt "Shapiro-Wilk" _col(29) "W = " as res %7.4f `r(W)' "  " %6.4f `r(p)'
+		di as txt "Shapiro-Wilk" _col(29) "W = " as res %7.0g `r(W)' "  " %6.4f `r(p)'
 		return scalar W = `r(W)'			// save
 		return scalar p_W = `r(p)'
 		qui su `yx' if `touse', detail
 		local skew = r(skewness)
 		local kurt = r(kurtosis)-3
 		qui sktest `yx' if `touse'
-		di as txt "Skewness" _col(28) "Sk = " as res %7.4f `skew' "  " %6.4f `r(P_skew)'
-		di as txt "Kurtosis-3" _col(28) "Ku = " as res %7.4f `kurt' "  " %6.4f `r(P_kurt)'
-		di as txt "Skewness & Kurtosis" _col(26) "Chi2 = " as res %7.4f `r(chi2)' "  " %6.4f `r(P_chi2)'
+		di as txt "Skewness" _col(28) "Sk = " as res %7.0g `skew' "  " %6.4f `r(P_skew)'
+		di as txt "Kurtosis-3" _col(28) "Ku = " as res %7.0g `kurt' "  " %6.4f `r(P_kurt)'
+		di as txt "Skewness & Kurtosis" _col(26) "Chi2 = " as res %7.0g `r(chi2)' "  " %6.4f `r(P_chi2)'
 		di as txt "{hline 47}"
 		return scalar sk = `skew'			// save
 		return scalar p_sk = `r(P_skew)'
@@ -286,7 +286,7 @@ program agree, byable(recall) sortpreserve rclass
 		if (`dbl_ties'>0 | `simp_ties'>0) {
 			di as txt "Ties: `dbl_ties' double ties out of `total_sij' slopes were excluded"
 			di as txt _col(7) "`simp_ties' simple ties in the denominator of the slopes"
-			di as txt _col(7) "were assigned to + or - infinity" _n
+			di as txt _col(7) "were assigned to + or -10^18 (infinity)" _n
 		}
 		else {
 			di as txt "Ties: 0 ties out of `total_sij' slopes" _n

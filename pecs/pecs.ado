@@ -76,7 +76,7 @@ program define open
 		* mover el pdf con el SO
 		shell $mv `orig' `corr'
 		* abrir el pdf con winexec
-		winexec "$reader" "`corr'"
+		winexec "$reader" /A "page=2" "`corr'"
 		* ruta del archivo sintaxis
 		local name "`dni'.do"
 		mata: st_local("sint", pathjoin(st_global("dir"),st_local("curso")))
@@ -526,6 +526,11 @@ program define alumnos
 
 	quietly{
 		use "`using'", clear
+		capture confirm variable PEC0 PEC1
+		if (_rc>0) {
+			gen PEC0 = .
+			gen PEC1 = .
+		}
 		keep periodo curso DNI grupo nombre ape1 ape2 nomcomp PC fijo clase entrega PEC0 PEC1 PEC NOTA copia IDcopia coment prov pobl trabajo email
 		drop if missing(NOTA)
 		save `f', replace

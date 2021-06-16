@@ -1,4 +1,4 @@
-*! version 1.2.1  27apr2021 JM. Domenech, R. Sesma
+*! version 1.2.2  30apr2021 JM. Domenech, R. Sesma
 
 /*
 Agreement: Passing-Bablok & Bland-Altman methods
@@ -10,7 +10,7 @@ program agree, byable(recall) sortpreserve rclass
 	*/	[pb ba Level(numlist max=1 >=50 <100) pct line list /*
 	*/	 id(varname numeric) ci title(string) nst(string)]
 
-	tempvar yx xy yx2 yxpct diff ai ai_lo ai_up sort d r cusumi sort idv s
+	tempvar yx xy yx2 yxpct diff ai ai_lo ai_up sort d r cusumi sort idv s yi
 	tempname D S N R A bias sd t z lo up se bias_se
 
 
@@ -307,27 +307,35 @@ program agree, byable(recall) sortpreserve rclass
 	        * Di distances
 	        gen `d' = (`y' + (1/`b')*`x' - `a')/sqrt(1+1/(`b'^2)) if `touse'
 	        sort `touse' `d'					// sort to compute the number of points
-	        count if `touse' & (`y' > `a'+`b'*`x')
+			gen `yi' = `a'+`b'*`x'				// PB regression line prediction
+			count if `touse' & (`y' > `yi')
 	        local l_sup = r(N)					// number of points with Yi > a + bXi
-	        count if `touse' & (`y' < `a'+`b'*`x')
+	        count if `touse' & (`y' < `yi')
 	        local l_inf = r(N)					// number of points with Yi < a + bXi
 	        * ri scores
-	        gen `r' = 0 if `touse'
-	        replace `r' = sqrt(`l_inf'/`l_sup') if `touse' & (`y' > `a'+`b'*`x')
-	        replace `r' = -sqrt(`l_sup'/`l_inf') if `touse' & (`y' < `a'+`b'*`x')
+	        gen `r' = . if `touse'
+	        replace `r' = sqrt(`l_inf'/`l_sup') if `touse' & (`y' > `yi')
+	        replace `r' = -sqrt(`l_sup'/`l_inf') if `touse' & (`y' < `yi')
+	        replace `r' = 0 if `touse' & (`y' == `yi')
 	        gen `cusumi' = sum(`r') if `touse'		// cumulative sum
 	        replace `cusumi' = abs(`cusumi') if `touse'
 	        summarize `cusumi' if `touse'
 	        local cusum = r(max)					// the maximum value marks the test
 	        sort `s'
 	    }
-	    local sqrl = sqrt(`l_sup'+1)
-	    if (`cusum'>1.63*`sqrl') local c "p < 0.01"
-	    if ((`cusum'<=1.63*`sqrl') & (`cusum'>1.36*`sqrl')) local c "p < 0.05"
-	    if ((`cusum'<=1.36*`sqrl') & (`cusum'>1.22*`sqrl')) local c "p < 0.10"
-	    if ((`cusum'<=1.22*`sqrl') & (`cusum'>1.07*`sqrl')) local c "p < 0.20"
-	    if (`cusum'<=1.07*`sqrl') local c "p > 0.20"
-	    di as txt "Linearity Test (CUSUM Test for deviation from linearity):   {bf:`c'}"
+	    local H = `cusum'/sqrt(`l_inf'+1)
+		* the CUSUM test for deviation from linearity is computed with critical values obtained 
+		* from the Kolmogorov-Smirnov test
+		if (`H' > 1.94947) local c "p < 0.001"
+		else if (`H'>1.62762) local c "p between 0.001 & 0.01"
+		else if (`H'>1.51743) local c "p between 0.01 & 0.02"
+		else if (`H'>1.35810) local c "p between 0.02 & 0.05"
+		else if (`H'>1.22385) local c "p between 0.05 & 0.10"
+		else if (`H'>1.13795) local c "p between 0.10 & 0.15"
+		else if (`H'>1.07275) local c "p between 0.15 & 0.20"
+		else if (`H'<=1.07275) local c "p > 0.20"
+	    di as txt "CUSUM Test for deviation from linearity -----------------"
+		di as txt "Max(CUSUM)= " as res %8.0g `cusum' as txt "  H= " %8.0g as res `H' "  `c'" _n
 	    return local cusum = "`c'"				// save
 		_lin, y(`y') x(`x') touse(`touse')
 		return scalar lin = `r(lin)'			// save

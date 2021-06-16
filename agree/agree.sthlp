@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.2.1 27apr2021}{...}
+{* *! version 1.2.2 30apr2021}{...}
 {viewerdialog agree "dialog agree"}{...}
 {viewerjumpto "Syntax" "agree##syntax"}{...}
 {viewerjumpto "Description" "agree##description"}{...}
@@ -48,6 +48,11 @@
 {p 4 4 2}
 Passing-Bablok and Bland-Altman methods of agreement. The command needs the names of the numeric variables
 with method X (reference) and method Y.
+
+{p 4 4 2}
+For the Passing-Bablok method of agreement, the CUSUM test for deviation from linearity is computed with 
+critical values obtained from the {it:Kolmogorov-Smirnov} test: 1.94947 (alpha=0.001); 1.62762 (alpha=0.01); 
+1.51743 (alpha=0.02); 1.35810 (alpha=0.05); 1.22385 (alpha=0.10); 1.13795 (alpha=0.15) and 1.07275 (alpha=0.20).
 
 {p 4 4}
 You can click {dialog agree:here} to pop up a {dialog agree:dialog} or type {inp: db agree}.
@@ -128,7 +133,7 @@ The command stores the following in {cmd:r()}:
 {title:Version}
 
 {p 4}
-Version 1.2.1 {hline 2} 27 April 2021
+Version 1.2.2 {hline 2} 30 April 2021
 
 
 {marker authors}{...}
@@ -146,7 +151,7 @@ stata@metodo.uab.cat{break}
 
 {p 4 6 2}
 Dom{c e'}nech JM. Passing-Bablok & Bland-Altman methods: User-written command agree for Stata [computer program].{break}
-V1.2.1. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2021.{break}
+V1.2.2. Bellaterra: Universitat Aut{c o'g}noma de Barcelona; 2021.{break}
 Available executing from Stata: net from http://metodo.uab.cat/stata{p_end}
 
 
